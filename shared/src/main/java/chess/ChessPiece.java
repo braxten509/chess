@@ -52,32 +52,29 @@ public class ChessPiece {
         var validMoves = new ArrayList<ChessMove>();
         var checkingPosition = new ChessPosition(myPosition.getRow(), myPosition.getColumn());
 
-        int currentCheckingRow = myPosition.getRow();
-        int currentCheckingCol = myPosition.getColumn();
+        while (true) {
+            // incrementing happens here
+            int newRow = checkingPosition.getRow() + rowChange;
+            int newCol = checkingPosition.getColumn() + colChange;
 
-        checkingPosition.setRowColumn(currentCheckingRow, currentCheckingCol);
-
-        while (checkingPosition.getRow() + rowChange >= 1 && checkingPosition.getColumn() + colChange >= 1
-                && checkingPosition.getRow() + rowChange <= 8 && checkingPosition.getColumn() + colChange <= 8) {
-
-            checkingPosition.setRowColumn(
-                    checkingPosition.getRow() + rowChange,
-                    checkingPosition.getColumn() + colChange
-            );
-
-            if (board.getPiece(checkingPosition) != null) {
-                var myPieceColor = board.getPiece(myPosition).pieceColor;
-                var otherPieceColor = board.getPiece(checkingPosition).pieceColor;
-
-                if (myPieceColor != otherPieceColor) {
-                    validMoves.add(new ChessMove(myPosition, checkingPosition, null));
-                } else {
-                    break;
-                }
+            if (newRow < 1 || newRow > 8 || newCol < 1 || newCol > 8) {
+                break;
             }
-            validMoves.add(new ChessMove(myPosition, checkingPosition, null));
-            currentCheckingRow += rowChange;
-            currentCheckingCol += colChange;
+
+            // if new coordinates are within bounds, apply them
+            // replace checking position with a new object so as not to reference the same one in memory
+            checkingPosition = new ChessPosition(newRow, newCol);
+            ChessPiece otherPiece = board.getPiece(checkingPosition);
+
+            if (otherPiece == null) {
+                validMoves.add(new ChessMove(myPosition, checkingPosition, null));
+                continue;
+            }
+
+            if (board.getPiece(myPosition).getTeamColor() != board.getPiece(checkingPosition).getTeamColor()) {
+                validMoves.add(new ChessMove(myPosition, checkingPosition, null));
+            }
+            break;
         }
 
         return validMoves;
@@ -116,12 +113,38 @@ public class ChessPiece {
         final int NOCHANGE = 0;
 
         if (selectedPieceType.type == PieceType.BISHOP) {
-            // diagonal left
+            // diagonal
             validMoves.addAll(checkAndReturnMoves(board, myPosition, DOWN, LEFT));
             validMoves.addAll(checkAndReturnMoves(board, myPosition, DOWN, RIGHT));
             validMoves.addAll(checkAndReturnMoves(board, myPosition, UP, LEFT));
             validMoves.addAll(checkAndReturnMoves(board, myPosition, UP, RIGHT));
         }
+
+        if (selectedPieceType.type == PieceType.ROOK) {
+            // horizontal
+            validMoves.addAll(checkAndReturnMoves(board, myPosition, DOWN, NOCHANGE));
+            validMoves.addAll(checkAndReturnMoves(board, myPosition, UP, NOCHANGE));
+            validMoves.addAll(checkAndReturnMoves(board, myPosition, NOCHANGE, LEFT));
+            validMoves.addAll(checkAndReturnMoves(board, myPosition, NOCHANGE, RIGHT));
+        }
+
+        if (selectedPieceType.type == PieceType.QUEEN) {
+            // diagonal
+            validMoves.addAll(checkAndReturnMoves(board, myPosition, DOWN, LEFT));
+            validMoves.addAll(checkAndReturnMoves(board, myPosition, DOWN, RIGHT));
+            validMoves.addAll(checkAndReturnMoves(board, myPosition, UP, LEFT));
+            validMoves.addAll(checkAndReturnMoves(board, myPosition, UP, RIGHT));
+
+            // horizontal
+            validMoves.addAll(checkAndReturnMoves(board, myPosition, DOWN, NOCHANGE));
+            validMoves.addAll(checkAndReturnMoves(board, myPosition, UP, NOCHANGE));
+            validMoves.addAll(checkAndReturnMoves(board, myPosition, NOCHANGE, LEFT));
+            validMoves.addAll(checkAndReturnMoves(board, myPosition, NOCHANGE, RIGHT));
+        }
+
+        /*
+         * ADD PAWN, KNIGHT, & KING (ONLY TESTS LEFT)
+         */
 
         return validMoves;
     }
