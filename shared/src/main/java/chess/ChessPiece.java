@@ -46,6 +46,42 @@ public class ChessPiece {
         return type;
     }
 
+    private Collection<ChessMove> checkAndReturnMoves(ChessBoard board, ChessPosition myPosition, int rowChange, int colChange) {
+
+        var validMoves = new ArrayList<ChessMove>();
+        var checkingPosition = new ChessPosition(myPosition.getRow(), myPosition.getColumn());
+
+        int currentCheckingRow = myPosition.getRow();
+        int currentCheckingCol = myPosition.getColumn();
+
+        checkingPosition.setRowColumn(currentCheckingRow, currentCheckingCol);
+
+        while (checkingPosition.getRow() + rowChange >= 1 && checkingPosition.getColumn() + colChange >= 1
+                && checkingPosition.getRow() + rowChange <= 8 && checkingPosition.getColumn() + colChange <= 8) {
+
+            checkingPosition.setRowColumn(
+                    checkingPosition.getRow() + rowChange,
+                    checkingPosition.getColumn() + colChange
+            );
+
+            if (board.getPiece(checkingPosition) != null) {
+                var myPieceColor = board.getPiece(myPosition).pieceColor;
+                var otherPieceColor = board.getPiece(checkingPosition).pieceColor;
+
+                if (myPieceColor != otherPieceColor) {
+                    validMoves.add(new ChessMove(myPosition, checkingPosition, null));
+                } else {
+                    break;
+                }
+            }
+            validMoves.add(new ChessMove(myPosition, checkingPosition, null));
+            currentCheckingRow += rowChange;
+            currentCheckingCol += colChange;
+        }
+
+        return validMoves;
+    }
+
     /**
      * Calculates all the positions a chess piece can move to
      * Does not take into account moves that are illegal due to leaving the king in
@@ -54,7 +90,24 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        // no moves [UNIMPLEMENTED]
-        return new ArrayList<>();
+
+        var selectedPieceType = board.getPiece(myPosition);
+        var validMoves = new ArrayList<ChessMove>();
+
+        final int UP = 1;
+        final int DOWN = -1;
+        final int RIGHT = 1;
+        final int LEFT = -1;
+        final int NOCHANGE = 0;
+
+        if (selectedPieceType.type == PieceType.BISHOP) {
+            // diagonal left
+            validMoves.addAll(checkAndReturnMoves(board, myPosition, DOWN, LEFT));
+            validMoves.addAll(checkAndReturnMoves(board, myPosition, DOWN, RIGHT));
+            validMoves.addAll(checkAndReturnMoves(board, myPosition, UP, LEFT));
+            validMoves.addAll(checkAndReturnMoves(board, myPosition, UP, RIGHT));
+        }
+
+        return validMoves;
     }
 }
