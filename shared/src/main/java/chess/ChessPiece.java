@@ -57,7 +57,7 @@ public class ChessPiece {
             int newRow = checkingPosition.getRow() + rowChange;
             int newCol = checkingPosition.getColumn() + colChange;
 
-            if (newRow < 1 || newRow > 8 || newCol < 1 || newCol > 8) {
+            if (!(newRow >= 1 && newRow <= 8 && newCol >= 1 && newCol <= 8)) {
                 break;
             }
 
@@ -144,6 +144,14 @@ public class ChessPiece {
 
         /*
          * ADD PAWN, KNIGHT, & KING (ONLY TESTS LEFT)
+         * KNIGHT:
+         * - Can only do an L shaped move in UP DOWN RIGHT LEFT and then facing two different ways in each direction
+         * PAWN:
+         * - Can move 2 tiles first turn
+         * - Only move 1 tile forward thereafter
+         * - Once reaches row 1 or 8, it will become a different piece
+         * KING:
+         * - Can only move 1 but in any direction
          */
 
         return validMoves;
