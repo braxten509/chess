@@ -35,36 +35,27 @@ public class ChessMove {
         return endPosition;
     }
 
+    private char numberToLetter(int number) {
+        char returnedLetter = ' ';
+
+        switch(number) {
+            case 1 -> returnedLetter = 'a';
+            case 2 -> returnedLetter = 'b';
+            case 3 -> returnedLetter = 'c';
+            case 4 -> returnedLetter = 'd';
+            case 5 -> returnedLetter = 'e';
+            case 6 -> returnedLetter = 'f';
+            case 7 -> returnedLetter = 'g';
+            case 8 -> returnedLetter = 'h';
+        }
+
+        return returnedLetter;
+    }
+
     @Override
     public String toString() {
-
-        char startColumnLetter = ' ';
-        char endColumnLetter = ' ';
-
-        switch(startPosition.getColumn()) {
-            case 1 -> startColumnLetter = 'a';
-            case 2 -> startColumnLetter = 'b';
-            case 3 -> startColumnLetter = 'c';
-            case 4 -> startColumnLetter = 'd';
-            case 5 -> startColumnLetter = 'e';
-            case 6 -> startColumnLetter = 'f';
-            case 7 -> startColumnLetter = 'g';
-            case 8 -> startColumnLetter = 'h';
-        }
-
-        switch(endPosition.getColumn()) {
-            case 1 -> endColumnLetter = 'a';
-            case 2 -> endColumnLetter = 'b';
-            case 3 -> endColumnLetter = 'c';
-            case 4 -> endColumnLetter = 'd';
-            case 5 -> endColumnLetter = 'e';
-            case 6 -> endColumnLetter = 'f';
-            case 7 -> endColumnLetter = 'g';
-            case 8 -> endColumnLetter = 'h';
-        }
-
-        return "startPosition=" + startColumnLetter + startPosition.getRow() +
-                ", endPosition=" + endColumnLetter + endPosition.getRow() +
+        return "startPosition=" + numberToLetter(startPosition.getColumn()) + startPosition.getRow() +
+                ", endPosition=" + numberToLetter(endPosition.getColumn()) + endPosition.getRow() +
                 ", promotionPiece=" + promotionPiece + '\n';
     }
 
