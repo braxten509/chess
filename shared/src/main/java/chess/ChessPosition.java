@@ -11,8 +11,8 @@ import java.util.Objects;
 public class ChessPosition {
 
     // parameters for this class
-    private int row;
-    private int col;
+    private final int row;
+    private final int col;
 
     public ChessPosition(int row, int col) {
         this.row = row;
@@ -47,10 +47,5 @@ public class ChessPosition {
     @Override
     public int hashCode() {
         return Objects.hash(row, col);
-    }
-
-    public void setRowColumn(int newRow, int newColumn) {
-        row = newRow;
-        col = newColumn;
     }
 }
