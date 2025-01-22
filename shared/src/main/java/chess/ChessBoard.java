@@ -1,5 +1,8 @@
 package chess;
 
+import java.util.Arrays;
+import java.util.Objects;
+
 /**
  * A chessboard that can hold and rearrange chess pieces.
  * <p>
@@ -21,7 +24,7 @@ public class ChessBoard {
      * @param piece    the piece to add
      */
     public void addPiece(ChessPosition position, ChessPiece piece) {
-        squares[position.getRow()][position.getColumn()] = piece;
+        squares[position.getRow()-1][position.getColumn()-1] = piece;
     }
     /**
      * Gets a chess piece on the chessboard
@@ -32,7 +35,7 @@ public class ChessBoard {
      */
     public ChessPiece getPiece(ChessPosition position) {
         // find the chess piece at these coordinates
-        return squares[position.getRow()][position.getColumn()];
+        return squares[position.getRow()-1][position.getColumn()-1];
     }
 
     /**
@@ -43,7 +46,7 @@ public class ChessBoard {
         // empty all squares
         for(int x = 1; x < 9; x++) {
             for(int y = 1; y < 9; y++) {
-                squares[x][y] = null;
+                squares[x-1][y-1] = null;
             }
         }
 
@@ -74,5 +77,64 @@ public class ChessBoard {
         for(int i = 1; i < 9; i++) {
             addPiece(new ChessPosition(7, i), new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN));
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        ChessBoard that = (ChessBoard) o;
+        return Objects.deepEquals(squares, that.squares);
+    }
+
+    // returns a string when the class is called
+    @Override
+    public String toString() {
+        StringBuilder returnString = new StringBuilder();
+
+        // row
+        for (int x = 8; x >= 1; x--) {
+            // column
+            returnString.append(x);
+            for (int y = 1; y <= 8; y++) {
+                ChessPiece piece = getPiece(new ChessPosition(x, y));
+                if (piece == null) {
+                    returnString.append(" -");
+                } else {
+                    var thisPieceType = getPiece(new ChessPosition(x, y)).getPieceType();
+                    var thisPieceColor = getPiece(new ChessPosition(x, y)).getTeamColor();
+
+                    if (thisPieceColor == ChessGame.TeamColor.WHITE) {
+                        switch (thisPieceType) {
+                            case ROOK -> returnString.append(" R");
+                            case KNIGHT -> returnString.append(" N");
+                            case BISHOP -> returnString.append(" B");
+                            case KING -> returnString.append(" K");
+                            case QUEEN -> returnString.append(" Q");
+                            case PAWN -> returnString.append(" P");
+                        }
+                    } else {
+                        switch (thisPieceType) {
+                            case ROOK -> returnString.append(" r");
+                            case KNIGHT -> returnString.append(" n");
+                            case BISHOP -> returnString.append(" b");
+                            case KING -> returnString.append(" k");
+                            case QUEEN -> returnString.append(" q");
+                            case PAWN -> returnString.append(" p");
+                        }
+                    }
+                }
+            }
+            returnString.append("\n");
+        }
+        returnString.append("  a b c d e f g h");
+
+        return returnString.toString();
+    }
+
+    @Override
+    public int hashCode() {
+        return Arrays.deepHashCode(squares);
     }
 }
