@@ -1,6 +1,5 @@
 package chess;
 
-import java.sql.Array;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Objects;
@@ -47,13 +46,21 @@ public class ChessPiece {
         return type;
     }
 
+    /**
+     * Finds valid moves in the given direction and returns them
+     * This takes into account the color and taking of enemy pieces
+     * @param board the board
+     * @param myPosition initial position
+     * @param rowChange the direction the piece will move diagonally (-1 or +1)
+     * @param colChange the direction the piece will move horizontally
+     * @return returns all valid moves
+     */
     private Collection<ChessMove> checkAndReturnMoves(ChessBoard board, ChessPosition myPosition, int rowChange, int colChange) {
 
         var validMoves = new ArrayList<ChessMove>();
         var checkingPosition = new ChessPosition(myPosition.getRow(), myPosition.getColumn());
 
         while (true) {
-            // incrementing happens here
             int newRow = checkingPosition.getRow() + rowChange;
             int newCol = checkingPosition.getColumn() + colChange;
 
@@ -61,8 +68,6 @@ public class ChessPiece {
                 break;
             }
 
-            // if new coordinates are within bounds, apply them
-            // replace checking position with a new object so as not to reference the same one in memory
             checkingPosition = new ChessPosition(newRow, newCol);
             ChessPiece otherPiece = board.getPiece(checkingPosition);
 
@@ -77,6 +82,46 @@ public class ChessPiece {
             break;
         }
 
+        return validMoves;
+    }
+
+    /**
+     * NOTE: ADD CAPTURING + PROMOTION
+     * calculates the moves a pawn can move excluding en peasant
+     * @param board game board
+     * @param myPosition initial pawn position
+     * @return returns valid moves (either one or two ahead)
+     */
+    private Collection<ChessMove> calculatePawnMoves(ChessBoard board, ChessPosition myPosition) {
+        var validMoves = new ArrayList<ChessMove>();
+        var checkingPosition = new ChessPosition(myPosition.getRow(), myPosition.getColumn());
+
+        // check 1 ahead white
+        if (board.getPiece(myPosition).getTeamColor() == ChessGame.TeamColor.WHITE) {
+            checkingPosition = new ChessPosition(myPosition.getRow() + 1, myPosition.getColumn() + 1);
+
+            if (board.getPiece(checkingPosition) == null) {
+                validMoves.add(new ChessMove(myPosition, checkingPosition, null));
+            }
+
+            checkingPosition = new ChessPosition(myPosition.getRow() + 2, myPosition.getColumn() + 2);
+            if (myPosition.getRow() == 2 && board.getPiece(checkingPosition) == null) {
+                validMoves.add(new ChessMove(myPosition, checkingPosition, null));
+            }
+        }
+
+        if (board.getPiece(myPosition).getTeamColor() == ChessGame.TeamColor.BLACK) {
+            checkingPosition = new ChessPosition(myPosition.getRow() - 1, myPosition.getColumn() - 1);
+
+            if (board.getPiece(checkingPosition) == null) {
+                validMoves.add(new ChessMove(myPosition, checkingPosition, null));
+            }
+
+            checkingPosition = new ChessPosition(myPosition.getRow() - 2, myPosition.getColumn() - 2);
+            if (myPosition.getRow() == 7 && board.getPiece(checkingPosition) == null) {
+                validMoves.add(new ChessMove(myPosition, checkingPosition, null));
+            }
+        }
         return validMoves;
     }
 
@@ -140,6 +185,10 @@ public class ChessPiece {
             validMoves.addAll(checkAndReturnMoves(board, myPosition, UP, NOCHANGE));
             validMoves.addAll(checkAndReturnMoves(board, myPosition, NOCHANGE, LEFT));
             validMoves.addAll(checkAndReturnMoves(board, myPosition, NOCHANGE, RIGHT));
+        }
+
+        if (selectedPieceType.type == PieceType.PAWN) {
+            validMoves.addAll(calculatePawnMoves(board, myPosition));
         }
 
         /*

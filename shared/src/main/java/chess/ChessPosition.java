@@ -10,7 +10,7 @@ import java.util.Objects;
  */
 public class ChessPosition {
 
-    // parameters for this class (fixed)
+    // parameters for this class
     private final int row;
     private final int col;
 
