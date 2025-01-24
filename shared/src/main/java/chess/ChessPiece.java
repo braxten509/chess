@@ -318,6 +318,78 @@ public class ChessPiece {
         return validMoves;
     }
 
+    private Collection<ChessMove> calculateKnightMoves(ChessBoard board, ChessPosition myPosition) {
+        var validMoves = new ArrayList<ChessMove>();
+        var thisPieceColor = board.getPiece(myPosition).getTeamColor();
+        var checkingPosition = new ChessPosition(myPosition.getRow(), myPosition.getColumn());
+
+        if (isInBounds(myPosition, UP * 2, RIGHT)) {
+            checkingPosition = new ChessPosition(myPosition.getRow() + (UP * 2), myPosition.getColumn() + RIGHT);
+
+            if ((board.getPiece(checkingPosition) == null) || (board.getPiece(checkingPosition).getTeamColor() != thisPieceColor)) {
+                validMoves.add(new ChessMove(myPosition, checkingPosition, null));
+            }
+        }
+
+        if (isInBounds(myPosition, UP * 2, LEFT)) {
+            checkingPosition = new ChessPosition(myPosition.getRow() + (UP * 2), myPosition.getColumn() + LEFT);
+
+            if ((board.getPiece(checkingPosition) == null) || (board.getPiece(checkingPosition).getTeamColor() != thisPieceColor)) {
+                validMoves.add(new ChessMove(myPosition, checkingPosition, null));
+            }
+        }
+
+        if (isInBounds(myPosition, DOWN * 2, RIGHT)) {
+            checkingPosition = new ChessPosition(myPosition.getRow() + (DOWN * 2), myPosition.getColumn() + RIGHT);
+
+            if ((board.getPiece(checkingPosition) == null) || (board.getPiece(checkingPosition).getTeamColor() != thisPieceColor)) {
+                validMoves.add(new ChessMove(myPosition, checkingPosition, null));
+            }
+        }
+
+        if (isInBounds(myPosition, DOWN * 2, LEFT)) {
+            checkingPosition = new ChessPosition(myPosition.getRow() + (DOWN * 2), myPosition.getColumn() + LEFT);
+
+            if ((board.getPiece(checkingPosition) == null) || (board.getPiece(checkingPosition).getTeamColor() != thisPieceColor)) {
+                validMoves.add(new ChessMove(myPosition, checkingPosition, null));
+            }
+        }
+
+        if (isInBounds(myPosition, UP, RIGHT * 2)) {
+            checkingPosition = new ChessPosition(myPosition.getRow() + UP, myPosition.getColumn() + (RIGHT * 2));
+
+            if ((board.getPiece(checkingPosition) == null) || (board.getPiece(checkingPosition).getTeamColor() != thisPieceColor)) {
+                validMoves.add(new ChessMove(myPosition, checkingPosition, null));
+            }
+        }
+
+        if (isInBounds(myPosition, DOWN, RIGHT * 2)) {
+            checkingPosition = new ChessPosition(myPosition.getRow() + DOWN, myPosition.getColumn() + (RIGHT * 2));
+
+            if ((board.getPiece(checkingPosition) == null) || (board.getPiece(checkingPosition).getTeamColor() != thisPieceColor)) {
+                validMoves.add(new ChessMove(myPosition, checkingPosition, null));
+            }
+        }
+
+        if (isInBounds(myPosition, UP, LEFT * 2)) {
+            checkingPosition = new ChessPosition(myPosition.getRow() + UP, myPosition.getColumn() + (LEFT * 2));
+
+            if ((board.getPiece(checkingPosition) == null) || (board.getPiece(checkingPosition).getTeamColor() != thisPieceColor)) {
+                validMoves.add(new ChessMove(myPosition, checkingPosition, null));
+            }
+        }
+
+        if (isInBounds(myPosition, DOWN, LEFT * 2)) {
+            checkingPosition = new ChessPosition(myPosition.getRow() + DOWN, myPosition.getColumn() + (LEFT * 2));
+
+            if ((board.getPiece(checkingPosition) == null) || (board.getPiece(checkingPosition).getTeamColor() != thisPieceColor)) {
+                validMoves.add(new ChessMove(myPosition, checkingPosition, null));
+            }
+        }
+
+        return validMoves;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) {
@@ -380,6 +452,10 @@ public class ChessPiece {
 
         if (selectedPieceType.type == PieceType.KING) {
             validMoves.addAll(calculateKingMoves(board, myPosition));
+        }
+
+        if (selectedPieceType.type == PieceType.KNIGHT) {
+            validMoves.addAll(calculateKnightMoves(board, myPosition));
         }
 
         /*
