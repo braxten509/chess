@@ -52,13 +52,6 @@ public class ChessMove {
         return returnedLetter;
     }
 
-    @Override
-    public String toString() {
-        return "startPosition=" + numberToLetter(startPosition.getColumn()) + startPosition.getRow() +
-                ", endPosition=" + numberToLetter(endPosition.getColumn()) + endPosition.getRow() +
-                ", promotionPiece=" + promotionPiece + '\n';
-    }
-
     /**
      * Gets the type of piece to promote a pawn to if pawn promotion is part of this
      * chess move
@@ -67,6 +60,13 @@ public class ChessMove {
      */
     public ChessPiece.PieceType getPromotionPiece() {
         return promotionPiece;
+    }
+
+    @Override
+    public String toString() {
+        return "startPosition=" + numberToLetter(startPosition.getColumn()) + startPosition.getRow() +
+                ", endPosition=" + numberToLetter(endPosition.getColumn()) + endPosition.getRow() +
+                ", promotionPiece=" + promotionPiece + '\n';
     }
 
     @Override

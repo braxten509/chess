@@ -12,6 +12,12 @@ import java.util.Objects;
  */
 public class ChessPiece {
 
+    final int UP = 1;
+    final int DOWN = -1;
+    final int RIGHT = 1;
+    final int LEFT = -1;
+    final int NOCHANGE = 0;
+
     private final ChessGame.TeamColor pieceColor;
     private final PieceType type;
 
@@ -85,8 +91,14 @@ public class ChessPiece {
         return validMoves;
     }
 
+    private boolean isInBounds(ChessPosition myPosition, int rowChange, int colChange) {
+        int newRow = myPosition.getRow() + rowChange;
+        int newCol = myPosition.getColumn() + colChange;
+        return newRow >= 1 && newRow <= 8 && newCol >= 1 && newCol <= 8;
+    }
+
     /**
-     * NOTE: ADD CAPTURING + PROMOTION
+     * NOTE: OUT OF BOUNDS DETECTION
      * calculates the moves a pawn can move excluding en peasant
      * @param board game board
      * @param myPosition initial pawn position
@@ -94,34 +106,93 @@ public class ChessPiece {
      */
     private Collection<ChessMove> calculatePawnMoves(ChessBoard board, ChessPosition myPosition) {
         var validMoves = new ArrayList<ChessMove>();
+        var thisPieceColor = board.getPiece(myPosition).getTeamColor();
         var checkingPosition = new ChessPosition(myPosition.getRow(), myPosition.getColumn());
 
-        // check 1 ahead white
         if (board.getPiece(myPosition).getTeamColor() == ChessGame.TeamColor.WHITE) {
-            checkingPosition = new ChessPosition(myPosition.getRow() + 1, myPosition.getColumn() + 1);
 
-            if (board.getPiece(checkingPosition) == null) {
-                validMoves.add(new ChessMove(myPosition, checkingPosition, null));
+            if (isInBounds(myPosition, UP, NOCHANGE)) {
+                checkingPosition = new ChessPosition(myPosition.getRow() + UP, myPosition.getColumn());
+
+                if (checkingPosition.getRow() == 8 && board.getPiece(checkingPosition) == null) {
+                    validMoves.add(new ChessMove(myPosition, checkingPosition, PieceType.QUEEN));
+                    validMoves.add(new ChessMove(myPosition, checkingPosition, PieceType.KNIGHT));
+                    validMoves.add(new ChessMove(myPosition, checkingPosition, PieceType.BISHOP));
+                    validMoves.add(new ChessMove(myPosition, checkingPosition, PieceType.ROOK));
+
+                } else if (board.getPiece(checkingPosition) == null) {
+                    validMoves.add(new ChessMove(myPosition, checkingPosition, null));
+
+                }
             }
 
-            checkingPosition = new ChessPosition(myPosition.getRow() + 2, myPosition.getColumn() + 2);
-            if (myPosition.getRow() == 2 && board.getPiece(checkingPosition) == null) {
-                validMoves.add(new ChessMove(myPosition, checkingPosition, null));
+            if (isInBounds(myPosition, UP*2, NOCHANGE)) {
+                checkingPosition = new ChessPosition(myPosition.getRow() + (UP * 2), myPosition.getColumn());
+
+                if (myPosition.getRow() == 2 && board.getPiece(checkingPosition) == null) {
+                    validMoves.add(new ChessMove(myPosition, checkingPosition, null));
+                }
+            }
+
+            if (isInBounds(myPosition, UP, RIGHT)) {
+                checkingPosition = new ChessPosition(myPosition.getRow() + UP, myPosition.getColumn() + RIGHT);
+
+                if (board.getPiece(checkingPosition) != null && thisPieceColor != board.getPiece(checkingPosition).getTeamColor()) {
+                    validMoves.add(new ChessMove(myPosition, checkingPosition, null));
+                }
+            }
+
+            if (isInBounds(myPosition, UP, LEFT)) {
+                checkingPosition = new ChessPosition(myPosition.getRow() + UP, myPosition.getColumn() + LEFT);
+
+                if (board.getPiece(checkingPosition) != null && thisPieceColor != board.getPiece(checkingPosition).getTeamColor()) {
+                    validMoves.add(new ChessMove(myPosition, checkingPosition, null));
+                }
             }
         }
 
         if (board.getPiece(myPosition).getTeamColor() == ChessGame.TeamColor.BLACK) {
-            checkingPosition = new ChessPosition(myPosition.getRow() - 1, myPosition.getColumn() - 1);
 
-            if (board.getPiece(checkingPosition) == null) {
-                validMoves.add(new ChessMove(myPosition, checkingPosition, null));
+            if (isInBounds(myPosition, DOWN, NOCHANGE)) {
+                checkingPosition = new ChessPosition(myPosition.getRow() + DOWN, myPosition.getColumn());
+
+                if (checkingPosition.getRow() == 1 && board.getPiece(checkingPosition) == null) {
+                    validMoves.add(new ChessMove(myPosition, checkingPosition, PieceType.QUEEN));
+                    validMoves.add(new ChessMove(myPosition, checkingPosition, PieceType.KNIGHT));
+                    validMoves.add(new ChessMove(myPosition, checkingPosition, PieceType.BISHOP));
+                    validMoves.add(new ChessMove(myPosition, checkingPosition, PieceType.ROOK));
+
+                } else if (board.getPiece(checkingPosition) == null) {
+                    validMoves.add(new ChessMove(myPosition, checkingPosition, null));
+
+                }
             }
 
-            checkingPosition = new ChessPosition(myPosition.getRow() - 2, myPosition.getColumn() - 2);
-            if (myPosition.getRow() == 7 && board.getPiece(checkingPosition) == null) {
-                validMoves.add(new ChessMove(myPosition, checkingPosition, null));
+            if (isInBounds(myPosition, DOWN*2, NOCHANGE)) {
+                checkingPosition = new ChessPosition(myPosition.getRow() + (DOWN * 2), myPosition.getColumn());
+
+                if (myPosition.getRow() == 7 && board.getPiece(checkingPosition) == null) {
+                    validMoves.add(new ChessMove(myPosition, checkingPosition, null));
+                }
+            }
+
+            if (isInBounds(myPosition, DOWN, RIGHT)) {
+                checkingPosition = new ChessPosition(myPosition.getRow() + DOWN, myPosition.getColumn() + RIGHT);
+
+                if (board.getPiece(checkingPosition) != null && thisPieceColor != board.getPiece(checkingPosition).getTeamColor()) {
+                    validMoves.add(new ChessMove(myPosition, checkingPosition, null));
+                }
+            }
+
+            if (isInBounds(myPosition, DOWN, LEFT)) {
+                checkingPosition = new ChessPosition(myPosition.getRow() + DOWN, myPosition.getColumn() + LEFT);
+
+                if (board.getPiece(checkingPosition) != null && thisPieceColor != board.getPiece(checkingPosition).getTeamColor()) {
+                    validMoves.add(new ChessMove(myPosition, checkingPosition, null));
+                }
             }
         }
+
         return validMoves;
     }
 
@@ -150,12 +221,6 @@ public class ChessPiece {
 
         var selectedPieceType = board.getPiece(myPosition);
         var validMoves = new ArrayList<ChessMove>();
-
-        final int UP = 1;
-        final int DOWN = -1;
-        final int RIGHT = 1;
-        final int LEFT = -1;
-        final int NOCHANGE = 0;
 
         if (selectedPieceType.type == PieceType.BISHOP) {
             // diagonal
