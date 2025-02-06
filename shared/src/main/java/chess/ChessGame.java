@@ -1,5 +1,6 @@
 package chess;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 /**
@@ -13,13 +14,13 @@ public class ChessGame {
     TeamColor turn = TeamColor.WHITE;
     ChessBoard board = new ChessBoard();
 
+    public ChessGame() {
+
+    }
+
     public ChessGame(TeamColor turn, ChessBoard board) {
         this.turn = turn;
         this.board = board;
-    }
-
-    public ChessGame() {
-
     }
 
     /**
@@ -75,7 +76,8 @@ public class ChessGame {
 
         final ChessPiece movingPiece = board.getPiece(start);
         if (movingPiece == null) {
-            throw new InvalidMoveException("Invalid move");
+            return;
+            //throw new InvalidMoveException("Invalid move");
         }
 
         final TeamColor color = board.getPiece(start).getTeamColor();
@@ -97,7 +99,31 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        var enemyPossibleMoves = new ArrayList<ChessMove>();
+        ChessPosition thisKingsPosition = null;
+
+        for (int x = 1; x <= 8; x++) {
+            for (int y = 1; y <= 8; y++) {
+                var checkingPosition = new ChessPosition(x, y);
+                var checkingPiece = board.getPiece(checkingPosition);
+
+                if (checkingPiece == null) continue;
+
+                var checkingPieceColor = checkingPiece.getTeamColor();
+                var checkingPieceType = checkingPiece.getPieceType();
+
+                if (checkingPieceColor == teamColor && checkingPieceType == ChessPiece.PieceType.KING) {
+                   thisKingsPosition = checkingPosition;
+                }
+
+                if (checkingPieceColor == teamColor) continue;
+
+                enemyPossibleMoves.addAll(checkingPiece.pieceMoves(board, checkingPosition));
+            }
+        }
+
+        final ChessPosition finalThisKingsPosition = thisKingsPosition;
+        return enemyPossibleMoves.stream().anyMatch(move -> move.getEndPosition().equals(finalThisKingsPosition));
     }
 
     /**
