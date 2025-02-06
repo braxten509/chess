@@ -47,6 +47,7 @@ public class ChessGame {
     }
 
     /**
+     * TODO: THIS METHOD MUST ACCOUNT FOR CHECK!
      * Gets a valid moves for a piece at the given location
      *
      * @param startPosition the piece to get valid moves for
@@ -54,10 +55,15 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-        throw new RuntimeException("Not implemented");
+        if (board.getPiece(startPosition) == null) {
+            return null;
+        }
+
+        return board.getPiece(startPosition).pieceMoves(board, startPosition);
     }
 
     /**
+     * TODO: TAKE INTO ACCOUNT ONLY VALID MOVES
      * Makes a move in a chess game
      *
      * @param move chess move to preform
