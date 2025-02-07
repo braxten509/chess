@@ -100,11 +100,32 @@ public class ChessGame {
         board.removePiece(start);
     }
 
+    public void makeAnyMove(ChessMove move, ChessBoard board) {
+        final ChessPosition start = move.getStartPosition();
+        final ChessPosition end = move.getEndPosition();
+
+        final ChessPiece movingPiece = board.getPiece(start);
+        if (movingPiece == null) {
+            return;
+        }
+
+        final TeamColor color = board.getPiece(start).getTeamColor();
+        final ChessPiece.PieceType promotionPiece = move.getPromotionPiece();
+
+        if (promotionPiece != null) {
+            board.addPiece(end, new ChessPiece(color, promotionPiece));
+        } else {
+            board.addPiece(end, movingPiece);
+        }
+
+        board.removePiece(start);
+    }
+
     /**
      * @param teamColor of the team
      * @return collection of enemy moves for every piece
      */
-    private ArrayList<ChessMove> teamsPossibleMoves(TeamColor teamColor) {
+    private ArrayList<ChessMove> teamsPossibleMoves(TeamColor teamColor, ChessBoard board) {
         var possibleMoves = new ArrayList<ChessMove>();
 
         for (int x = 1; x <= 8; x++) {
@@ -173,31 +194,19 @@ public class ChessGame {
         final ChessPosition thisKingsPosition = findKing(teamColor);
 
         final TeamColor enemyColor = (teamColor == TeamColor.WHITE) ? TeamColor.BLACK : TeamColor.WHITE;
-        var enemyPossibleMoves = teamsPossibleMoves(enemyColor);
+        var enemyPossibleMoves = teamsPossibleMoves(enemyColor, board);
 
         return enemyPossibleMoves.stream().anyMatch(move -> move.getEndPosition().equals(thisKingsPosition));
     }
 
-    /**
-     * Determines if the given team is in checkmate
-     *
-     * @param teamColor which team to check for checkmate
-     * @return True if the specified team is in checkmate
-     */
-    public boolean isInCheckmate(TeamColor teamColor) {
+    private boolean canKingMove(TeamColor teamColor, ChessBoard board) {
         final ChessPosition kingPosition = findKing(teamColor);
         final Collection<ChessMove> kingsMoves = board.getPiece(kingPosition).pieceMoves(board, kingPosition);
 
-        // is the king in check?
-
-        if (!isInCheck(teamColor)) return false;
-
         final TeamColor enemyColor = (teamColor == TeamColor.WHITE) ? TeamColor.BLACK : TeamColor.WHITE;
-        final Collection<ChessMove> enemyPossibleMoves = teamsPossibleMoves(enemyColor);
+        final Collection<ChessMove> enemyPossibleMoves = teamsPossibleMoves(enemyColor, board);
 
-        // can the king move?
-
-        boolean isKingPinned = false;
+        boolean canMove = true;
 
         Set<ChessPosition> kingEndPositions = new HashSet<>();
         Set<ChessPosition> enemyEndPositions = new HashSet<>();
@@ -213,12 +222,69 @@ public class ChessGame {
         }
 
         if (enemyEndPositions.containsAll(kingEndPositions)) {
-            isKingPinned = true;
+            canMove = false;
         }
+
+        return canMove;
+    }
+
+    /**
+     * Determines if the given team is in checkmate
+     *
+     * @param teamColor which team to check for checkmate
+     * @return True if the specified team is in checkmate
+     */
+    public boolean isInCheckmate(TeamColor teamColor) {
+        final ChessPosition kingPosition = findKing(teamColor);
+        // final Collection<ChessMove> kingsMoves = board.getPiece(kingPosition).pieceMoves(board, kingPosition);
+
+        // is the king in check?
+
+        if (!isInCheck(teamColor)) {
+            return false;
+        }
+
+        final TeamColor enemyColor = (teamColor == TeamColor.WHITE) ? TeamColor.BLACK : TeamColor.WHITE;
+        // final Collection<ChessMove> enemyPossibleMoves = teamsPossibleMoves(enemyColor, board);
+
+        // can the king move?
+
+        boolean canMove = canKingMove(teamColor, board);
+
+//        boolean isKingPinned = false;
+//
+//        Set<ChessPosition> kingEndPositions = new HashSet<>();
+//        Set<ChessPosition> enemyEndPositions = new HashSet<>();
+//
+//        for (ChessMove kingMove : kingsMoves) {
+//            final ChessPosition kingEndPosition = kingMove.getEndPosition();
+//            kingEndPositions.add(kingEndPosition);
+//
+//            for (ChessMove enemyMove : enemyPossibleMoves) {
+//                final ChessPosition enemyEndPosition = enemyMove.getEndPosition();
+//                enemyEndPositions.add(enemyEndPosition);
+//            }
+//        }
+//
+//        if (enemyEndPositions.containsAll(kingEndPositions)) {
+//            isKingPinned = true;
+//        }
 
         // can any piece's move get the king out of check or give him a place to move to?
 
-        ChessBoard copyBoard = new ChessBoard();
+        Set<ChessMove> thisTeamsMoves = new HashSet<>(teamsPossibleMoves(teamColor, board));
+
+        for (ChessMove move : thisTeamsMoves) {
+            ChessBoard copyBoard = board.copyBoard();
+            makeAnyMove(move, copyBoard);
+
+            boolean canKingNowMove = canKingMove(teamColor, copyBoard);
+            boolean gameOver = !canKingNowMove;
+
+            if (canKingNowMove) {
+
+            }
+        }
 
 
 

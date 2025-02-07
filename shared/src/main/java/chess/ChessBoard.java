@@ -85,6 +85,24 @@ public class ChessBoard {
         }
     }
 
+    public ChessBoard copyBoard() {
+        ChessBoard copy = new ChessBoard();
+        copy.emptyBoard();
+
+        for (int x = 1; x <= 8; x++) {
+            for (int y = 1; y <= 8; y++) {
+                final ChessPosition checkingPosition = new ChessPosition(x, y);
+                final ChessPiece checkingPiece = this.getPiece(checkingPosition);
+
+                if (checkingPiece != null) {
+                    copy.addPiece(checkingPosition, new ChessPiece(checkingPiece.getTeamColor(), checkingPiece.getPieceType()));
+                }
+            }
+        }
+
+        return copy;
+    }
+
     /**
      * this == o checks to see if the objects are the same memory location
      * o == null checks to see if what is being compared is not an object
