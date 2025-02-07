@@ -93,6 +93,7 @@ public class ChessGame {
     }
 
     /**
+     * TODO: FIX
      * Determines if the given team is in check
      *
      * @param teamColor which team to check for check
@@ -120,6 +121,10 @@ public class ChessGame {
 
                 enemyPossibleMoves.addAll(checkingPiece.pieceMoves(board, checkingPosition));
             }
+        }
+
+        if (thisKingsPosition == null) {
+            throw new RuntimeException("No king is on the board");
         }
 
         final ChessPosition finalThisKingsPosition = thisKingsPosition;
