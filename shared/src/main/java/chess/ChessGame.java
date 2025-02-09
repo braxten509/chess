@@ -66,7 +66,9 @@ public class ChessGame {
     }
 
     final TeamColor teamColor = piece.getTeamColor();
-    final HashSet<ChessMove> possibleMoves = new HashSet<>(board.getPiece(startPosition).pieceMoves(board, startPosition));
+    final HashSet<ChessMove> possibleMoves = new HashSet<>(
+      board.getPiece(startPosition).pieceMoves(board, startPosition)
+    );
     HashSet<ChessMove> invalidMoves = new HashSet<>();
 
     for (ChessMove move : possibleMoves) {
@@ -103,7 +105,6 @@ public class ChessGame {
       throw new InvalidMoveException("Invalid move");
     }
 
-
     final TeamColor teamColor = board.getPiece(start).getTeamColor();
     final ChessPiece.PieceType promotionPiece = move.getPromotionPiece();
 
@@ -116,8 +117,8 @@ public class ChessGame {
     board.removePiece(start);
 
     final TeamColor enemyColor = (teamColor == TeamColor.WHITE)
-            ? TeamColor.BLACK
-            : TeamColor.WHITE;
+      ? TeamColor.BLACK
+      : TeamColor.WHITE;
 
     setTeamTurn(enemyColor);
   }
@@ -176,8 +177,8 @@ public class ChessGame {
    * @return collection of enemy moves for every piece
    */
   private HashSet<ChessMove> getTeamsValidMoves(
-          TeamColor teamColor,
-          ChessBoard board
+    TeamColor teamColor,
+    ChessBoard board
   ) {
     var teamsValidMoves = new HashSet<ChessMove>();
 
@@ -269,8 +270,10 @@ public class ChessGame {
     final ChessPosition thisKingsPosition = findKing(teamColor, copyBoard);
 
     return enemyPossibleMoves
-            .stream()
-            .anyMatch(enemyMove -> enemyMove.getEndPosition().equals(thisKingsPosition));
+      .stream()
+      .anyMatch(enemyMove ->
+        enemyMove.getEndPosition().equals(thisKingsPosition)
+      );
   }
 
   /**
@@ -334,7 +337,9 @@ public class ChessGame {
       return NOT_IN_CHECKMATE;
     }
 
-    if (getTeamsValidMoves(teamColor, board).isEmpty() && isInCheck(teamColor)) {
+    if (
+      getTeamsValidMoves(teamColor, board).isEmpty() && isInCheck(teamColor)
+    ) {
       return IN_CHECKMATE;
     }
 
@@ -352,7 +357,9 @@ public class ChessGame {
     final boolean IN_STALEMATE = true;
     final boolean NOT_IN_STALEMATE = false;
 
-    if (getTeamsValidMoves(teamColor, board).isEmpty() && !isInCheck(teamColor)) {
+    if (
+      getTeamsValidMoves(teamColor, board).isEmpty() && !isInCheck(teamColor)
+    ) {
       return IN_STALEMATE;
     }
 
