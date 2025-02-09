@@ -23,7 +23,10 @@ public class ChessGame {
   TeamColor turn = TeamColor.WHITE;
   ChessBoard board = new ChessBoard();
 
-  public ChessGame() {}
+  // default constructor is used when a new object is created
+  public ChessGame() {
+    board.resetBoard();
+  }
 
   public ChessGame(TeamColor turn, ChessBoard board) {
     this.turn = turn;
@@ -55,7 +58,6 @@ public class ChessGame {
   }
 
   /**
-   * TODO: THIS METHOD MUST ACCOUNT FOR CHECK!
    * Gets a valid moves for a piece at the given location
    *
    * @param startPosition the piece to get valid moves for
@@ -71,7 +73,6 @@ public class ChessGame {
   }
 
   /**
-   * TODO: TAKE INTO ACCOUNT ONLY VALID MOVES
    * Makes a move in a chess game
    *
    * @param move chess move to preform
@@ -83,8 +84,7 @@ public class ChessGame {
 
     final ChessPiece movingPiece = board.getPiece(start);
     if (movingPiece == null) {
-      return;
-      //throw new InvalidMoveException("Invalid move");
+      throw new InvalidMoveException("Invalid move");
     }
 
     final TeamColor color = board.getPiece(start).getTeamColor();
@@ -124,9 +124,7 @@ public class ChessGame {
    * @param teamColor of the team
    * @return collection of enemy moves for every piece
    */
-  private ArrayList<ChessMove> teamsPossibleMoves(
-    TeamColor teamColor,
-    ChessBoard board
+  private ArrayList<ChessMove> teamsPossibleMoves(TeamColor teamColor, ChessBoard board
   ) {
     var possibleMoves = new ArrayList<ChessMove>();
 
@@ -182,16 +180,6 @@ public class ChessGame {
     return thisKingsPosition;
   }
 
-  private boolean isInBounds(
-    ChessPosition myPosition,
-    int rowChange,
-    int colChange
-  ) {
-    int newRow = myPosition.getRow() + rowChange;
-    int newCol = myPosition.getColumn() + colChange;
-    return newRow >= 1 && newRow <= 8 && newCol >= 1 && newCol <= 8;
-  }
-
   /**
    * Determines if the given team is in check
    *
@@ -206,9 +194,13 @@ public class ChessGame {
       : TeamColor.WHITE;
     var enemyPossibleMoves = teamsPossibleMoves(enemyColor, board);
 
-    return enemyPossibleMoves
-      .stream()
-      .anyMatch(move -> move.getEndPosition().equals(thisKingsPosition));
+    for (ChessMove move : enemyPossibleMoves) {
+      if (move.getEndPosition().equals(thisKingsPosition)) {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   public boolean isInCheckCopy(TeamColor teamColor, ChessBoard board) {
@@ -268,6 +260,10 @@ public class ChessGame {
     return false;
   }
 
+  private void print(Object text) {
+    System.out.println(text);
+  }
+
   /**
    * Determines if the given team is in checkmate
    *
@@ -275,7 +271,7 @@ public class ChessGame {
    * @return True if the specified team is in checkmate
    */
   public boolean isInCheckmate(TeamColor teamColor) {
-    System.out.println(board);
+    print(board);
 
     if (canKingMove(teamColor, board)) {
       return false;
@@ -288,7 +284,23 @@ public class ChessGame {
       ChessBoard copyBoard = board.copyBoard();
       makeAnyMove(move, copyBoard);
 
-      if (canKingMove(teamColor, copyBoard)) {
+      if (
+        copyBoard.getPiece(move.getEndPosition()) != null &&
+        copyBoard.getPiece(move.getEndPosition()).getPieceType() ==
+        ChessPiece.PieceType.KING
+      ) {
+        TeamColor enemyColor = (teamColor == TeamColor.WHITE)
+          ? TeamColor.BLACK
+          : TeamColor.WHITE;
+        var enemyMoves = teamsPossibleMoves(enemyColor, copyBoard);
+
+        for (ChessMove enemyMove : enemyMoves) {
+          if (enemyMove.getEndPosition().equals(move.getEndPosition())) {
+            return true;
+          }
+        }
+      } else if (canKingMove(teamColor, copyBoard)) {
+        print("pass");
         return false;
       }
     }
@@ -304,7 +316,13 @@ public class ChessGame {
    * @return True if the specified team is in stalemate, otherwise false
    */
   public boolean isInStalemate(TeamColor teamColor) {
-    throw new RuntimeException("Not implemented");
+    TeamColor enemyColor = (teamColor == TeamColor.WHITE)
+      ? TeamColor.BLACK
+      : TeamColor.WHITE;
+    var thisTeamsMoves = teamsPossibleMoves(teamColor, board);
+    var enemyTeamsMoves = teamsPossibleMoves(enemyColor, board);
+
+    return thisTeamsMoves.isEmpty() && enemyTeamsMoves.isEmpty();
   }
 
   /**
@@ -313,7 +331,18 @@ public class ChessGame {
    * @param board the new board to use
    */
   public void setBoard(ChessBoard board) {
-    board.resetBoard();
+    this.board.emptyBoard();
+
+    for (int x = 1; x <= 8; x++) {
+      for (int y = 1; y <= 8; y++) {
+        ChessPosition checkingPosition = new ChessPosition(x, y);
+        ChessPiece pieceCopying = board.getPiece(checkingPosition);
+        if (pieceCopying == null) {
+          continue;
+        }
+        this.board.addPiece(checkingPosition, board.getPiece(checkingPosition));
+      }
+    }
   }
 
   /**
