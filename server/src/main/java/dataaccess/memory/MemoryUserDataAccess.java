@@ -2,9 +2,9 @@ package dataaccess.memory;
 
 import dataaccess.DataAccessException;
 import dataaccess.UserDataAccess;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+
+import java.util.*;
+
 import model.AuthData;
 import model.UserData;
 
@@ -17,7 +17,7 @@ public class MemoryUserDataAccess implements UserDataAccess {
   }
 
   @Override
-  public UserData getUser(String username) {
+  public UserData getUser(String username) throws DataAccessException {
     return users.get(username);
   }
 
@@ -34,5 +34,10 @@ public class MemoryUserDataAccess implements UserDataAccess {
   @Override
   public void clear() throws DataAccessException {
     users.clear();
+  }
+
+  @Override
+  public Collection<UserData> listUsers() throws DataAccessException {
+    return users.values();
   }
 }

@@ -5,11 +5,12 @@ import dataaccess.DataAccessException;
 import dataaccess.UserDataAccess;
 import dataaccess.memory.MemoryAuthDataAccess;
 import dataaccess.memory.MemoryUserDataAccess;
-import javax.xml.crypto.Data;
 import model.AuthData;
 import model.RegisterRequest;
 import model.RegisterResult;
 import model.UserData;
+
+import java.util.Collection;
 
 public class UserService {
 
@@ -27,6 +28,14 @@ public class UserService {
   public void clearDataAccess() throws DataAccessException {
     userDataAccess.clear();
     authDataAccess.clear();
+  }
+
+  public UserData getUser(String username) throws DataAccessException {
+    return userDataAccess.getUser(username);
+  }
+
+  public Collection<UserData> listUsers() throws DataAccessException {
+    return userDataAccess.listUsers();
   }
 
   public RegisterResult register(RegisterRequest registerRequest)
