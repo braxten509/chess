@@ -1,4 +1,3 @@
 package model;
 
-public record LoginResult() {
-}
+public record LoginResult() {}

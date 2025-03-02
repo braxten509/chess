@@ -1,4 +1,3 @@
 package dataaccess;
 
-public interface GameDataAccess {
-}
+public interface GameDataAccess {}

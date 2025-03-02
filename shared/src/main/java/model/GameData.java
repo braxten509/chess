@@ -1,4 +1,3 @@
 package model;
 
-public record GameData() {
-}
+public record GameData() {}
