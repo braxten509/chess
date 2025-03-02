@@ -1,4 +1,9 @@
 package dataaccess;
 
-public class AuthDataAccess {
+import model.AuthData;
+
+public interface AuthDataAccess {
+
+    public void createAuth(AuthData authData) throws DataAccessException;
+
 }

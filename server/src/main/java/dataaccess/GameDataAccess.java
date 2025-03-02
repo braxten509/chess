@@ -1,4 +1,4 @@
 package dataaccess;
 
-public class GameDataAccess {
+public interface GameDataAccess {
 }
