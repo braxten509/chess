@@ -4,16 +4,21 @@ import dataaccess.AuthDataAccess;
 import dataaccess.DataAccessException;
 import java.util.HashMap;
 import java.util.Map;
-import model.AuthData;
-import model.UserData;
+import java.util.UUID;
 
 public class MemoryAuthDataAccess implements AuthDataAccess {
 
+  private static String generateToken() {
+    return UUID.randomUUID().toString();
+  }
+
+  // username, authToken
   Map<String, String> auths = new HashMap<>();
 
   @Override
-  public void createAuth(AuthData authData) throws DataAccessException {
-    auths.put(authData.authToken(), authData.username());
+  public String createAuth(String username) throws DataAccessException {
+    auths.put(username, generateToken());
+    return auths.get(username);
   }
 
   @Override

@@ -6,10 +6,8 @@ import dataaccess.UserDataAccess;
 import dataaccess.memory.MemoryAuthDataAccess;
 import dataaccess.memory.MemoryUserDataAccess;
 import java.util.Collection;
-import model.AuthData;
-import model.RegisterRequest;
-import model.RegisterResult;
-import model.UserData;
+import java.util.Objects;
+import model.*;
 
 public class UserService {
 
@@ -37,21 +35,47 @@ public class UserService {
     return userDataAccess.listUsers();
   }
 
+  public LoginResult login(LoginRequest loginRequest)
+    throws DataAccessException {
+    UserData user = userDataAccess.getUser(loginRequest.username());
+
+    if (user == null) {
+      throw new DataAccessException("unauthorized");
+    }
+
+    if (!Objects.equals(loginRequest.password(), user.password())) {
+      throw new DataAccessException("unauthorized");
+    }
+
+    String authToken = authDataAccess.createAuth(user.username());
+
+    return new LoginResult(authToken, user.username());
+  }
+
   public RegisterResult register(RegisterRequest registerRequest)
     throws DataAccessException {
+    if (
+      registerRequest.username() == null ||
+      registerRequest.password() == null ||
+      registerRequest.email() == null
+    ) {
+      throw new DataAccessException("bad request");
+    }
+
     UserData user = userDataAccess.getUser(registerRequest.username());
 
     if (user != null) {
-      throw new DataAccessException("User already exists!");
+      throw new DataAccessException("already taken");
     }
 
-    AuthData authData = userDataAccess.createUser(
+    user = userDataAccess.createUser(
       registerRequest.username(),
       registerRequest.password(),
       registerRequest.email()
     );
-    authDataAccess.createAuth(authData);
 
-    return new RegisterResult(registerRequest.username(), authData.authToken());
+    String authToken = authDataAccess.createAuth(user.username());
+
+    return new RegisterResult(user.username(), authToken);
   }
 }

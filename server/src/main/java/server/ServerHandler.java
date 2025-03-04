@@ -6,9 +6,10 @@ import dataaccess.DataAccessException;
 import dataaccess.memory.MemoryAuthDataAccess;
 import dataaccess.memory.MemoryUserDataAccess;
 import java.util.Map;
-
 import model.LoginRequest;
+import model.LoginResult;
 import model.RegisterRequest;
+import model.RegisterResult;
 import service.UserService;
 import spark.Request;
 import spark.Response;
@@ -67,26 +68,25 @@ public class ServerHandler {
   public static Object registerUser(Request req, Response res) {
     try {
       res.type("application/json");
+      RegisterRequest registerRequest = turnIntoObject(
+        req,
+        res,
+        RegisterRequest.class
+      );
 
-      RegisterRequest registerRequest = turnIntoObject(req, res, RegisterRequest.class);
+      RegisterResult successRegisterResult = userService.register(
+        registerRequest
+      );
 
-      if (
-        registerRequest.username() == null ||
-        registerRequest.password() == null ||
-        registerRequest.email() == null
-      ) {
-        res.status(400);
-        return turnIntoJson("message", "Error: bad request");
-      }
-
-      var successResult = userService.register(registerRequest);
       res.status(200);
-      return turnIntoJson(successResult);
-
+      return turnIntoJson(successRegisterResult);
     } catch (DataAccessException e) {
-      res.status(403);
-      return turnIntoJson("message", "Error: already taken");
-
+      if (e.getMessage().equals("already taken")) {
+        res.status(403);
+      } else {
+        res.status(400);
+      }
+      return turnIntoJson("message", "Error: " + e.getMessage());
     } catch (Exception e) {
       res.status(500);
       return turnIntoJson("message", "Error: " + e.getMessage());
@@ -100,17 +100,29 @@ public class ServerHandler {
    * @return returns an Object, likely a JSON formatted String
    */
   public static Object loginUser(Request req, Response res) {
-    res.type("application/json");
+    try {
+      res.type("application/json");
 
-    LoginRequest loginRequest = turnIntoObject(req, res, LoginRequest.class);
+      LoginRequest loginRequest = turnIntoObject(req, res, LoginRequest.class);
 
-    //    try {
-    //
-    //    } catch (DataAccessException e) {
-    //
-    //    }
+      if (loginRequest.username() == null || loginRequest.password() == null) {
+        res.status(400);
+        return turnIntoJson("message", "Error: bad request");
+      }
 
-    return new Object();
+      LoginResult successLoginResult = userService.login(loginRequest);
+      res.status(200);
+      return turnIntoJson(successLoginResult);
+
+    } catch (DataAccessException e) {
+      res.status(401);
+      return turnIntoJson("message", "Error: " + e.getMessage());
+
+    } catch (Exception e) {
+      res.status(500);
+      return turnIntoJson("message", "Error: " + e.getMessage());
+
+    }
   }
 
   /**
@@ -125,7 +137,6 @@ public class ServerHandler {
       userService.clearDataAccess();
       res.status(200);
       return turnIntoJson(Map.of());
-
     } catch (Exception e) {
       res.status(500);
       turnIntoJson("message", "Error: " + e.getMessage());
