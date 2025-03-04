@@ -12,13 +12,23 @@ public class MemoryAuthDataAccess implements AuthDataAccess {
     return UUID.randomUUID().toString();
   }
 
-  // username, authToken
+  // authToken, username
   Map<String, String> auths = new HashMap<>();
 
   @Override
   public String createAuth(String username) throws DataAccessException {
-    auths.put(username, generateToken());
-    return auths.get(username);
+    String authToken = generateToken();
+    auths.put(authToken, username);
+    return authToken;
+  }
+
+  @Override
+  public boolean removeAuth(String authToken) throws DataAccessException {
+    if (auths.containsKey(authToken)) {
+      auths.remove(authToken);
+      return true;
+    }
+      return false;
   }
 
   @Override

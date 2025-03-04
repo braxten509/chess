@@ -103,7 +103,7 @@ public class StandardAPITests {
     @Order(4)
     @DisplayName("Normal User Registration")
     public void successRegister() {
-        //submit register request
+        //submit registerUser request
         TestAuthResult registerResult = serverFacade.register(newUser);
 
         assertHttpOk(registerResult);
@@ -116,7 +116,7 @@ public class StandardAPITests {
     @Order(5)
     @DisplayName("Re-Register User")
     public void registerTwice() {
-        //submit register request trying to register existing user
+        //submit registerUser request trying to registerUser existing user
         TestAuthResult registerResult = serverFacade.register(existingUser);
 
         assertHttpForbidden(registerResult);
@@ -127,7 +127,7 @@ public class StandardAPITests {
     @Order(5)
     @DisplayName("Register Bad Request")
     public void failRegister() {
-        //attempt to register a user without a password
+        //attempt to registerUser a user without a password
         TestUser registerRequest = new TestUser(newUser.getUsername(), null, newUser.getEmail());
 
         TestAuthResult registerResult = serverFacade.register(registerRequest);
@@ -246,7 +246,7 @@ public class StandardAPITests {
         TestJoinRequest joinRequest = new TestJoinRequest(ChessGame.TeamColor.BLACK, createResult.getGameID());
         serverFacade.joinPlayer(joinRequest, existingAuth);
 
-        //register second user
+        //registerUser second user
         TestAuthResult registerResult = serverFacade.register(newUser);
 
         //join request trying to also join  as black
@@ -287,7 +287,7 @@ public class StandardAPITests {
     @Order(12)
     @DisplayName("List Multiple Games")
     public void gamesList() {
-        //register a few users to create games
+        //registerUser a few users to create games
         TestUser userA = new TestUser("a", "A", "a.A");
         TestUser userB = new TestUser("b", "B", "b.B");
         TestUser userC = new TestUser("c", "C", "c.C");
@@ -355,11 +355,11 @@ public class StandardAPITests {
         Assertions.assertNotNull(loginTwo.getAuthToken(), "Login result did not contain an authToken");
 
         Assertions.assertNotEquals(existingAuth, loginOne.getAuthToken(),
-                "Authtoken returned by login matched authtoken from prior register");
+                "Authtoken returned by loginUser matched authtoken from prior registerUser");
         Assertions.assertNotEquals(existingAuth, loginTwo.getAuthToken(),
-                "Authtoken returned by login matched authtoken from prior register");
+                "Authtoken returned by loginUser matched authtoken from prior registerUser");
         Assertions.assertNotEquals(loginOne.getAuthToken(), loginTwo.getAuthToken(),
-                "Authtoken returned by login matched authtoken from prior login");
+                "Authtoken returned by loginUser matched authtoken from prior loginUser");
 
 
         TestCreateResult createResult = serverFacade.createGame(createRequest, existingAuth);

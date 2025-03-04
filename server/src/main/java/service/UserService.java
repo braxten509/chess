@@ -35,11 +35,15 @@ public class UserService {
     return userDataAccess.listUsers();
   }
 
-  public LoginResult login(LoginRequest loginRequest)
+  public LoginResult loginUser(LoginRequest loginRequest)
     throws DataAccessException {
     UserData user = userDataAccess.getUser(loginRequest.username());
 
     if (user == null) {
+      throw new DataAccessException("unauthorized");
+    }
+
+    if (user.username() == null || user.password() == null) {
       throw new DataAccessException("unauthorized");
     }
 
@@ -52,7 +56,14 @@ public class UserService {
     return new LoginResult(authToken, user.username());
   }
 
-  public RegisterResult register(RegisterRequest registerRequest)
+  public void logoutUser(String authToken) throws DataAccessException {
+    boolean success = authDataAccess.removeAuth(authToken);
+    if (!success) {
+      throw new DataAccessException("unauthorized");
+    }
+  }
+
+  public RegisterResult registerUser(RegisterRequest registerRequest)
     throws DataAccessException {
     if (
       registerRequest.username() == null ||

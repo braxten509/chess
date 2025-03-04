@@ -1,15 +1,14 @@
 package server;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import dataaccess.DataAccessException;
 import dataaccess.memory.MemoryAuthDataAccess;
 import dataaccess.memory.MemoryUserDataAccess;
 import java.util.Map;
-import model.LoginRequest;
-import model.LoginResult;
-import model.RegisterRequest;
-import model.RegisterResult;
+
+import model.*;
 import service.UserService;
 import spark.Request;
 import spark.Response;
@@ -74,7 +73,7 @@ public class ServerHandler {
         RegisterRequest.class
       );
 
-      RegisterResult successRegisterResult = userService.register(
+      RegisterResult successRegisterResult = userService.registerUser(
         registerRequest
       );
 
@@ -105,17 +104,16 @@ public class ServerHandler {
 
       LoginRequest loginRequest = turnIntoObject(req, res, LoginRequest.class);
 
-      if (loginRequest.username() == null || loginRequest.password() == null) {
-        res.status(400);
-        return turnIntoJson("message", "Error: bad request");
-      }
-
-      LoginResult successLoginResult = userService.login(loginRequest);
+      LoginResult successLoginResult = userService.loginUser(loginRequest);
       res.status(200);
       return turnIntoJson(successLoginResult);
 
     } catch (DataAccessException e) {
-      res.status(401);
+      if (e.getMessage().equals("unauthorized")) {
+        res.status(401);
+      } else {
+        res.status(500);
+      }
       return turnIntoJson("message", "Error: " + e.getMessage());
 
     } catch (Exception e) {
@@ -123,6 +121,25 @@ public class ServerHandler {
       return turnIntoJson("message", "Error: " + e.getMessage());
 
     }
+  }
+
+  public static Object logoutUser(Request req, Response res) {
+    try {
+      res.type("application/json");
+
+      String authToken = req.headers("Authorization");
+
+      userService.logoutUser(authToken);
+      res.status(200);
+      return turnIntoJson(new JsonObject());
+    } catch (DataAccessException e) {
+      res.status(401);
+      return turnIntoJson("message", "Error: " + e.getMessage());
+    } catch (Exception e) {
+      res.status(500);
+      return turnIntoJson("message", "Error: " + e.getMessage());
+    }
+
   }
 
   /**
@@ -136,10 +153,9 @@ public class ServerHandler {
       res.type("application/json");
       userService.clearDataAccess();
       res.status(200);
-      return turnIntoJson(Map.of());
+      return turnIntoJson(new JsonObject());
     } catch (Exception e) {
       res.status(500);
-      turnIntoJson("message", "Error: " + e.getMessage());
       return turnIntoJson("message", "Error: " + e.getMessage());
     }
   }

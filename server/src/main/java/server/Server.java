@@ -14,6 +14,7 @@ public class Server {
     // Register your endpoints and handle exceptions here.
     Spark.post("/user", ServerHandler::registerUser);
     Spark.post("/session", ServerHandler::loginUser);
+    Spark.delete("/session", ServerHandler::logoutUser);
     Spark.delete("/db", ServerHandler::clearDatabase);
 
     //This line initializes the server and can be removed once you have a functioning endpoint

@@ -22,19 +22,25 @@ class UserServiceTest {
     }
 
     @Test
-    void register() throws DataAccessException {
+    void registerUser() throws DataAccessException {
         var user = new UserData("Jimmethy", "abc123", "jmail@gmail.com");
-        userService.register(new RegisterRequest(user.username(), user.password(), user.email()));
+        userService.registerUser(new RegisterRequest(user.username(), user.password(), user.email()));
         var users = userService.listUsers();
 
         assertEquals(1, users.size());
         assertTrue(users.contains(user));
     }
 
+   @Test
+   void loginUser() throws DataAccessException {
+       var user = new UserData("Jimmethy", "abc123", "jmail@gmail.com");
+       userService.registerUser(new RegisterRequest(user.username(), user.password(), user.email()));
+   }
+
     @Test
     void clearDataAccess() throws DataAccessException {
-        userService.register(new RegisterRequest("Jimmethy", "abc123", "jmail@gmail.com"));
-        userService.register(new RegisterRequest("Jimsim", "abc123aa", "jimsim001@gmail.com"));
+        userService.registerUser(new RegisterRequest("Jimmethy", "abc123", "jmail@gmail.com"));
+        userService.registerUser(new RegisterRequest("Jimsim", "abc123aa", "jimsim001@gmail.com"));
 
         userService.clearDataAccess();
 
@@ -42,9 +48,9 @@ class UserServiceTest {
     }
 
     @Test
-    void get() throws DataAccessException {
+    void getUser() throws DataAccessException {
         var user = new UserData("Jimmethy", "abc123", "jmail@gmail.com");
-        userService.register(new RegisterRequest(user.username(), user.password(), user.email()));
+        userService.registerUser(new RegisterRequest(user.username(), user.password(), user.email()));
 
         var foundUser = userService.getUser(user.username());
 
@@ -58,9 +64,9 @@ class UserServiceTest {
         expected.add(new UserData("Jimbo", "abc12asas3", "jmaaaaail@gmail.com"));
         expected.add(new UserData("JimmethyJones", "abc1232222", "jmaiLLLl@gmail.com"));
 
-        userService.register(new RegisterRequest("Jimmethy", "abc123", "jmail@gmail.com"));
-        userService.register(new RegisterRequest("Jimbo", "abc12asas3", "jmaaaaail@gmail.com"));
-        userService.register(new RegisterRequest("JimmethyJones", "abc1232222", "jmaiLLLl@gmail.com"));
+        userService.registerUser(new RegisterRequest("Jimmethy", "abc123", "jmail@gmail.com"));
+        userService.registerUser(new RegisterRequest("Jimbo", "abc12asas3", "jmaaaaail@gmail.com"));
+        userService.registerUser(new RegisterRequest("JimmethyJones", "abc1232222", "jmaiLLLl@gmail.com"));
 
         assertTrue(userService.listUsers().containsAll(expected));
     }
