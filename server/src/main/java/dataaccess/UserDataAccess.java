@@ -1,9 +1,8 @@
 package dataaccess;
 
+import java.util.Collection;
 import model.AuthData;
 import model.UserData;
-
-import java.util.Collection;
 
 public interface UserDataAccess {
   UserData getUser(String username) throws DataAccessException;

@@ -5,12 +5,11 @@ import dataaccess.DataAccessException;
 import dataaccess.UserDataAccess;
 import dataaccess.memory.MemoryAuthDataAccess;
 import dataaccess.memory.MemoryUserDataAccess;
+import java.util.Collection;
 import model.AuthData;
 import model.RegisterRequest;
 import model.RegisterResult;
 import model.UserData;
-
-import java.util.Collection;
 
 public class UserService {
 

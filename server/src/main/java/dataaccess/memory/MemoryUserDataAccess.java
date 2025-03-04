@@ -2,9 +2,7 @@ package dataaccess.memory;
 
 import dataaccess.DataAccessException;
 import dataaccess.UserDataAccess;
-
 import java.util.*;
-
 import model.AuthData;
 import model.UserData;
 
@@ -17,7 +15,7 @@ public class MemoryUserDataAccess implements UserDataAccess {
   }
 
   @Override
-  public UserData getUser(String username) throws DataAccessException {
+  public UserData getUser(String username) {
     return users.get(username);
   }
 
