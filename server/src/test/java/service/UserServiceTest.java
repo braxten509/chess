@@ -6,6 +6,7 @@ import dataaccess.memory.MemoryUserDataAccess;
 import model.RegisterRequest;
 import model.UserData;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -14,17 +15,22 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 class UserServiceTest {
-    static final UserService userService = new UserService(new MemoryUserDataAccess(), new MemoryAuthDataAccess());
+    private static final UserService userService = new UserService(new MemoryUserDataAccess(), new MemoryAuthDataAccess());
+    private static final UserData user = new UserData("Jimmethy", "abc123", "jmail@gmail.com");
+
 
     @BeforeEach
     void clear() throws Exception {
         userService.clearDataAccess();
+
+        var user = new UserData("Jimmethy", "abc123", "jmail@gmail.com");
+        userService.registerUser(new RegisterRequest(user.username(), user.password(), user.email()));
+        var auth = userService.getAuth(user.username());
     }
 
     @Test
+    @Order(1)
     void registerUser() throws DataAccessException {
-        var user = new UserData("Jimmethy", "abc123", "jmail@gmail.com");
-        userService.registerUser(new RegisterRequest(user.username(), user.password(), user.email()));
         var users = userService.listUsers();
 
         assertEquals(1, users.size());
@@ -32,39 +38,34 @@ class UserServiceTest {
     }
 
    @Test
+   @Order(2)
    void loginUser() throws DataAccessException {
-       var user = new UserData("Jimmethy", "abc123", "jmail@gmail.com");
-       userService.registerUser(new RegisterRequest(user.username(), user.password(), user.email()));
+
    }
 
     @Test
+    @Order(3)
     void clearDataAccess() throws DataAccessException {
-        userService.registerUser(new RegisterRequest("Jimmethy", "abc123", "jmail@gmail.com"));
-        userService.registerUser(new RegisterRequest("Jimsim", "abc123aa", "jimsim001@gmail.com"));
-
         userService.clearDataAccess();
 
         assertEquals(0, userService.listUsers().size());
     }
 
     @Test
+    @Order(4)
     void getUser() throws DataAccessException {
-        var user = new UserData("Jimmethy", "abc123", "jmail@gmail.com");
-        userService.registerUser(new RegisterRequest(user.username(), user.password(), user.email()));
-
         var foundUser = userService.getUser(user.username());
-
         assertEquals(user, foundUser);
     }
 
     @Test
+    @Order(5)
     void listUsers() throws DataAccessException {
         List<UserData> expected = new ArrayList<>();
         expected.add(new UserData("Jimmethy", "abc123", "jmail@gmail.com"));
         expected.add(new UserData("Jimbo", "abc12asas3", "jmaaaaail@gmail.com"));
         expected.add(new UserData("JimmethyJones", "abc1232222", "jmaiLLLl@gmail.com"));
 
-        userService.registerUser(new RegisterRequest("Jimmethy", "abc123", "jmail@gmail.com"));
         userService.registerUser(new RegisterRequest("Jimbo", "abc12asas3", "jmaaaaail@gmail.com"));
         userService.registerUser(new RegisterRequest("JimmethyJones", "abc1232222", "jmaiLLLl@gmail.com"));
 

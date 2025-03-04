@@ -4,6 +4,7 @@ import dataaccess.AuthDataAccess;
 import dataaccess.DataAccessException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
 public class MemoryAuthDataAccess implements AuthDataAccess {
@@ -29,6 +30,16 @@ public class MemoryAuthDataAccess implements AuthDataAccess {
       return true;
     }
       return false;
+  }
+
+  @Override
+  public String getAuth(String username) throws DataAccessException {
+    for (Map.Entry<String, String> entry : auths.entrySet()) {
+      if (Objects.equals(entry.getValue(), username)) {
+        return entry.getKey();
+      }
+    }
+    return null;
   }
 
   @Override
