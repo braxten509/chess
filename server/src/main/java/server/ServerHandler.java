@@ -6,6 +6,7 @@ import dataaccess.DataAccessException;
 import dataaccess.memory.MemoryAuthDataAccess;
 import dataaccess.memory.MemoryGameDataAccess;
 import dataaccess.memory.MemoryUserDataAccess;
+import java.util.ArrayList;
 import java.util.Map;
 import model.*;
 import service.GameService;
@@ -176,7 +177,11 @@ public class ServerHandler {
       String authToken = req.headers("Authorization");
       JsonObject reqBody = turnIntoObject(req, res, JsonObject.class);
 
-      if (reqBody == null || reqBody.get("playerColor") == null || reqBody.get("gameID") == null) {
+      if (
+        reqBody == null ||
+        reqBody.get("playerColor") == null ||
+        reqBody.get("gameID") == null
+      ) {
         throw new DataAccessException("bad request");
       }
 
@@ -188,6 +193,7 @@ public class ServerHandler {
 
       gameService.joinGame(joinGameRequest);
 
+      res.status(200);
       return turnIntoJson(new JsonObject());
     } catch (DataAccessException e) {
       if (e.getMessage().equals("unauthorized")) {
@@ -204,11 +210,22 @@ public class ServerHandler {
     }
   }
 
-  public static Object listGames(Request req, Response res)
-  {
-    res.type("application/json");
-    String authToken = req.headers("Authorization");
-    return new Object();
+  public static Object listGames(Request req, Response res) {
+    try {
+      res.type("application/json");
+      String authToken = req.headers("Authorization");
+
+      ArrayList<GameData> games = gameService.listGames(authToken);
+
+      res.status(200);
+      return turnIntoJson("games", games);
+    } catch (DataAccessException e) {
+      res.status(401);
+      return turnIntoJson("message", "Error: " + e.getMessage());
+    } catch (Exception e) {
+      res.status(500);
+      return turnIntoJson("message", "Error: " + e.getMessage());
+    }
   }
 
   /**
@@ -221,6 +238,7 @@ public class ServerHandler {
     try {
       res.type("application/json");
       userService.clearDataAccess();
+      gameService.clearDataAccess();
       res.status(200);
       return turnIntoJson(new JsonObject());
     } catch (Exception e) {

@@ -3,8 +3,7 @@ package dataaccess.memory;
 import chess.ChessGame;
 import dataaccess.DataAccessException;
 import dataaccess.GameDataAccess;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import model.GameData;
 
 public class MemoryGameDataAccess implements GameDataAccess {
@@ -14,7 +13,9 @@ public class MemoryGameDataAccess implements GameDataAccess {
   int currentId = 0;
 
   @Override
-  public void clear() throws DataAccessException {}
+  public void clear() throws DataAccessException {
+    games.clear();
+  }
 
   @Override
   public int createNewGame(String gameName) throws DataAccessException {
@@ -37,15 +38,23 @@ public class MemoryGameDataAccess implements GameDataAccess {
     String gameName = joiningGame.gameName();
     ChessGame game = joiningGame.game();
 
-    if (playerColor.equals("WHITE"))
-    {
+    if (playerColor.equals("WHITE")) {
       String blackUsername = joiningGame.blackUsername();
-      games.put(gameID, new GameData(gameID, playerUsername, blackUsername, gameName, game));
-    }
-    else
-    {
+      games.put(
+        gameID,
+        new GameData(gameID, playerUsername, blackUsername, gameName, game)
+      );
+    } else {
       String whiteUsername = joiningGame.whiteUsername();
-      games.put(gameID, new GameData(gameID, whiteUsername, playerUsername, gameName, game));
+      games.put(
+        gameID,
+        new GameData(gameID, whiteUsername, playerUsername, gameName, game)
+      );
     }
+  }
+
+  @Override
+  public ArrayList<GameData> listGames() throws DataAccessException {
+    return new ArrayList<>(games.values());
   }
 }
