@@ -9,7 +9,8 @@ import model.GameData;
 
 public class MemoryGameDataAccess implements GameDataAccess {
 
-  Map<String, GameData> games = new HashMap<>();
+  // id and GameData
+  Map<Integer, GameData> games = new HashMap<>();
   int currentId = 0;
 
   @Override
@@ -19,9 +20,32 @@ public class MemoryGameDataAccess implements GameDataAccess {
   public int createNewGame(String gameName) throws DataAccessException {
     currentId += 1;
     games.put(
-      gameName,
+      currentId,
       new GameData(currentId, null, null, gameName, new ChessGame())
     );
     return currentId;
+  }
+
+  @Override
+  public GameData getGame(int gameID) {
+    return games.get(gameID);
+  }
+
+  @Override
+  public void joinGame(String playerColor, int gameID, String playerUsername) {
+    GameData joiningGame = games.get(gameID);
+    String gameName = joiningGame.gameName();
+    ChessGame game = joiningGame.game();
+
+    if (playerColor.equals("WHITE"))
+    {
+      String blackUsername = joiningGame.blackUsername();
+      games.put(gameID, new GameData(gameID, playerUsername, blackUsername, gameName, game));
+    }
+    else
+    {
+      String whiteUsername = joiningGame.whiteUsername();
+      games.put(gameID, new GameData(gameID, whiteUsername, playerUsername, gameName, game));
+    }
   }
 }

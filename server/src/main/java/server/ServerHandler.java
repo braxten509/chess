@@ -1,7 +1,6 @@
 package server;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import dataaccess.DataAccessException;
 import dataaccess.memory.MemoryAuthDataAccess;
@@ -172,9 +171,43 @@ public class ServerHandler {
   }
 
   public static Object joinGame(Request req, Response res) {
+    try {
+      res.type("application/json");
+      String authToken = req.headers("Authorization");
+      JsonObject reqBody = turnIntoObject(req, res, JsonObject.class);
+
+      if (reqBody == null || reqBody.get("playerColor") == null || reqBody.get("gameID") == null) {
+        throw new DataAccessException("bad request");
+      }
+
+      JoinGameRequest joinGameRequest = new JoinGameRequest(
+        authToken,
+        reqBody.get("playerColor").getAsString(),
+        reqBody.get("gameID").getAsInt()
+      );
+
+      gameService.joinGame(joinGameRequest);
+
+      return turnIntoJson(new JsonObject());
+    } catch (DataAccessException e) {
+      if (e.getMessage().equals("unauthorized")) {
+        res.status(401);
+      } else if (e.getMessage().equals("already taken")) {
+        res.status(403);
+      } else {
+        res.status(400);
+      }
+      return turnIntoJson("message", "Error: " + e.getMessage());
+    } catch (Exception e) {
+      res.status(500);
+      return turnIntoJson("message", "Error: " + e.getMessage());
+    }
+  }
+
+  public static Object listGames(Request req, Response res)
+  {
     res.type("application/json");
-
-
+    String authToken = req.headers("Authorization");
     return new Object();
   }
 

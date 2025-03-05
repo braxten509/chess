@@ -6,6 +6,8 @@ import dataaccess.GameDataAccess;
 import java.util.Objects;
 import model.AuthData;
 import model.CreateGameRequest;
+import model.GameData;
+import model.JoinGameRequest;
 
 public class GameService {
 
@@ -43,5 +45,41 @@ public class GameService {
     }
 
     return gameDataAccess.createNewGame(createGameRequest.gameName());
+  }
+
+  public GameData getGame(int gameID) throws DataAccessException {
+      return gameDataAccess.getGame(gameID);
+  }
+
+  public void joinGame(JoinGameRequest joinGameRequest)
+    throws DataAccessException {
+    if (joinGameRequest == null || joinGameRequest.authToken().isEmpty()) {
+      throw new DataAccessException("bad request");
+    }
+
+    AuthData authData = authDataAccess.getAuthData(joinGameRequest.authToken());
+
+    if (authData == null) {
+      throw new DataAccessException("unauthorized");
+    }
+
+    GameData gameData = getGame(joinGameRequest.gameID());
+
+    if (gameData == null) {
+        throw new DataAccessException("bad request");
+    }
+
+    String teamColor = joinGameRequest.playerColor();
+
+    if (gameData.blackUsername() != null && Objects.equals(teamColor, "BLACK")) {
+        throw new DataAccessException("already taken");
+    }
+
+    if (gameData.whiteUsername() != null && Objects.equals(teamColor, "WHITE")) {
+        throw new DataAccessException("already taken");
+    }
+
+    String playerUsername = authData.username();
+    gameDataAccess.joinGame(joinGameRequest.playerColor(), joinGameRequest.gameID(), playerUsername);
   }
 }
