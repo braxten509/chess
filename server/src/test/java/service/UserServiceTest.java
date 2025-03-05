@@ -25,7 +25,7 @@ class UserServiceTest {
 
         var user = new UserData("Jimmethy", "abc123", "jmail@gmail.com");
         userService.registerUser(new RegisterRequest(user.username(), user.password(), user.email()));
-        var auth = userService.getAuth(user.username());
+        // var authToken = userService.getAuthData(user.username()).authToken();
     }
 
     @Test

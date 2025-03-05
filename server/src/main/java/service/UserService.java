@@ -31,8 +31,8 @@ public class UserService {
     return userDataAccess.getUser(username);
   }
 
-  public String getAuth(String username) throws DataAccessException {
-    return authDataAccess.getAuth(username);
+  public AuthData getAuthData(String authToken) throws DataAccessException {
+    return authDataAccess.getAuthData(authToken);
   }
 
   public Collection<UserData> listUsers() throws DataAccessException {

@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
+import model.AuthData;
 
 public class MemoryAuthDataAccess implements AuthDataAccess {
 
@@ -29,17 +30,19 @@ public class MemoryAuthDataAccess implements AuthDataAccess {
       auths.remove(authToken);
       return true;
     }
-      return false;
+    return false;
   }
 
   @Override
-  public String getAuth(String username) throws DataAccessException {
-    for (Map.Entry<String, String> entry : auths.entrySet()) {
-      if (Objects.equals(entry.getValue(), username)) {
-        return entry.getKey();
-      }
+  public AuthData getAuthData(String authToken) throws DataAccessException {
+    if (
+      Objects.equals(authToken, "") ||
+      authToken == null ||
+      auths.get(authToken) == null
+    ) {
+      return null;
     }
-    return null;
+    return new AuthData(authToken, auths.get(authToken));
   }
 
   @Override

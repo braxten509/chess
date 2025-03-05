@@ -1,3 +1,6 @@
 package dataaccess;
 
-public interface GameDataAccess {}
+public interface GameDataAccess {
+  void clear() throws DataAccessException;
+  int createNewGame(String gameName) throws DataAccessException;
+}

@@ -5,10 +5,11 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import dataaccess.DataAccessException;
 import dataaccess.memory.MemoryAuthDataAccess;
+import dataaccess.memory.MemoryGameDataAccess;
 import dataaccess.memory.MemoryUserDataAccess;
 import java.util.Map;
-
 import model.*;
+import service.GameService;
 import service.UserService;
 import spark.Request;
 import spark.Response;
@@ -19,6 +20,13 @@ public class ServerHandler {
     new MemoryUserDataAccess();
   private static final MemoryAuthDataAccess authDataAccess =
     new MemoryAuthDataAccess();
+  private static final MemoryGameDataAccess gameDataAccess =
+    new MemoryGameDataAccess();
+
+  private static final GameService gameService = new GameService(
+    gameDataAccess,
+    authDataAccess
+  );
   private static final UserService userService = new UserService(
     userDataAccess,
     authDataAccess
@@ -107,19 +115,16 @@ public class ServerHandler {
       LoginResult successLoginResult = userService.loginUser(loginRequest);
       res.status(200);
       return turnIntoJson(successLoginResult);
-
     } catch (DataAccessException e) {
       if (e.getMessage().equals("unauthorized")) {
         res.status(401);
       } else {
-        res.status(500);
+        res.status(400);
       }
       return turnIntoJson("message", "Error: " + e.getMessage());
-
     } catch (Exception e) {
       res.status(500);
       return turnIntoJson("message", "Error: " + e.getMessage());
-
     }
   }
 
@@ -139,7 +144,38 @@ public class ServerHandler {
       res.status(500);
       return turnIntoJson("message", "Error: " + e.getMessage());
     }
+  }
 
+  public static Object createGame(Request req, Response res) {
+    try {
+      res.type("application/json");
+      String authToken = req.headers("Authorization");
+
+      CreateGameRequest createGameRequest = new CreateGameRequest(
+        authToken,
+        req.body()
+      );
+
+      int id = gameService.createGame(createGameRequest);
+      return turnIntoJson("gameID", id);
+    } catch (DataAccessException e) {
+      if (e.getMessage().equals("unauthorized")) {
+        res.status(401);
+      } else {
+        res.status(400);
+      }
+      return turnIntoJson("message", "Error: " + e.getMessage());
+    } catch (Exception e) {
+      res.status(500);
+      return turnIntoJson("message", "Error: " + e.getMessage());
+    }
+  }
+
+  public static Object joinGame(Request req, Response res) {
+    res.type("application/json");
+
+
+    return new Object();
   }
 
   /**
