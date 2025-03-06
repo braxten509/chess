@@ -1,7 +1,9 @@
 package server;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import dataaccess.DataAccessException;
 import dataaccess.memory.MemoryAuthDataAccess;
 import dataaccess.memory.MemoryGameDataAccess;
@@ -22,6 +24,7 @@ public class ServerHandler {
     new MemoryAuthDataAccess();
   private static final MemoryGameDataAccess gameDataAccess =
     new MemoryGameDataAccess();
+  private static final Gson gson = new GsonBuilder().disableHtmlEscaping().create();
 
   private static final GameService gameService = new GameService(
     gameDataAccess,
@@ -35,17 +38,15 @@ public class ServerHandler {
   /**
    * turns a JSON string into an object
    * @param req request object
-   * @param res response object
    * @param classOfT type of object (Object.class)
    * @return returns object 'T', whatever it is defined as
    * @param <T> labels as a generic method
    */
   private static <T> T turnIntoObject(
     Request req,
-    Response res,
     Class<T> classOfT
   ) {
-    return new Gson().fromJson(req.body(), classOfT);
+    return gson.fromJson(req.body(), classOfT);
   }
 
   /**
@@ -53,7 +54,7 @@ public class ServerHandler {
    * @return "param1"
    */
   private static <T> String turnIntoJson(T object) {
-    return new Gson().toJson(object);
+    return gson.toJson(object);
   }
 
   /**
@@ -63,7 +64,7 @@ public class ServerHandler {
    */
   @SuppressWarnings("SameParameterValue")
   private static <T> String turnIntoJson(String keyword, T definition) {
-    return new Gson().toJson(Map.of(keyword, definition));
+    return gson.toJson(Map.of(keyword, definition));
   }
 
   /**
@@ -77,7 +78,6 @@ public class ServerHandler {
       res.type("application/json");
       RegisterRequest registerRequest = turnIntoObject(
         req,
-        res,
         RegisterRequest.class
       );
 
@@ -110,7 +110,7 @@ public class ServerHandler {
     try {
       res.type("application/json");
 
-      LoginRequest loginRequest = turnIntoObject(req, res, LoginRequest.class);
+      LoginRequest loginRequest = turnIntoObject(req, LoginRequest.class);
 
       LoginResult successLoginResult = userService.loginUser(loginRequest);
       res.status(200);
@@ -148,12 +148,15 @@ public class ServerHandler {
 
   public static Object createGame(Request req, Response res) {
     try {
-      res.type("application/json");
+      res.type("application/json; charset=utf-8");
       String authToken = req.headers("Authorization");
+
+      JsonObject jsonObject = JsonParser.parseString(req.body()).getAsJsonObject();
+      String gameName = jsonObject.get("gameName").getAsString();
 
       CreateGameRequest createGameRequest = new CreateGameRequest(
         authToken,
-        req.body()
+        gameName
       );
 
       int id = gameService.createGame(createGameRequest);
@@ -175,7 +178,7 @@ public class ServerHandler {
     try {
       res.type("application/json");
       String authToken = req.headers("Authorization");
-      JsonObject reqBody = turnIntoObject(req, res, JsonObject.class);
+      JsonObject reqBody = turnIntoObject(req, JsonObject.class);
 
       if (
         reqBody == null ||

@@ -45,7 +45,6 @@ public class GameService {
     if (authData == null) {
       throw new DataAccessException("unauthorized");
     }
-
     return gameDataAccess.createNewGame(createGameRequest.gameName());
   }
 

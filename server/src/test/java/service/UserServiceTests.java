@@ -14,7 +14,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class UserServiceTest {
+class UserServiceTests {
     private static final UserService userService = new UserService(new MemoryUserDataAccess(), new MemoryAuthDataAccess());
     private static final UserData user = new UserData("Jimmethy", "abc123", "jmail@gmail.com");
 
