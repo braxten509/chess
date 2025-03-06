@@ -28,6 +28,11 @@ class UserServiceTests {
   @BeforeEach
   void clear() throws Exception {
     USER_SERVICE.clearDataAccess();
+
+    var user = new UserData("Jimmethy", "abc123", "jmail@gmail.com");
+    USER_SERVICE.registerUser(
+      new RegisterRequest(user.username(), user.password(), user.email())
+    );
   }
 
   @Test
