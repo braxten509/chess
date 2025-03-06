@@ -18,23 +18,23 @@ import spark.Response;
 
 public class ServerHandler {
 
-  private static final MemoryUserDataAccess userDataAccess =
+  private static final MemoryUserDataAccess USER_DATA_ACCESS =
     new MemoryUserDataAccess();
-  private static final MemoryAuthDataAccess authDataAccess =
+  private static final MemoryAuthDataAccess AUTH_DATA_ACCESS =
     new MemoryAuthDataAccess();
-  private static final MemoryGameDataAccess gameDataAccess =
+  private static final MemoryGameDataAccess GAME_DATA_ACCESS =
     new MemoryGameDataAccess();
-  private static final Gson gson = new GsonBuilder()
+  private static final Gson GSON = new GsonBuilder()
     .disableHtmlEscaping()
     .create();
 
-  private static final GameService gameService = new GameService(
-    gameDataAccess,
-    authDataAccess
+  private static final GameService GAME_SERVICE = new GameService(
+    GAME_DATA_ACCESS,
+    AUTH_DATA_ACCESS
   );
-  private static final UserService userService = new UserService(
-    userDataAccess,
-    authDataAccess
+  private static final UserService USER_SERVICE = new UserService(
+    USER_DATA_ACCESS,
+    AUTH_DATA_ACCESS
   );
 
   /**
@@ -45,7 +45,7 @@ public class ServerHandler {
    * @param <T> labels as a generic method
    */
   private static <T> T turnIntoObject(Request req, Class<T> classOfT) {
-    return gson.fromJson(req.body(), classOfT);
+    return GSON.fromJson(req.body(), classOfT);
   }
 
   /**
@@ -53,7 +53,7 @@ public class ServerHandler {
    * @return "param1"
    */
   private static <T> String turnIntoJson(T object) {
-    return gson.toJson(object);
+    return GSON.toJson(object);
   }
 
   /**
@@ -63,7 +63,7 @@ public class ServerHandler {
    */
   @SuppressWarnings("SameParameterValue")
   private static <T> String turnIntoJson(String keyword, T definition) {
-    return gson.toJson(Map.of(keyword, definition));
+    return GSON.toJson(Map.of(keyword, definition));
   }
 
   /**
@@ -80,7 +80,7 @@ public class ServerHandler {
         RegisterRequest.class
       );
 
-      AuthData authData = userService.registerUser(registerRequest);
+      AuthData authData = USER_SERVICE.registerUser(registerRequest);
 
       res.status(200);
       return turnIntoJson(authData);
@@ -109,7 +109,7 @@ public class ServerHandler {
 
       LoginRequest loginRequest = turnIntoObject(req, LoginRequest.class);
 
-      AuthData authData = userService.loginUser(loginRequest);
+      AuthData authData = USER_SERVICE.loginUser(loginRequest);
       res.status(200);
       return turnIntoJson(authData);
     } catch (DataAccessException e) {
@@ -131,7 +131,7 @@ public class ServerHandler {
 
       String authToken = req.headers("Authorization");
 
-      userService.logoutUser(authToken);
+      USER_SERVICE.logoutUser(authToken);
       res.status(200);
       return turnIntoJson(new JsonObject());
     } catch (DataAccessException e) {
@@ -158,7 +158,7 @@ public class ServerHandler {
         gameName
       );
 
-      int id = gameService.createGame(createGameRequest);
+      int id = GAME_SERVICE.createGame(createGameRequest);
       return turnIntoJson("gameID", id);
     } catch (DataAccessException e) {
       if (e.getMessage().equals("unauthorized")) {
@@ -193,7 +193,7 @@ public class ServerHandler {
         reqBody.get("gameID").getAsInt()
       );
 
-      gameService.joinGame(joinGameRequest);
+      GAME_SERVICE.joinGame(joinGameRequest);
 
       res.status(200);
       return turnIntoJson(new JsonObject());
@@ -217,7 +217,7 @@ public class ServerHandler {
       res.type("application/json");
       String authToken = req.headers("Authorization");
 
-      ArrayList<GameData> games = gameService.listGames(authToken);
+      ArrayList<GameData> games = GAME_SERVICE.listGames(authToken);
 
       res.status(200);
       return turnIntoJson("games", games);
@@ -239,8 +239,8 @@ public class ServerHandler {
   public static Object clearDatabase(Request req, Response res) {
     try {
       res.type("application/json");
-      userService.clearDataAccess();
-      gameService.clearDataAccess();
+      USER_SERVICE.clearDataAccess();
+      GAME_SERVICE.clearDataAccess();
       res.status(200);
       return turnIntoJson(new JsonObject());
     } catch (Exception e) {

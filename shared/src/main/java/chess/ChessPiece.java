@@ -12,11 +12,11 @@ import java.util.Objects;
  */
 public class ChessPiece {
 
-  final int UP = 1;
-  final int DOWN = -1;
-  final int RIGHT = 1;
-  final int LEFT = -1;
-  final int NOCHANGE = 0;
+  static final int UP = 1;
+  static final int DOWN = -1;
+  static final int RIGHT = 1;
+  static final int LEFT = -1;
+  static final int NO_CHANGE = 0;
 
   private final ChessGame.TeamColor pieceColor;
   private final PieceType type;
@@ -104,8 +104,8 @@ public class ChessPiece {
   /**
    * Determines if a move is in bounds or not
    * @param myPosition initial position
-   * @param rowChange UP/DOWN/NOCHANGE
-   * @param colChange LEFT/RIGHT/NOCHANGE
+   * @param rowChange UP/DOWN/NO_CHANGE
+   * @param colChange LEFT/RIGHT/NO_CHANGE
    * @return returns true if inbounds and false if not
    */
   private boolean isInBounds(
@@ -116,6 +116,21 @@ public class ChessPiece {
     int newRow = myPosition.getRow() + rowChange;
     int newCol = myPosition.getColumn() + colChange;
     return newRow >= 1 && newRow <= 8 && newCol >= 1 && newCol <= 8;
+  }
+
+  private void addMoves(ArrayList<ChessMove> validMoves, ChessPosition myPosition, ChessPosition checkingPosition) {
+      validMoves.add(
+              new ChessMove(myPosition, checkingPosition, PieceType.QUEEN)
+      );
+      validMoves.add(
+              new ChessMove(myPosition, checkingPosition, PieceType.KNIGHT)
+      );
+      validMoves.add(
+              new ChessMove(myPosition, checkingPosition, PieceType.BISHOP)
+      );
+      validMoves.add(
+              new ChessMove(myPosition, checkingPosition, PieceType.ROOK)
+      );
   }
 
   /**
@@ -138,7 +153,7 @@ public class ChessPiece {
     if (
       board.getPiece(myPosition).getTeamColor() == ChessGame.TeamColor.WHITE
     ) {
-      if (isInBounds(myPosition, UP, NOCHANGE)) {
+      if (isInBounds(myPosition, UP, NO_CHANGE)) {
         checkingPosition = new ChessPosition(
           myPosition.getRow() + UP,
           myPosition.getColumn()
@@ -148,24 +163,13 @@ public class ChessPiece {
           checkingPosition.getRow() == 8 &&
           board.getPiece(checkingPosition) == null
         ) {
-          validMoves.add(
-            new ChessMove(myPosition, checkingPosition, PieceType.QUEEN)
-          );
-          validMoves.add(
-            new ChessMove(myPosition, checkingPosition, PieceType.KNIGHT)
-          );
-          validMoves.add(
-            new ChessMove(myPosition, checkingPosition, PieceType.BISHOP)
-          );
-          validMoves.add(
-            new ChessMove(myPosition, checkingPosition, PieceType.ROOK)
-          );
+          addMoves(validMoves, myPosition, checkingPosition);
         } else if (board.getPiece(checkingPosition) == null) {
           validMoves.add(new ChessMove(myPosition, checkingPosition, null));
         }
       }
 
-      if (isInBounds(myPosition, UP * 2, NOCHANGE)) {
+      if (isInBounds(myPosition, UP * 2, NO_CHANGE)) {
         checkingPosition = new ChessPosition(
           myPosition.getRow() + UP,
           myPosition.getColumn()
@@ -197,18 +201,7 @@ public class ChessPiece {
           board.getPiece(checkingPosition) != null &&
           thisPieceColor != board.getPiece(checkingPosition).getTeamColor()
         ) {
-          validMoves.add(
-            new ChessMove(myPosition, checkingPosition, PieceType.QUEEN)
-          );
-          validMoves.add(
-            new ChessMove(myPosition, checkingPosition, PieceType.KNIGHT)
-          );
-          validMoves.add(
-            new ChessMove(myPosition, checkingPosition, PieceType.BISHOP)
-          );
-          validMoves.add(
-            new ChessMove(myPosition, checkingPosition, PieceType.ROOK)
-          );
+          addMoves(validMoves, myPosition, checkingPosition);
         } else if (
           board.getPiece(checkingPosition) != null &&
           thisPieceColor != board.getPiece(checkingPosition).getTeamColor()
@@ -228,18 +221,7 @@ public class ChessPiece {
           board.getPiece(checkingPosition) != null &&
           thisPieceColor != board.getPiece(checkingPosition).getTeamColor()
         ) {
-          validMoves.add(
-            new ChessMove(myPosition, checkingPosition, PieceType.QUEEN)
-          );
-          validMoves.add(
-            new ChessMove(myPosition, checkingPosition, PieceType.KNIGHT)
-          );
-          validMoves.add(
-            new ChessMove(myPosition, checkingPosition, PieceType.BISHOP)
-          );
-          validMoves.add(
-            new ChessMove(myPosition, checkingPosition, PieceType.ROOK)
-          );
+          addMoves(validMoves, myPosition, checkingPosition);
         } else if (
           board.getPiece(checkingPosition) != null &&
           thisPieceColor != board.getPiece(checkingPosition).getTeamColor()
@@ -252,7 +234,7 @@ public class ChessPiece {
     if (
       board.getPiece(myPosition).getTeamColor() == ChessGame.TeamColor.BLACK
     ) {
-      if (isInBounds(myPosition, DOWN, NOCHANGE)) {
+      if (isInBounds(myPosition, DOWN, NO_CHANGE)) {
         checkingPosition = new ChessPosition(
           myPosition.getRow() + DOWN,
           myPosition.getColumn()
@@ -262,24 +244,13 @@ public class ChessPiece {
           checkingPosition.getRow() == 1 &&
           board.getPiece(checkingPosition) == null
         ) {
-          validMoves.add(
-            new ChessMove(myPosition, checkingPosition, PieceType.QUEEN)
-          );
-          validMoves.add(
-            new ChessMove(myPosition, checkingPosition, PieceType.KNIGHT)
-          );
-          validMoves.add(
-            new ChessMove(myPosition, checkingPosition, PieceType.BISHOP)
-          );
-          validMoves.add(
-            new ChessMove(myPosition, checkingPosition, PieceType.ROOK)
-          );
+          addMoves(validMoves, myPosition, checkingPosition);
         } else if (board.getPiece(checkingPosition) == null) {
           validMoves.add(new ChessMove(myPosition, checkingPosition, null));
         }
       }
 
-      if (isInBounds(myPosition, DOWN * 2, NOCHANGE)) {
+      if (isInBounds(myPosition, DOWN * 2, NO_CHANGE)) {
         checkingPosition = new ChessPosition(
           myPosition.getRow() + DOWN,
           myPosition.getColumn()
@@ -311,18 +282,7 @@ public class ChessPiece {
           board.getPiece(checkingPosition) != null &&
           thisPieceColor != board.getPiece(checkingPosition).getTeamColor()
         ) {
-          validMoves.add(
-            new ChessMove(myPosition, checkingPosition, PieceType.QUEEN)
-          );
-          validMoves.add(
-            new ChessMove(myPosition, checkingPosition, PieceType.KNIGHT)
-          );
-          validMoves.add(
-            new ChessMove(myPosition, checkingPosition, PieceType.BISHOP)
-          );
-          validMoves.add(
-            new ChessMove(myPosition, checkingPosition, PieceType.ROOK)
-          );
+          addMoves(validMoves, myPosition, checkingPosition);
         } else if (
           board.getPiece(checkingPosition) != null &&
           thisPieceColor != board.getPiece(checkingPosition).getTeamColor()
@@ -342,18 +302,7 @@ public class ChessPiece {
           board.getPiece(checkingPosition) != null &&
           thisPieceColor != board.getPiece(checkingPosition).getTeamColor()
         ) {
-          validMoves.add(
-            new ChessMove(myPosition, checkingPosition, PieceType.QUEEN)
-          );
-          validMoves.add(
-            new ChessMove(myPosition, checkingPosition, PieceType.KNIGHT)
-          );
-          validMoves.add(
-            new ChessMove(myPosition, checkingPosition, PieceType.BISHOP)
-          );
-          validMoves.add(
-            new ChessMove(myPosition, checkingPosition, PieceType.ROOK)
-          );
+          addMoves(validMoves, myPosition, checkingPosition);
         } else if (
           board.getPiece(checkingPosition) != null &&
           thisPieceColor != board.getPiece(checkingPosition).getTeamColor()
@@ -371,8 +320,8 @@ public class ChessPiece {
    * This takes into account opposite pieces
    * @param board the chess board
    * @param myPosition the initial position
-   * @param rowChange UP/DOWN/NOCHANGE * whatever amount to move
-   * @param colChange RIGHT/LEFT/NOCHANGE * whatever amount to move
+   * @param rowChange UP/DOWN/NO_CHANGE * whatever amount to move
+   * @param colChange RIGHT/LEFT/NO_CHANGE * whatever amount to move
    * @return returns an array of ChessMove(s) that will either contain one move or an empty array
    */
   private Collection<ChessMove> addSimpleMoveIfPossible(
@@ -417,19 +366,21 @@ public class ChessPiece {
   ) {
     var validMoves = new ArrayList<ChessMove>();
 
-    validMoves.addAll(addSimpleMoveIfPossible(board, myPosition, UP, NOCHANGE));
+    validMoves.addAll(
+      addSimpleMoveIfPossible(board, myPosition, UP, NO_CHANGE)
+    );
     validMoves.addAll(addSimpleMoveIfPossible(board, myPosition, UP, RIGHT));
     validMoves.addAll(addSimpleMoveIfPossible(board, myPosition, UP, LEFT));
     validMoves.addAll(
-      addSimpleMoveIfPossible(board, myPosition, DOWN, NOCHANGE)
+      addSimpleMoveIfPossible(board, myPosition, DOWN, NO_CHANGE)
     );
     validMoves.addAll(addSimpleMoveIfPossible(board, myPosition, DOWN, RIGHT));
     validMoves.addAll(addSimpleMoveIfPossible(board, myPosition, DOWN, LEFT));
     validMoves.addAll(
-      addSimpleMoveIfPossible(board, myPosition, NOCHANGE, RIGHT)
+      addSimpleMoveIfPossible(board, myPosition, NO_CHANGE, RIGHT)
     );
     validMoves.addAll(
-      addSimpleMoveIfPossible(board, myPosition, NOCHANGE, LEFT)
+      addSimpleMoveIfPossible(board, myPosition, NO_CHANGE, LEFT)
     );
 
     return validMoves;
@@ -495,11 +446,15 @@ public class ChessPiece {
 
     if (selectedPieceType.type == PieceType.ROOK) {
       // horizontal
-      validMoves.addAll(checkAndReturnMoves(board, myPosition, DOWN, NOCHANGE));
-      validMoves.addAll(checkAndReturnMoves(board, myPosition, UP, NOCHANGE));
-      validMoves.addAll(checkAndReturnMoves(board, myPosition, NOCHANGE, LEFT));
       validMoves.addAll(
-        checkAndReturnMoves(board, myPosition, NOCHANGE, RIGHT)
+        checkAndReturnMoves(board, myPosition, DOWN, NO_CHANGE)
+      );
+      validMoves.addAll(checkAndReturnMoves(board, myPosition, UP, NO_CHANGE));
+      validMoves.addAll(
+        checkAndReturnMoves(board, myPosition, NO_CHANGE, LEFT)
+      );
+      validMoves.addAll(
+        checkAndReturnMoves(board, myPosition, NO_CHANGE, RIGHT)
       );
     }
 
@@ -511,11 +466,15 @@ public class ChessPiece {
       validMoves.addAll(checkAndReturnMoves(board, myPosition, UP, RIGHT));
 
       // horizontal
-      validMoves.addAll(checkAndReturnMoves(board, myPosition, DOWN, NOCHANGE));
-      validMoves.addAll(checkAndReturnMoves(board, myPosition, UP, NOCHANGE));
-      validMoves.addAll(checkAndReturnMoves(board, myPosition, NOCHANGE, LEFT));
       validMoves.addAll(
-        checkAndReturnMoves(board, myPosition, NOCHANGE, RIGHT)
+        checkAndReturnMoves(board, myPosition, DOWN, NO_CHANGE)
+      );
+      validMoves.addAll(checkAndReturnMoves(board, myPosition, UP, NO_CHANGE));
+      validMoves.addAll(
+        checkAndReturnMoves(board, myPosition, NO_CHANGE, LEFT)
+      );
+      validMoves.addAll(
+        checkAndReturnMoves(board, myPosition, NO_CHANGE, RIGHT)
       );
     }
 
@@ -530,18 +489,6 @@ public class ChessPiece {
     if (selectedPieceType.type == PieceType.KNIGHT) {
       validMoves.addAll(calculateKnightMoves(board, myPosition));
     }
-
-    /*
-     * ADD PAWN, KNIGHT, & KING (ONLY TESTS LEFT)
-     * KNIGHT:
-     * - Can only do an L shaped move in UP DOWN RIGHT LEFT and then facing two different ways in each direction
-     * PAWN:
-     * - Can move 2 tiles first turn
-     * - Only move 1 tile forward thereafter
-     * - Once reaches row 1 or 8, it will become a different piece
-     * KING:
-     * - Can only move 1 but in any direction
-     */
 
     return validMoves;
   }

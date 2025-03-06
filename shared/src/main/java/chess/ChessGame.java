@@ -13,6 +13,13 @@ import java.util.Set;
  */
 public class ChessGame {
 
+  static final boolean IN_CHECKMATE = true;
+  static final boolean NOT_IN_CHECKMATE = false;
+  static final boolean CANNOT_MOVE = false;
+  static final boolean CAN_MOVE = true;
+  static final boolean IN_STALEMATE = true;
+  static final boolean NOT_IN_STALEMATE = false;
+
   TeamColor turn = TeamColor.WHITE;
   ChessBoard board = new ChessBoard();
 
@@ -159,11 +166,15 @@ public class ChessGame {
         var checkingPosition = new ChessPosition(x, y);
         var checkingPiece = board.getPiece(checkingPosition);
 
-        if (checkingPiece == null) continue;
+        if (checkingPiece == null) {
+          continue;
+        }
 
         var checkingPieceColor = checkingPiece.getTeamColor();
 
-        if (checkingPieceColor != teamColor) continue;
+        if (checkingPieceColor != teamColor) {
+          continue;
+        }
 
         possibleMoves.addAll(checkingPiece.pieceMoves(board, checkingPosition));
       }
@@ -187,11 +198,15 @@ public class ChessGame {
         var position = new ChessPosition(x, y);
         var piece = board.getPiece(position);
 
-        if (piece == null) continue;
+        if (piece == null) {
+          continue;
+        }
 
         var pieceColor = piece.getTeamColor();
 
-        if (pieceColor != teamColor) continue;
+        if (pieceColor != teamColor) {
+          continue;
+        }
 
         teamsValidMoves.addAll(validMoves(position));
       }
@@ -212,7 +227,9 @@ public class ChessGame {
         var checkingPosition = new ChessPosition(x, y);
         var checkingPiece = board.getPiece(checkingPosition);
 
-        if (checkingPiece == null) continue;
+        if (checkingPiece == null) {
+          continue;
+        }
 
         var checkingPieceColor = checkingPiece.getTeamColor();
         var checkingPieceType = checkingPiece.getPieceType();
@@ -284,9 +301,6 @@ public class ChessGame {
    * @return if he can move or not boolean
    */
   private boolean canKingMove(TeamColor teamColor, ChessBoard board) {
-    final boolean CANNOT_MOVE = false;
-    final boolean CAN_MOVE = true;
-
     final ChessPosition kingPosition = findKing(teamColor, board);
     final Collection<ChessMove> kingMoves = board
       .getPiece(kingPosition)
@@ -330,9 +344,6 @@ public class ChessGame {
    * @return True if the specified team is in checkmate
    */
   public boolean isInCheckmate(TeamColor teamColor) {
-    final boolean IN_CHECKMATE = true;
-    final boolean NOT_IN_CHECKMATE = false;
-
     if (canKingMove(teamColor, board)) {
       return NOT_IN_CHECKMATE;
     }
@@ -354,9 +365,6 @@ public class ChessGame {
    * @return True if the specified team is in stalemate, otherwise false
    */
   public boolean isInStalemate(TeamColor teamColor) {
-    final boolean IN_STALEMATE = true;
-    final boolean NOT_IN_STALEMATE = false;
-
     if (
       getTeamsValidMoves(teamColor, board).isEmpty() && !isInCheck(teamColor)
     ) {

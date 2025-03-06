@@ -15,8 +15,7 @@ public class MemoryUserDataAccess implements UserDataAccess {
   }
 
   @Override
-  public UserData createUser(String username, String password, String email)
-    {
+  public UserData createUser(String username, String password, String email) {
     users.put(username, new UserData(username, password, email));
     return users.get(username);
   }
