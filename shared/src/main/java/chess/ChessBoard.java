@@ -168,7 +168,8 @@ public class ChessBoard {
    * o == null checks to see if what is being compared is not an object
    * getClass() != o.getClass() checks to see if the classes being compared are different
    * ChessBoard that = (ChessBoard) o this converts the 'o' object defined as class "Object" to the ChessBoard class
-   * !Objects.equals(a, b) is used because if we use the != operator, it's looking for the same memory location versus the same value at that memory location
+   * !Objects.equals(a, b) is used because if we use the != operator,
+   * it's looking for the same memory location versus the same value at that memory location
    * @param o the object being compared against the current object
    * @return if the classes match
    */
@@ -192,11 +193,35 @@ public class ChessBoard {
     return true;
   }
 
+  private void identifyPieceTypes(StringBuilder returnString, int x, int y) {
+    var thisPieceType = getPiece(new ChessPosition(x, y)).getPieceType();
+    var thisPieceColor = getPiece(new ChessPosition(x, y)).getTeamColor();
+
+    if (thisPieceColor == ChessGame.TeamColor.WHITE) {
+      switch (thisPieceType) {
+        case ROOK -> returnString.append(" R");
+        case KNIGHT -> returnString.append(" N");
+        case BISHOP -> returnString.append(" B");
+        case KING -> returnString.append(" K");
+        case QUEEN -> returnString.append(" Q");
+        case PAWN -> returnString.append(" P");
+      }
+    } else {
+      switch (thisPieceType) {
+        case ROOK -> returnString.append(" r");
+        case KNIGHT -> returnString.append(" n");
+        case BISHOP -> returnString.append(" b");
+        case KING -> returnString.append(" k");
+        case QUEEN -> returnString.append(" q");
+        case PAWN -> returnString.append(" p");
+      }
+    }
+  }
+
   // returns a string when the class is called
   @Override
   public String toString() {
     StringBuilder returnString = new StringBuilder();
-
     // row
     for (int x = 8; x >= 1; x--) {
       // column
@@ -206,28 +231,7 @@ public class ChessBoard {
         if (piece == null) {
           returnString.append(" -");
         } else {
-          var thisPieceType = getPiece(new ChessPosition(x, y)).getPieceType();
-          var thisPieceColor = getPiece(new ChessPosition(x, y)).getTeamColor();
-
-          if (thisPieceColor == ChessGame.TeamColor.WHITE) {
-            switch (thisPieceType) {
-              case ROOK -> returnString.append(" R");
-              case KNIGHT -> returnString.append(" N");
-              case BISHOP -> returnString.append(" B");
-              case KING -> returnString.append(" K");
-              case QUEEN -> returnString.append(" Q");
-              case PAWN -> returnString.append(" P");
-            }
-          } else {
-            switch (thisPieceType) {
-              case ROOK -> returnString.append(" r");
-              case KNIGHT -> returnString.append(" n");
-              case BISHOP -> returnString.append(" b");
-              case KING -> returnString.append(" k");
-              case QUEEN -> returnString.append(" q");
-              case PAWN -> returnString.append(" p");
-            }
-          }
+          identifyPieceTypes(returnString, x, y);
         }
       }
       returnString.append("\n");

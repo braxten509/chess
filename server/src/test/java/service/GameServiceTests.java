@@ -1,10 +1,8 @@
 package service;
 
-import chess.ChessGame;
-import dataaccess.AuthDataAccess;
+import static org.junit.jupiter.api.Assertions.*;
+
 import dataaccess.DataAccessException;
-import dataaccess.GameDataAccess;
-import dataaccess.UserDataAccess;
 import dataaccess.memory.MemoryAuthDataAccess;
 import dataaccess.memory.MemoryGameDataAccess;
 import dataaccess.memory.MemoryUserDataAccess;
@@ -12,83 +10,85 @@ import model.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
-
 public class GameServiceTests {
-    private GameService gameService;
-    private UserService userService;
+
+  private GameService gameService;
     private AuthData authData;
-    private int gameID;
+  private int gameID;
 
-    @BeforeEach
-    void clear() throws DataAccessException {
-        MemoryAuthDataAccess authDataAccess = new MemoryAuthDataAccess();
-        MemoryGameDataAccess gameDataAccess = new MemoryGameDataAccess();
-        MemoryUserDataAccess userDataAccess = new MemoryUserDataAccess();
+  @BeforeEach
+  void clear() throws DataAccessException {
+    MemoryAuthDataAccess authDataAccess = new MemoryAuthDataAccess();
+    MemoryGameDataAccess gameDataAccess = new MemoryGameDataAccess();
+    MemoryUserDataAccess userDataAccess = new MemoryUserDataAccess();
 
-        this.gameService = new GameService(gameDataAccess, authDataAccess);
-        this.userService = new UserService(userDataAccess, authDataAccess);
+    this.gameService = new GameService(gameDataAccess, authDataAccess);
+      UserService userService = new UserService(userDataAccess, authDataAccess);
 
-        userService.registerUser(new RegisterRequest("username", "password", "email"));
-        this.authData = userService.loginUser(new LoginRequest("username", "password"));
-        this.gameID = gameService.createGame(new CreateGameRequest(authData.authToken(), "gameName"));
-    }
+    userService.registerUser(
+      new RegisterRequest("username", "password", "email")
+    );
+    this.authData = userService.loginUser(
+      new LoginRequest("username", "password")
+    );
+    this.gameID = gameService.createGame(
+      new CreateGameRequest(authData.authToken(), "gameName")
+    );
+  }
 
-    // will always succeed so no fail save test
-    @Test
-    void clearDataBase() throws DataAccessException {
-        gameService.clearDataAccess();
-        assertEquals(0, gameService.listGames(authData.authToken()).size());
-    }
+  // will always succeed so no fail save test
+  @Test
+  void clearDataBase() throws DataAccessException {
+    gameService.clearDataAccess();
+    assertEquals(0, gameService.listGames(authData.authToken()).size());
+  }
 
-    @Test
-    void createGame() throws DataAccessException {
-        assertEquals(1, gameService.listGames(authData.authToken()).size());
-    }
+  @Test
+  void createGame() throws DataAccessException {
+    assertEquals(1, gameService.listGames(authData.authToken()).size());
+  }
 
-    @Test
-    void createGameFail() {
-        assertThrows(DataAccessException.class, () -> {
-            gameService.createGame(new CreateGameRequest("invalidToken", "gameName"));
-        });
-    }
+  @Test
+  void createGameFail() {
+    assertThrows(DataAccessException.class, () -> gameService.createGame(new CreateGameRequest("invalidToken", "gameName")));
+  }
 
-    @Test
-    void getGame() throws DataAccessException {
-        GameData game = gameService.getGame(gameID);
+  @Test
+  void getGame() throws DataAccessException {
+    GameData game = gameService.getGame(gameID);
 
-        assertNotNull(game);
-    }
+    assertNotNull(game);
+  }
 
-    @Test
-    void getGameFail() throws DataAccessException {
-        assertNull(gameService.getGame(12345));
-    }
+  @Test
+  void getGameFail() throws DataAccessException {
+    assertNull(gameService.getGame(12345));
+  }
 
-    @Test
-    void joinGame() throws DataAccessException {
-        gameService.joinGame(new JoinGameRequest(authData.authToken(), "WHITE", gameID));
+  @Test
+  void joinGame() throws DataAccessException {
+    gameService.joinGame(
+      new JoinGameRequest(authData.authToken(), "WHITE", gameID)
+    );
 
-        GameData game = gameService.getGame(gameID);
-        assertNotNull(game.whiteUsername());
-    }
+    GameData game = gameService.getGame(gameID);
+    assertNotNull(game.whiteUsername());
+  }
 
-    @Test
-    void joinGameFail() {
-        assertThrows(DataAccessException.class, () -> {
-            gameService.joinGame(new JoinGameRequest("", "", 123));
-        });
-    }
+  @Test
+  void joinGameFail() {
+    assertThrows(DataAccessException.class, () -> gameService.joinGame(new JoinGameRequest("", "", 123)));
+  }
 
-    @Test
-    void listGames() throws DataAccessException {
-        gameService.createGame(new CreateGameRequest(authData.authToken(), "gameName"));
-        gameService.createGame(new CreateGameRequest(authData.authToken(), "gameNameA"));
+  @Test
+  void listGames() throws DataAccessException {
+    gameService.createGame(
+      new CreateGameRequest(authData.authToken(), "gameName")
+    );
+    gameService.createGame(
+      new CreateGameRequest(authData.authToken(), "gameNameA")
+    );
 
-        assertEquals(3, gameService.listGames(authData.authToken()).size());
-    }
-
+    assertEquals(3, gameService.listGames(authData.authToken()).size());
+  }
 }
