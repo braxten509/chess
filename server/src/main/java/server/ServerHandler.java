@@ -37,6 +37,14 @@ public class ServerHandler {
     AUTH_DATA_ACCESS
   );
 
+  private static void showErrors(Response res, Exception e) {
+    if (e.getMessage().equals("unauthorized")) {
+      res.status(401);
+    } else {
+      res.status(400);
+    }
+  }
+
   /**
    * turns a JSON string into an object
    * @param req request object
@@ -113,11 +121,7 @@ public class ServerHandler {
       res.status(200);
       return turnIntoJson(authData);
     } catch (DataAccessException e) {
-      if (e.getMessage().equals("unauthorized")) {
-        res.status(401);
-      } else {
-        res.status(400);
-      }
+      showErrors(res, e);
       return turnIntoJson("message", "Error: " + e.getMessage());
     } catch (Exception e) {
       res.status(500);
@@ -161,11 +165,7 @@ public class ServerHandler {
       int id = GAME_SERVICE.createGame(createGameRequest);
       return turnIntoJson("gameID", id);
     } catch (DataAccessException e) {
-      if (e.getMessage().equals("unauthorized")) {
-        res.status(401);
-      } else {
-        res.status(400);
-      }
+      showErrors(res, e);
       return turnIntoJson("message", "Error: " + e.getMessage());
     } catch (Exception e) {
       res.status(500);
@@ -232,11 +232,11 @@ public class ServerHandler {
 
   /**
    * Clears entire database
-   * @param req request object
+   * @param ignoredReq request object
    * @param res response object
    * @return empty JSON string or error
    */
-  public static Object clearDatabase(Request req, Response res) {
+  public static Object clearDatabase(Request ignoredReq, Response res) {
     try {
       res.type("application/json");
       USER_SERVICE.clearDataAccess();
