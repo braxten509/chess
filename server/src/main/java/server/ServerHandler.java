@@ -24,7 +24,9 @@ public class ServerHandler {
     new MemoryAuthDataAccess();
   private static final MemoryGameDataAccess gameDataAccess =
     new MemoryGameDataAccess();
-  private static final Gson gson = new GsonBuilder().disableHtmlEscaping().create();
+  private static final Gson gson = new GsonBuilder()
+    .disableHtmlEscaping()
+    .create();
 
   private static final GameService gameService = new GameService(
     gameDataAccess,
@@ -42,10 +44,7 @@ public class ServerHandler {
    * @return returns object 'T', whatever it is defined as
    * @param <T> labels as a generic method
    */
-  private static <T> T turnIntoObject(
-    Request req,
-    Class<T> classOfT
-  ) {
+  private static <T> T turnIntoObject(Request req, Class<T> classOfT) {
     return gson.fromJson(req.body(), classOfT);
   }
 
@@ -81,9 +80,7 @@ public class ServerHandler {
         RegisterRequest.class
       );
 
-      AuthData authData = userService.registerUser(
-        registerRequest
-      );
+      AuthData authData = userService.registerUser(registerRequest);
 
       res.status(200);
       return turnIntoJson(authData);
@@ -151,7 +148,9 @@ public class ServerHandler {
       res.type("application/json; charset=utf-8");
       String authToken = req.headers("Authorization");
 
-      JsonObject jsonObject = JsonParser.parseString(req.body()).getAsJsonObject();
+      JsonObject jsonObject = JsonParser.parseString(
+        req.body()
+      ).getAsJsonObject();
       String gameName = jsonObject.get("gameName").getAsString();
 
       CreateGameRequest createGameRequest = new CreateGameRequest(

@@ -71,7 +71,9 @@ public class UserService {
   public AuthData registerUser(RegisterRequest registerRequest)
     throws DataAccessException {
     if (
-            StringUtils.isEmpty(registerRequest.username()) || StringUtils.isEmpty(registerRequest.password()) || StringUtils.isEmpty(registerRequest.email())
+      StringUtils.isEmpty(registerRequest.username()) ||
+      StringUtils.isEmpty(registerRequest.password()) ||
+      StringUtils.isEmpty(registerRequest.email())
     ) {
       throw new DataAccessException("bad request");
     }

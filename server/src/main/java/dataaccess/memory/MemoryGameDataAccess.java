@@ -33,7 +33,8 @@ public class MemoryGameDataAccess implements GameDataAccess {
   }
 
   @Override
-  public void joinGame(String playerColor, int gameID, String playerUsername) throws DataAccessException {
+  public void joinGame(String playerColor, int gameID, String playerUsername)
+    throws DataAccessException {
     GameData joiningGame = games.get(gameID);
     String gameName = joiningGame.gameName();
     ChessGame game = joiningGame.game();
