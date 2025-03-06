@@ -4,7 +4,6 @@ import dataaccess.AuthDataAccess;
 import dataaccess.DataAccessException;
 import dataaccess.GameDataAccess;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Objects;
 import model.AuthData;
 import model.CreateGameRequest;

@@ -9,10 +9,6 @@ public class MemoryUserDataAccess implements UserDataAccess {
 
   Map<String, UserData> users = new HashMap<>();
 
-  private static String generateToken() {
-    return UUID.randomUUID().toString();
-  }
-
   @Override
   public UserData getUser(String username) {
     return users.get(username);
@@ -20,7 +16,7 @@ public class MemoryUserDataAccess implements UserDataAccess {
 
   @Override
   public UserData createUser(String username, String password, String email)
-    throws DataAccessException {
+    {
     users.put(username, new UserData(username, password, email));
     return users.get(username);
   }
@@ -31,7 +27,7 @@ public class MemoryUserDataAccess implements UserDataAccess {
   }
 
   @Override
-  public Collection<UserData> listUsers() throws DataAccessException {
+  public Collection<UserData> listUsers() {
     return users.values();
   }
 }

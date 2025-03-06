@@ -1,7 +1,6 @@
 package dataaccess;
 
 import java.util.Collection;
-import model.AuthData;
 import model.UserData;
 
 public interface UserDataAccess {

@@ -1,7 +1,6 @@
 package dataaccess;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import model.GameData;
 
 public interface GameDataAccess {

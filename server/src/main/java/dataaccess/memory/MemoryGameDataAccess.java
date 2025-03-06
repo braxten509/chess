@@ -18,7 +18,7 @@ public class MemoryGameDataAccess implements GameDataAccess {
   }
 
   @Override
-  public int createNewGame(String gameName) throws DataAccessException {
+  public int createNewGame(String gameName) {
     currentId += 1;
     games.put(
       currentId,
@@ -28,13 +28,13 @@ public class MemoryGameDataAccess implements GameDataAccess {
   }
 
   @Override
-  public GameData getGame(int gameID) throws DataAccessException {
+  public GameData getGame(int gameID) {
     return games.get(gameID);
   }
 
   @Override
   public void joinGame(String playerColor, int gameID, String playerUsername)
-    throws DataAccessException {
+    {
     GameData joiningGame = games.get(gameID);
     String gameName = joiningGame.gameName();
     ChessGame game = joiningGame.game();
@@ -55,7 +55,7 @@ public class MemoryGameDataAccess implements GameDataAccess {
   }
 
   @Override
-  public ArrayList<GameData> listGames() throws DataAccessException {
+  public ArrayList<GameData> listGames() {
     return new ArrayList<>(games.values());
   }
 }

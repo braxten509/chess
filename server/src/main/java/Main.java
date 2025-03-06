@@ -1,8 +1,5 @@
 import chess.*;
-import dataaccess.memory.MemoryAuthDataAccess;
-import dataaccess.memory.MemoryUserDataAccess;
 import server.Server;
-import service.UserService;
 
 public class Main {
 
