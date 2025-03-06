@@ -45,7 +45,9 @@ class UserServiceTests {
 
   @Test
   void registerUserFail() {
-    assertThrows(DataAccessException.class, () -> USER_SERVICE.registerUser(new RegisterRequest("", "a", "a")));
+    assertThrows(DataAccessException.class, () ->
+      USER_SERVICE.registerUser(new RegisterRequest("", "a", "a"))
+    );
   }
 
   @Test
@@ -61,9 +63,11 @@ class UserServiceTests {
     var newUser = USER_SERVICE.registerUser(
       new RegisterRequest("hello", "a", "b")
     );
-    assertThrows(DataAccessException.class, () -> USER_SERVICE.loginUser(
-      new LoginRequest(newUser.username(), "wrongPassword")
-    ));
+    assertThrows(DataAccessException.class, () ->
+      USER_SERVICE.loginUser(
+        new LoginRequest(newUser.username(), "wrongPassword")
+      )
+    );
   }
 
   @Test
@@ -81,7 +85,9 @@ class UserServiceTests {
 
   @Test
   void logoutUserFail() {
-    assertThrows(DataAccessException.class, () -> USER_SERVICE.logoutUser("fakeToken"));
+    assertThrows(DataAccessException.class, () ->
+      USER_SERVICE.logoutUser("fakeToken")
+    );
   }
 
   // test can NEVER fail, so no fail save test was made

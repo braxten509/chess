@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test;
 public class GameServiceTests {
 
   private GameService gameService;
-    private AuthData authData;
+  private AuthData authData;
   private int gameID;
 
   @BeforeEach
@@ -23,7 +23,7 @@ public class GameServiceTests {
     MemoryUserDataAccess userDataAccess = new MemoryUserDataAccess();
 
     this.gameService = new GameService(gameDataAccess, authDataAccess);
-      UserService userService = new UserService(userDataAccess, authDataAccess);
+    UserService userService = new UserService(userDataAccess, authDataAccess);
 
     userService.registerUser(
       new RegisterRequest("username", "password", "email")
@@ -50,7 +50,9 @@ public class GameServiceTests {
 
   @Test
   void createGameFail() {
-    assertThrows(DataAccessException.class, () -> gameService.createGame(new CreateGameRequest("invalidToken", "gameName")));
+    assertThrows(DataAccessException.class, () ->
+      gameService.createGame(new CreateGameRequest("invalidToken", "gameName"))
+    );
   }
 
   @Test
@@ -77,7 +79,9 @@ public class GameServiceTests {
 
   @Test
   void joinGameFail() {
-    assertThrows(DataAccessException.class, () -> gameService.joinGame(new JoinGameRequest("", "", 123)));
+    assertThrows(DataAccessException.class, () ->
+      gameService.joinGame(new JoinGameRequest("", "", 123))
+    );
   }
 
   @Test
