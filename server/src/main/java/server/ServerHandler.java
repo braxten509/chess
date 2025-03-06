@@ -81,12 +81,12 @@ public class ServerHandler {
         RegisterRequest.class
       );
 
-      RegisterResult successRegisterResult = userService.registerUser(
+      AuthData authData = userService.registerUser(
         registerRequest
       );
 
       res.status(200);
-      return turnIntoJson(successRegisterResult);
+      return turnIntoJson(authData);
     } catch (DataAccessException e) {
       if (e.getMessage().equals("already taken")) {
         res.status(403);
@@ -112,9 +112,9 @@ public class ServerHandler {
 
       LoginRequest loginRequest = turnIntoObject(req, LoginRequest.class);
 
-      LoginResult successLoginResult = userService.loginUser(loginRequest);
+      AuthData authData = userService.loginUser(loginRequest);
       res.status(200);
-      return turnIntoJson(successLoginResult);
+      return turnIntoJson(authData);
     } catch (DataAccessException e) {
       if (e.getMessage().equals("unauthorized")) {
         res.status(401);

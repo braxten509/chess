@@ -8,6 +8,7 @@ import dataaccess.memory.MemoryUserDataAccess;
 import java.util.Collection;
 import java.util.Objects;
 import model.*;
+import spark.utils.StringUtils;
 
 public class UserService {
 
@@ -39,7 +40,7 @@ public class UserService {
     return userDataAccess.listUsers();
   }
 
-  public LoginResult loginUser(LoginRequest loginRequest)
+  public AuthData loginUser(LoginRequest loginRequest)
     throws DataAccessException {
     UserData user = userDataAccess.getUser(loginRequest.username());
 
@@ -57,7 +58,7 @@ public class UserService {
 
     String authToken = authDataAccess.createAuth(user.username());
 
-    return new LoginResult(authToken, user.username());
+    return new AuthData(authToken, user.username());
   }
 
   public void logoutUser(String authToken) throws DataAccessException {
@@ -67,12 +68,10 @@ public class UserService {
     }
   }
 
-  public RegisterResult registerUser(RegisterRequest registerRequest)
+  public AuthData registerUser(RegisterRequest registerRequest)
     throws DataAccessException {
     if (
-      registerRequest.username() == null ||
-      registerRequest.password() == null ||
-      registerRequest.email() == null
+            StringUtils.isEmpty(registerRequest.username()) || StringUtils.isEmpty(registerRequest.password()) || StringUtils.isEmpty(registerRequest.email())
     ) {
       throw new DataAccessException("bad request");
     }
@@ -91,6 +90,6 @@ public class UserService {
 
     String authToken = authDataAccess.createAuth(user.username());
 
-    return new RegisterResult(user.username(), authToken);
+    return new AuthData(authToken, user.username());
   }
 }
