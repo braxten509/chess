@@ -2,6 +2,8 @@ import chess.*;
 import dataaccess.DatabaseManager;
 import server.Server;
 
+import javax.xml.crypto.Data;
+
 public class Main {
 
   public static void main(String[] args) {
@@ -13,6 +15,7 @@ public class Main {
 
     try {
       DatabaseManager.createDatabase();
+      DatabaseManager.createTables();
     } catch (Exception e) {
       System.out.println("ERROR: " + e);
     }
