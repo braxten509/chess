@@ -60,37 +60,37 @@ public class DatabaseManager {
       var conn = getConnection();
       Statement statement = conn.createStatement();
     ) {
-        String command = """
-                CREATE TABLE IF NOT EXISTS users (
-                  id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-                  username VARCHAR(255) NOT NULL,
-                  password VARCHAR(255) NOT NULL,
-                  email VARCHAR(255) NOT NULL
-                );
-                """;
-        statement.executeUpdate(command);
+      String command =
+        """
+        CREATE TABLE IF NOT EXISTS users (
+          username VARCHAR(255) NOT NULL PRIMARY KEY,
+          password VARCHAR(255) NOT NULL,
+          email VARCHAR(255) NOT NULL
+        );
+        """;
+      statement.executeUpdate(command);
 
-        command = """
-                CREATE TABLE IF NOT EXISTS games (
-                id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-                white_username VARCHAR(255),
-                black_username VARCHAR(255),
-                game_name VARCHAR(255) NOT NULL,
-                chess_game TEXT NOT NULL
-                );
-                """;
-        statement.executeUpdate(command);
+      command = """
+      CREATE TABLE IF NOT EXISTS games (
+      id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+      white_username VARCHAR(255),
+      black_username VARCHAR(255),
+      game_name VARCHAR(255) NOT NULL,
+      chess_game TEXT NOT NULL
+      );
+      """;
+      statement.executeUpdate(command);
 
-        command = """
-                CREATE TABLE IF NOT EXISTS auths (
-                id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-                auth_token VARCHAR(255) NOT NULL,
-                username VARCHAR(255) NOT NULL
-                );
-                """;
-        statement.executeUpdate(command);
+      command = """
+      CREATE TABLE IF NOT EXISTS auths (
+      id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+      auth_token VARCHAR(255) NOT NULL,
+      username VARCHAR(255) NOT NULL
+      );
+      """;
+      statement.executeUpdate(command);
     } catch (SQLException e) {
-        System.out.println("ERROR: " + e);
+      System.out.println("ERROR: " + e);
     }
   }
 

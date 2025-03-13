@@ -1,8 +1,7 @@
 import chess.*;
 import dataaccess.DatabaseManager;
-import server.Server;
-
 import javax.xml.crypto.Data;
+import server.Server;
 
 public class Main {
 
