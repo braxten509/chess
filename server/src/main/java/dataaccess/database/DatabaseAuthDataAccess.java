@@ -7,7 +7,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.UUID;
 import model.AuthData;
-import model.UserData;
 
 public class DatabaseAuthDataAccess implements AuthDataAccess {
 
