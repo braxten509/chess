@@ -83,8 +83,7 @@ public class DatabaseManager {
 
       command = """
       CREATE TABLE IF NOT EXISTS auths (
-      id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-      auth_token VARCHAR(255) NOT NULL,
+      auth_token VARCHAR(255) NOT NULL PRIMARY KEY,
       username VARCHAR(255) NOT NULL
       );
       """;
