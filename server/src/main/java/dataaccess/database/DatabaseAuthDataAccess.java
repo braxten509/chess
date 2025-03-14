@@ -42,11 +42,11 @@ public class DatabaseAuthDataAccess implements AuthDataAccess {
       )
     ) {
       preparedStatement.setString(1, authToken);
-      preparedStatement.executeUpdate();
+      int rowsDeleted = preparedStatement.executeUpdate();
+      return rowsDeleted > 0;
     } catch (SQLException e) {
       throw new DataAccessException("ERROR removing auth: " + e);
     }
-    return false;
   }
 
   @Override
