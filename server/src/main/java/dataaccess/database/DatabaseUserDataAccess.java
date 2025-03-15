@@ -1,5 +1,6 @@
 package dataaccess.database;
 
+import org.mindrot.jbcrypt.BCrypt;
 import dataaccess.DataAccessException;
 import dataaccess.DatabaseManager;
 import dataaccess.UserDataAccess;
@@ -24,7 +25,7 @@ public class DatabaseUserDataAccess implements UserDataAccess {
       try (ResultSet result = preparedStatement.executeQuery()) {
         if (result.next()) {
           String foundUsername = result.getString("username");
-          String foundPassword = result.getString("password");
+          String foundPassword = result.getString("hashed_password");
           String foundEmail = result.getString("email");
           return new UserData(foundUsername, foundPassword, foundEmail);
         }
@@ -40,14 +41,15 @@ public class DatabaseUserDataAccess implements UserDataAccess {
   @Override
   public UserData createUser(String username, String password, String email)
     throws DataAccessException {
+    String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
     try (
       var conn = DatabaseManager.getConnection();
       var preparedStatement = conn.prepareStatement(
-        "INSERT INTO users (username, password, email) VALUES (?, ?, ?)"
+        "INSERT INTO users (username, hashed_password, email) VALUES (?, ?, ?)"
       )
     ) {
       preparedStatement.setString(1, username);
-      preparedStatement.setString(2, password);
+      preparedStatement.setString(2, hashedPassword);
       preparedStatement.setString(3, email);
       preparedStatement.executeUpdate();
     } catch (SQLException e) {

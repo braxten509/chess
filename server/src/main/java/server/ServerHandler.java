@@ -5,9 +5,9 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import dataaccess.DataAccessException;
-import dataaccess.memory.MemoryAuthDataAccess;
-import dataaccess.memory.MemoryGameDataAccess;
-import dataaccess.memory.MemoryUserDataAccess;
+import dataaccess.database.DatabaseAuthDataAccess;
+import dataaccess.database.DatabaseGameDataAccess;
+import dataaccess.database.DatabaseUserDataAccess;
 import java.util.ArrayList;
 import java.util.Map;
 import model.*;
@@ -18,12 +18,12 @@ import spark.Response;
 
 public class ServerHandler {
 
-  private static final MemoryUserDataAccess USER_DATA_ACCESS =
-    new MemoryUserDataAccess();
-  private static final MemoryAuthDataAccess AUTH_DATA_ACCESS =
-    new MemoryAuthDataAccess();
-  private static final MemoryGameDataAccess GAME_DATA_ACCESS =
-    new MemoryGameDataAccess();
+  private static final DatabaseUserDataAccess USER_DATA_ACCESS =
+    new DatabaseUserDataAccess();
+  private static final DatabaseAuthDataAccess AUTH_DATA_ACCESS =
+    new DatabaseAuthDataAccess();
+  private static final DatabaseGameDataAccess GAME_DATA_ACCESS =
+    new DatabaseGameDataAccess();
   private static final Gson GSON = new GsonBuilder()
     .disableHtmlEscaping()
     .create();

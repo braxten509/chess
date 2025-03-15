@@ -1,12 +1,10 @@
 package service;
 
+import org.mindrot.jbcrypt.BCrypt;
 import dataaccess.AuthDataAccess;
 import dataaccess.DataAccessException;
 import dataaccess.UserDataAccess;
-import dataaccess.memory.MemoryAuthDataAccess;
-import dataaccess.memory.MemoryUserDataAccess;
 import java.util.Collection;
-import java.util.Objects;
 import model.*;
 import spark.utils.StringUtils;
 
@@ -16,8 +14,8 @@ public class UserService {
   private final AuthDataAccess authDataAccess;
 
   public UserService(
-    MemoryUserDataAccess userDataAccess,
-    MemoryAuthDataAccess authDataAccess
+    UserDataAccess userDataAccess,
+    AuthDataAccess authDataAccess
   ) {
     this.userDataAccess = userDataAccess;
     this.authDataAccess = authDataAccess;
@@ -52,7 +50,8 @@ public class UserService {
       throw new DataAccessException("unauthorized");
     }
 
-    if (!Objects.equals(loginRequest.password(), user.password())) {
+    String hashedPassword = user.password();
+    if (!BCrypt.checkpw(loginRequest.password(), hashedPassword)) {
       throw new DataAccessException("unauthorized");
     }
 
