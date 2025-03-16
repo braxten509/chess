@@ -16,17 +16,20 @@ import org.junit.jupiter.api.Test;
 public class GameServiceTests {
 
   private GameService gameService;
-  private AuthData authData;
+    private AuthData authData;
   private int gameID;
 
   @BeforeEach
-  void clear() throws DataAccessException {
+  void reset() throws DataAccessException {
     AuthDataAccess authDataAccess = new DatabaseAuthDataAccess();
     GameDataAccess gameDataAccess = new DatabaseGameDataAccess();
     UserDataAccess userDataAccess = new DatabaseUserDataAccess();
 
     this.gameService = new GameService(gameDataAccess, authDataAccess);
     UserService userService = new UserService(userDataAccess, authDataAccess);
+
+    gameService.clearDataAccess();
+    userService.clearDataAccess();
 
     userService.registerUser(
       new RegisterRequest("username", "password", "email")
