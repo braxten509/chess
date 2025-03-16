@@ -2,10 +2,13 @@ package service;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import dataaccess.AuthDataAccess;
 import dataaccess.DataAccessException;
-import dataaccess.memory.MemoryAuthDataAccess;
-import dataaccess.memory.MemoryGameDataAccess;
-import dataaccess.memory.MemoryUserDataAccess;
+import dataaccess.GameDataAccess;
+import dataaccess.UserDataAccess;
+import dataaccess.database.DatabaseAuthDataAccess;
+import dataaccess.database.DatabaseGameDataAccess;
+import dataaccess.database.DatabaseUserDataAccess;
 import model.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,9 +21,9 @@ public class GameServiceTests {
 
   @BeforeEach
   void clear() throws DataAccessException {
-    MemoryAuthDataAccess authDataAccess = new MemoryAuthDataAccess();
-    MemoryGameDataAccess gameDataAccess = new MemoryGameDataAccess();
-    MemoryUserDataAccess userDataAccess = new MemoryUserDataAccess();
+    AuthDataAccess authDataAccess = new DatabaseAuthDataAccess();
+    GameDataAccess gameDataAccess = new DatabaseGameDataAccess();
+    UserDataAccess userDataAccess = new DatabaseUserDataAccess();
 
     this.gameService = new GameService(gameDataAccess, authDataAccess);
     UserService userService = new UserService(userDataAccess, authDataAccess);

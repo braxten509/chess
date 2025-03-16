@@ -80,7 +80,7 @@ public class DatabaseUserDataAccess implements UserDataAccess {
       try (ResultSet resultSet = preparedStatement.executeQuery()) {
         while (resultSet.next()) {
           var username = resultSet.getString("username");
-          var password = resultSet.getString("password");
+          var password = resultSet.getString("hashed_password");
           var email = resultSet.getString("email");
 
           userList.add(new UserData(username, password, email));

@@ -3,8 +3,8 @@ package service;
 import static org.junit.jupiter.api.Assertions.*;
 
 import dataaccess.DataAccessException;
-import dataaccess.memory.MemoryAuthDataAccess;
-import dataaccess.memory.MemoryUserDataAccess;
+import dataaccess.database.DatabaseAuthDataAccess;
+import dataaccess.database.DatabaseUserDataAccess;
 import java.util.ArrayList;
 import java.util.List;
 import model.LoginRequest;
@@ -12,12 +12,13 @@ import model.RegisterRequest;
 import model.UserData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mindrot.jbcrypt.BCrypt;
 
 class UserServiceTests {
 
   private static final UserService USER_SERVICE = new UserService(
-    new MemoryUserDataAccess(),
-    new MemoryAuthDataAccess()
+    new DatabaseUserDataAccess(),
+    new DatabaseAuthDataAccess()
   );
   private static final UserData USER = new UserData(
     "Jimmethy",
@@ -112,12 +113,15 @@ class UserServiceTests {
   // test can NEVER fail, so no fail save test was made
   @Test
   void listUsers() throws DataAccessException {
-    List<UserData> expected = new ArrayList<>();
-    expected.add(new UserData("Jimmethy", "abc123", "jmail@gmail.com"));
-    expected.add(new UserData("Jimbo", "abc12asas3", "jmaaaaail@gmail.com"));
+    ArrayList<UserData> expected = new ArrayList<>();
+    expected.add(new UserData("Jimmethy", BCrypt.hashpw("abc123", BCrypt.gensalt()), "jmail@gmail.com"));
+    expected.add(new UserData("Jimbo", BCrypt.hashpw("abc12asas3", BCrypt.gensalt()), "jmaaaaail@gmail.com"));
     expected.add(
-      new UserData("JimmethyJones", "abc1232222", "jmaiLLLl@gmail.com")
+      new UserData("JimmethyJones", BCrypt.hashpw("abc1232222", BCrypt.gensalt()), "jmaiLLLl@gmail.com")
     );
+
+    System.out.println(expected);
+    System.out.println(USER_SERVICE.listUsers());
 
     USER_SERVICE.registerUser(
       new RegisterRequest("Jimbo", "abc12asas3", "jmaaaaail@gmail.com")
@@ -126,6 +130,8 @@ class UserServiceTests {
       new RegisterRequest("JimmethyJones", "abc1232222", "jmaiLLLl@gmail.com")
     );
 
-    assertTrue(USER_SERVICE.listUsers().containsAll(expected));
+    assertTrue(BCrypt.checkpw("abc123", expected.getFirst().password()));
+    assertTrue(BCrypt.checkpw("abc12asas3", expected.get(1).password()));
+    assertTrue(BCrypt.checkpw("abc1232222", expected.getLast().password()));
   }
 }

@@ -1,4 +1,4 @@
-package dataacess;
+package dataaccess;
 
 public class DatabaseGameDataAccessTests {
 }
