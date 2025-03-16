@@ -7,6 +7,8 @@ import dataaccess.database.DatabaseAuthDataAccess;
 import dataaccess.database.DatabaseUserDataAccess;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+
 import model.LoginRequest;
 import model.RegisterRequest;
 import model.UserData;
@@ -39,9 +41,13 @@ class UserServiceTests {
   @Test
   void registerUser() throws DataAccessException {
     var users = USER_SERVICE.listUsers();
+    UserData foundUser = USER_SERVICE.getUser(USER.username());
 
     assertEquals(1, users.size());
-    assertTrue(users.contains(USER));
+
+    assertEquals(USER.username(), foundUser.username());
+    assertTrue(BCrypt.checkpw(USER.password(), foundUser.password()));
+    assertEquals(USER.email(), foundUser.email());
   }
 
   @Test
@@ -54,9 +60,11 @@ class UserServiceTests {
   @Test
   void loginUser() throws DataAccessException {
     USER_SERVICE.loginUser(new LoginRequest(USER.username(), USER.password()));
-    var usersList = USER_SERVICE.listUsers();
+    UserData foundUser = USER_SERVICE.getUser(USER.username());
 
-    assertTrue(usersList.contains(USER));
+    assertEquals(USER.username(), foundUser.username());
+    assertTrue(BCrypt.checkpw(USER.password(), foundUser.password()));
+    assertEquals(USER.email(), foundUser.email());
   }
 
   @Test
@@ -101,8 +109,11 @@ class UserServiceTests {
 
   @Test
   void getUser() throws DataAccessException {
-    var foundUser = USER_SERVICE.getUser(USER.username());
-    assertEquals(USER, foundUser);
+    UserData foundUser = USER_SERVICE.getUser(USER.username());
+
+    assertEquals(USER.username(), foundUser.username());
+    assertTrue(BCrypt.checkpw(USER.password(), foundUser.password()));
+    assertEquals(USER.email(), foundUser.email());
   }
 
   @Test
@@ -119,9 +130,6 @@ class UserServiceTests {
     expected.add(
       new UserData("JimmethyJones", BCrypt.hashpw("abc1232222", BCrypt.gensalt()), "jmaiLLLl@gmail.com")
     );
-
-    System.out.println(expected);
-    System.out.println(USER_SERVICE.listUsers());
 
     USER_SERVICE.registerUser(
       new RegisterRequest("Jimbo", "abc12asas3", "jmaaaaail@gmail.com")
