@@ -12,6 +12,13 @@ public class Server {
 
     Spark.staticFiles.location("web");
 
+    try {
+      DatabaseManager.createDatabase();
+      DatabaseManager.createTables();
+    } catch (Exception e) {
+      System.out.println("ERROR: " + e);
+    }
+
     // Register your endpoints and handle exceptions here.
     Spark.post("/user", ServerHandler::registerUser);
     Spark.post("/session", ServerHandler::loginUser);

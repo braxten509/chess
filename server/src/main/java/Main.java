@@ -1,5 +1,4 @@
 import chess.*;
-import dataaccess.DatabaseManager;
 import server.Server;
 
 public class Main {
@@ -10,13 +9,6 @@ public class Main {
       ChessPiece.PieceType.PAWN
     );
     System.out.println("♕ 240 Chess Server: " + piece);
-
-    try {
-      DatabaseManager.createDatabase();
-      DatabaseManager.createTables();
-    } catch (Exception e) {
-      System.out.println("ERROR: " + e);
-    }
 
     var server = new Server();
 
