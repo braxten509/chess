@@ -88,15 +88,15 @@ public class DatabaseGameDataAccess implements GameDataAccess {
   @Override
   public void joinGame(String playerColor, int gameID, String playerUsername)
     throws DataAccessException {
-    String SQLString;
+    String sqlString;
     if (Objects.equals(playerColor, "WHITE")) {
-      SQLString = "UPDATE games SET white_username = ? WHERE game_id = ?";
+      sqlString = "UPDATE games SET white_username = ? WHERE game_id = ?";
     } else {
-      SQLString = "UPDATE games SET black_username = ? WHERE game_id = ?";
+      sqlString = "UPDATE games SET black_username = ? WHERE game_id = ?";
     }
     try (
             var conn = DatabaseManager.getConnection();
-            var preparedStatement = conn.prepareStatement(SQLString)
+            var preparedStatement = conn.prepareStatement(sqlString)
     ) {
       preparedStatement.setString(1, playerUsername);
       preparedStatement.setInt(2, gameID);
