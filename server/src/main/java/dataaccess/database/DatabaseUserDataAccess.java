@@ -42,6 +42,11 @@ public class DatabaseUserDataAccess implements UserDataAccess {
   public UserData createUser(String username, String password, String email)
     throws DataAccessException {
     String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
+
+    if (!username.matches("[a-zA-Z0-9_-]+") || !password.matches("[^);]+") || !email.matches("[^();:]+")) {
+      throw new DataAccessException("User info does not match expected syntax");
+    }
+
     try (
       var conn = DatabaseManager.getConnection();
       var preparedStatement = conn.prepareStatement(
