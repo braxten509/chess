@@ -58,7 +58,7 @@ public class DatabaseManager {
   public static void createTables() throws DataAccessException {
     try (
       var conn = getConnection();
-      Statement statement = conn.createStatement();
+      Statement statement = conn.createStatement()
     ) {
       String command =
         """
@@ -72,19 +72,19 @@ public class DatabaseManager {
 
       command = """
       CREATE TABLE IF NOT EXISTS games (
-      game_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-      white_username VARCHAR(255),
-      black_username VARCHAR(255),
-      game_name VARCHAR(255) NOT NULL,
-      chess_game TEXT NOT NULL
+        game_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+        white_username VARCHAR(255),
+        black_username VARCHAR(255),
+        game_name VARCHAR(255) NOT NULL,
+        chess_game TEXT NOT NULL
       );
       """;
       statement.executeUpdate(command);
 
       command = """
       CREATE TABLE IF NOT EXISTS auths (
-      auth_token VARCHAR(255) NOT NULL PRIMARY KEY,
-      username VARCHAR(255) NOT NULL
+        auth_token VARCHAR(255) NOT NULL PRIMARY KEY,
+        username VARCHAR(255) NOT NULL
       );
       """;
       statement.executeUpdate(command);

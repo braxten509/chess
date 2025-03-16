@@ -1,6 +1,7 @@
 package dataaccess.database;
 
 import chess.ChessGame;
+import com.google.gson.Gson;
 import dataaccess.DataAccessException;
 import dataaccess.DatabaseManager;
 import dataaccess.GameDataAccess;
@@ -11,9 +12,10 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 import model.GameData;
-import model.UserData;
 
 public class DatabaseGameDataAccess implements GameDataAccess {
+
+  Gson serializer = new Gson();
 
   @Override
   public void clear() throws DataAccessException {
@@ -32,14 +34,16 @@ public class DatabaseGameDataAccess implements GameDataAccess {
     try (
             var conn = DatabaseManager.getConnection();
             var preparedStatement = conn.prepareStatement(
-                    "INSERT INTO games (white_username, black_username, game_name, game) VALUES (?, ?, ?, ?)"
+                    "INSERT INTO games (white_username, black_username, game_name, chess_game) VALUES (?, ?, ?, ?)"
             )
     ) {
-      /* ADD CHESS GAME */
+      ChessGame newGame = new ChessGame();
+      String serializedGame = serializer.toJson(newGame);
+
       preparedStatement.setString(1, null);
       preparedStatement.setString(2, null);
       preparedStatement.setString(3, gameName);
-      preparedStatement.setString(4, "CHESS GAME");
+      preparedStatement.setString(4, serializedGame);
       preparedStatement.executeUpdate();
 
       try (var preparedStatement2 = conn.prepareStatement("SELECT game_id FROM games WHERE game_name = ?")) {
@@ -68,10 +72,11 @@ public class DatabaseGameDataAccess implements GameDataAccess {
           String whiteUsername = result.getString("white_username");
           String blackUsername = result.getString("black_username");
           String gameName = result.getString("game_name");
-          String game = result.getString("game");
+          String serializedGame = result.getString("chess_game");
 
-          /* TODO: ADD CHESS GAME */
-          return new GameData(gameID, whiteUsername, blackUsername, gameName, new ChessGame());
+          ChessGame deserializedGame = serializer.fromJson(serializedGame, ChessGame.class);
+
+          return new GameData(gameID, whiteUsername, blackUsername, gameName, deserializedGame);
         }
         return null;
       }
@@ -83,7 +88,7 @@ public class DatabaseGameDataAccess implements GameDataAccess {
   @Override
   public void joinGame(String playerColor, int gameID, String playerUsername)
     throws DataAccessException {
-    String SQLString = "";
+    String SQLString;
     if (Objects.equals(playerColor, "WHITE")) {
       SQLString = "UPDATE games SET white_username = ? WHERE game_id = ?";
     } else {
@@ -114,10 +119,11 @@ public class DatabaseGameDataAccess implements GameDataAccess {
           var whiteUsername = resultSet.getString("white_username");
           var blackUsername = resultSet.getString("black_username");
           var gameName = resultSet.getString("game_name");
-          var game = resultSet.getString("game");
+          String serializedGame = resultSet.getString("chess_game");
 
-          /* TODO: Add Chess Game */
-          gamesList.add(new GameData(id, whiteUsername, blackUsername, gameName, new ChessGame()));
+          ChessGame deserializedGame = serializer.fromJson(serializedGame, ChessGame.class);
+
+          gamesList.add(new GameData(id, whiteUsername, blackUsername, gameName, deserializedGame));
         }
       }
     } catch (SQLException e) {

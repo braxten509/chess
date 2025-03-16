@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="at.favre.lib.bcrypt" type="repository">
+    <properties maven-id="at.favre.lib:bcrypt:0.10.2" />
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/lib/bcrypt-0.10.2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/bytes-1.5.0.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
