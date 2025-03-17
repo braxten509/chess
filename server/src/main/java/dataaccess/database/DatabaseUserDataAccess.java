@@ -41,6 +41,9 @@ public class DatabaseUserDataAccess implements UserDataAccess {
   @Override
   public UserData createUser(String username, String password, String email)
     throws DataAccessException {
+    if (!password.matches("[^);(]+")) {
+      throw new DataAccessException("Password contains invalid characters");
+    }
     String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
     try (
       var conn = DatabaseManager.getConnection();
