@@ -16,7 +16,7 @@ import org.junit.jupiter.api.Test;
 public class GameServiceTests {
 
   private GameService gameService;
-    private AuthData authData;
+  private AuthData authData;
   private int gameID;
 
   @BeforeEach

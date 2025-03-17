@@ -31,6 +31,9 @@ public class DatabaseGameDataAccess implements GameDataAccess {
 
   @Override
   public int createNewGame(String gameName) throws DataAccessException {
+    if (!gameName.matches("[a-zA-Z0-9_-]+")) {
+      throw new DataAccessException("User info does not match expected syntax");
+    }
     try (
             var conn = DatabaseManager.getConnection();
             var preparedStatement = conn.prepareStatement(
@@ -88,15 +91,18 @@ public class DatabaseGameDataAccess implements GameDataAccess {
   @Override
   public void joinGame(String playerColor, int gameID, String playerUsername)
     throws DataAccessException {
-    String SQLString;
+    String sqlString;
     if (Objects.equals(playerColor, "WHITE")) {
-      SQLString = "UPDATE games SET white_username = ? WHERE game_id = ?";
+      sqlString = "UPDATE games SET white_username = ? WHERE game_id = ?";
     } else {
-      SQLString = "UPDATE games SET black_username = ? WHERE game_id = ?";
+      sqlString = "UPDATE games SET black_username = ? WHERE game_id = ?";
+    }
+    if (gameID == 0) {
+      throw new DataAccessException("Non-existent game");
     }
     try (
             var conn = DatabaseManager.getConnection();
-            var preparedStatement = conn.prepareStatement(SQLString)
+            var preparedStatement = conn.prepareStatement(sqlString)
     ) {
       preparedStatement.setString(1, playerUsername);
       preparedStatement.setInt(2, gameID);
