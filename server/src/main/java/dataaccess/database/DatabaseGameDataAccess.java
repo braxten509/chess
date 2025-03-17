@@ -31,7 +31,7 @@ public class DatabaseGameDataAccess implements GameDataAccess {
 
   @Override
   public int createNewGame(String gameName) throws DataAccessException {
-    if (!gameName.matches("[a-zA-Z0-9_-]+")) {
+    if (!gameName.matches("[^);(]+")) {
       throw new DataAccessException("User info does not match expected syntax");
     }
     try (
