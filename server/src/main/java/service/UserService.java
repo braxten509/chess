@@ -1,11 +1,11 @@
 package service;
 
-import org.mindrot.jbcrypt.BCrypt;
 import dataaccess.AuthDataAccess;
 import dataaccess.DataAccessException;
 import dataaccess.UserDataAccess;
 import java.util.Collection;
 import model.*;
+import org.mindrot.jbcrypt.BCrypt;
 import spark.utils.StringUtils;
 
 public class UserService {

@@ -1,6 +1,5 @@
 package dataaccess.database;
 
-import org.mindrot.jbcrypt.BCrypt;
 import dataaccess.DataAccessException;
 import dataaccess.DatabaseManager;
 import dataaccess.UserDataAccess;
@@ -9,6 +8,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import model.UserData;
+import org.mindrot.jbcrypt.BCrypt;
 
 public class DatabaseUserDataAccess implements UserDataAccess {
 
@@ -46,7 +46,11 @@ public class DatabaseUserDataAccess implements UserDataAccess {
     }
     String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
 
-    if (!username.matches("[a-zA-Z0-9_-]+") || !password.matches("[^);]+") || !email.matches("[^();:]+")) {
+    if (
+      !username.matches("[a-zA-Z0-9_-]+") ||
+      !password.matches("[^);]+") ||
+      !email.matches("[^();:]+")
+    ) {
       throw new DataAccessException("User info does not match expected syntax");
     }
 

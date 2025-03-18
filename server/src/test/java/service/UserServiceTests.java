@@ -6,9 +6,6 @@ import dataaccess.DataAccessException;
 import dataaccess.database.DatabaseAuthDataAccess;
 import dataaccess.database.DatabaseUserDataAccess;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-
 import model.LoginRequest;
 import model.RegisterRequest;
 import model.UserData;
@@ -125,10 +122,26 @@ class UserServiceTests {
   @Test
   void listUsers() throws DataAccessException {
     ArrayList<UserData> expected = new ArrayList<>();
-    expected.add(new UserData("Jimmethy", BCrypt.hashpw("abc123", BCrypt.gensalt()), "jmail@gmail.com"));
-    expected.add(new UserData("Jimbo", BCrypt.hashpw("abc12asas3", BCrypt.gensalt()), "jmaaaaail@gmail.com"));
     expected.add(
-      new UserData("JimmethyJones", BCrypt.hashpw("abc1232222", BCrypt.gensalt()), "jmaiLLLl@gmail.com")
+      new UserData(
+        "Jimmethy",
+        BCrypt.hashpw("abc123", BCrypt.gensalt()),
+        "jmail@gmail.com"
+      )
+    );
+    expected.add(
+      new UserData(
+        "Jimbo",
+        BCrypt.hashpw("abc12asas3", BCrypt.gensalt()),
+        "jmaaaaail@gmail.com"
+      )
+    );
+    expected.add(
+      new UserData(
+        "JimmethyJones",
+        BCrypt.hashpw("abc1232222", BCrypt.gensalt()),
+        "jmaiLLLl@gmail.com"
+      )
     );
 
     USER_SERVICE.registerUser(
