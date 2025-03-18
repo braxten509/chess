@@ -17,6 +17,9 @@ public class DatabaseAuthDataAccess implements AuthDataAccess {
   @Override
   public String createAuth(String username) throws DataAccessException {
     String authToken = generateToken();
+    if (!username.matches("[^(;)]+")) {
+      throw new DataAccessException("Invalid username syntax");
+    }
     try (
       var conn = DatabaseManager.getConnection();
       var preparedStatement = conn.prepareStatement(

@@ -34,4 +34,31 @@ public class DatabaseAuthDataAccessTests {
         assertNull(databaseAuthDataAccess.getAuthData("fakefakefakeinvalid"));
     }
 
+    @Test
+    void createAuth() throws DataAccessException {
+        String authToken = databaseAuthDataAccess.createAuth("newUser");
+        assertNotNull(databaseAuthDataAccess.getAuthData(authToken));
+    }
+
+    @Test
+    void createAuthFail() {
+        assertThrows(DataAccessException.class, () -> {
+            databaseAuthDataAccess.createAuth("newUser DRP TBLE ();");
+        });
+    }
+
+    @Test
+    void removeAuth() throws DataAccessException {
+        databaseAuthDataAccess.removeAuth(authToken);
+        assertNull(databaseAuthDataAccess.getAuthData(authToken));
+    }
+
+    @Test
+    void removeAuthFail() throws DataAccessException {
+        String fakeAuthToken = "askasjydgjdg6576354";
+        assertNull(databaseAuthDataAccess.getAuthData(fakeAuthToken));
+    }
+
+
+
 }
