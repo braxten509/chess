@@ -4,14 +4,13 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.*;
 import com.google.gson.Gson;
-import model.CreateGameRequest;
-import model.JoinGameRequest;
-import model.LoginRequest;
-import model.RegisterRequest;
+import com.google.gson.JsonIOException;
+import model.*;
 
 import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class ServerFacade {
 
@@ -21,19 +20,20 @@ public class ServerFacade {
         this.serverUrl = url;
     }
 
-    public Object registerUser(String username, String password, String email) {
+    public RegisterResult registerUser(String username, String password, String email) {
         String path = "/user";
-        return this.makeRequest("POST", path, null, new RegisterRequest(username, password, email), RegisterRequest.class);
+        return this.makeRequest("POST", path, null, new RegisterRequest(username, password, email), RegisterResult.class);
     }
 
-    public Object loginUser(String username, String password) {
+    public AuthData loginUser(String username, String password) {
         String path = "/session";
-        return this.makeRequest("POST", path, null, new LoginRequest(username, password), LoginRequest.class);
+        return this.makeRequest("POST", path, null, new LoginRequest(username, password), AuthData.class);
     }
 
-    public Object createGame(String authToken, String gameName) {
+    public CreateGameResult createGame(String authToken, String gameName) {
         String path = "/game";
-        return this.makeRequest("POST", path, mapAuthToken(authToken), gameName, CreateGameRequest.class);
+        HashMap<String, String> header = mapAuthToken(authToken);
+        return this.makeRequest("POST", path, header, new CreateGameRequest(null, gameName), CreateGameResult.class);
     }
 
     /**
@@ -41,11 +41,29 @@ public class ServerFacade {
      * @param authToken authToken
      * @param playerColor this is either "WHITE" or "BLACK"
      * @param gameID game ID
-     * @return response from server
      */
-    public Object joinGame(String authToken, String playerColor, int gameID) {
+    public void joinGame(String authToken, String playerColor, int gameID) {
         String path = "/game";
-        return this.makeRequest("PUT", path, mapAuthToken(authToken), new JoinGameRequest(playerColor, gameID), JoinGameRequest.class);
+        HashMap<String, String> header = mapAuthToken(authToken);
+        this.makeRequest("PUT", path, header, new JoinGameRequest(null, playerColor, gameID), Void.class);
+    }
+
+    public ListGamesResult listGames(String authToken) {
+        String path = "/game";
+        HashMap<String, String> header = mapAuthToken(authToken);
+        return this.makeRequest("GET", path, header, null, ListGamesResult.class);
+    }
+
+    public void logoutUser(String authToken) {
+        String path = "/session";
+        HashMap<String, String> header = mapAuthToken(authToken);
+        this.makeRequest("DELETE", path, header, null, Void.class);
+    }
+
+    public void clearDatabase(String authToken) {
+        String path = "/db";
+        HashMap<String, String> header = mapAuthToken(authToken);
+        this.makeRequest("DELETE", path, header, null, Void.class);
     }
 
     private HashMap<String, String> mapAuthToken(String authToken) {
@@ -60,7 +78,8 @@ public class ServerFacade {
             URL url = (new URI(serverUrl + path)).toURL();
             HttpURLConnection http = (HttpURLConnection) url.openConnection();
             http.setRequestMethod(method);
-            http.setDoOutput(true);
+
+            http.setDoOutput(method.equals("POST") || method.equals("PUT"));
 
             if (headers != null) {
                 for (Map.Entry<String, String> header : headers.entrySet()) {
@@ -79,7 +98,7 @@ public class ServerFacade {
     }
 
     private static void writeBody(Object request, HttpURLConnection http) throws IOException {
-        if (request != null) {
+        if (request != null && http.getDoOutput()) {
             http.addRequestProperty("Content-Type", "application/json");
             Gson gson = new Gson();
             String reqData = gson.toJson(request);
@@ -92,28 +111,28 @@ public class ServerFacade {
     private void throwIfNotSuccessful(HttpURLConnection http) throws IOException, RuntimeException {
         var status = http.getResponseCode();
         if (!isSuccessful(status)) {
-            try (InputStream responseError = http.getErrorStream()) {
-                if (responseError != null) {
-                    throw new RuntimeException("ERROR CODE " + responseError);
-                }
+            if (http.getErrorStream() != null) {
+                String errorMessage = new BufferedReader(new InputStreamReader(http.getErrorStream())).lines().collect(Collectors.joining());
+                throw new RuntimeException("(" + status + ") ERROR: " + errorMessage);
+            } else {
+                throw new RuntimeException("(" + status + ") ERROR: " + status);
             }
-
-            throw new RuntimeException(status + "other failure: " + status);
         }
     }
 
+
     private static <T> T readBody(HttpURLConnection http, Class<T> responseClass) throws IOException {
-        T response = null;
-        if (http.getContentLength() < 0) {
-            try (InputStream responseBody = http.getInputStream()) {
-                InputStreamReader reader = new InputStreamReader(responseBody);
-                if (responseClass != null) {
-                    Gson gson = new Gson();
-                    response = gson.fromJson(reader, responseClass);
-                }
-            }
+        if (responseClass == null) {
+            return null;
         }
-        return response;
+        try (InputStream responseBody = http.getInputStream()) {
+            InputStreamReader reader = new InputStreamReader(responseBody);
+            Gson gson = new Gson();
+            return gson.fromJson(reader, responseClass);
+
+        } catch (JsonIOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private boolean isSuccessful(int status) {

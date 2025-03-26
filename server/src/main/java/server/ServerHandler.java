@@ -162,8 +162,8 @@ public class ServerHandler {
         gameName
       );
 
-      int id = GAME_SERVICE.createGame(createGameRequest);
-      return turnIntoJson("gameID", id);
+      int gameId = GAME_SERVICE.createGame(createGameRequest);
+      return turnIntoJson(new CreateGameResult(gameId));
     } catch (DataAccessException e) {
       showErrors(res, e);
       return turnIntoJson("message", "Error: " + e.getMessage());
@@ -220,7 +220,7 @@ public class ServerHandler {
       ArrayList<GameData> games = GAME_SERVICE.listGames(authToken);
 
       res.status(200);
-      return turnIntoJson("games", games);
+      return turnIntoJson(new ListGamesResult(games));
     } catch (DataAccessException e) {
       res.status(401);
       return turnIntoJson("message", "Error: " + e.getMessage());
