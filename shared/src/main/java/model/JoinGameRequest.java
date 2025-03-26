@@ -1,7 +1,7 @@
 package model;
 
 public record JoinGameRequest(
-        String authToken,
+  String authToken,
   String playerColor,
   int gameID
 ) {}

@@ -1,80 +1,99 @@
 package dataaccess;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import dataaccess.database.DatabaseGameDataAccess;
 import dataaccess.database.DatabaseUserDataAccess;
 import model.UserData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 public class DatabaseGameDataAccessTests {
-    private DatabaseUserDataAccess databaseUserDataAccess;
-    private DatabaseGameDataAccess databaseGameDataAccess;
-    private final UserData userData = new UserData("testusername", "testPassword", "testEmail@email.com");
-    private int gameID;
 
-    @BeforeEach
-    void reset() throws DataAccessException {
-        this.databaseUserDataAccess = new DatabaseUserDataAccess();
-        this.databaseGameDataAccess = new DatabaseGameDataAccess();
+  private DatabaseUserDataAccess databaseUserDataAccess;
+  private DatabaseGameDataAccess databaseGameDataAccess;
+  private final UserData userData = new UserData(
+    "testusername",
+    "testPassword",
+    "testEmail@email.com"
+  );
+  private int gameID;
 
-        databaseUserDataAccess.clear();
-        databaseGameDataAccess.clear();
+  @BeforeEach
+  void reset() throws DataAccessException {
+    this.databaseUserDataAccess = new DatabaseUserDataAccess();
+    this.databaseGameDataAccess = new DatabaseGameDataAccess();
 
-        databaseUserDataAccess.createUser(userData.username(), userData.password(), userData.email());
-        this.gameID = databaseGameDataAccess.createNewGame("gameOne");
-    }
+    databaseUserDataAccess.clear();
+    databaseGameDataAccess.clear();
 
-    @Test
-    void clear() throws DataAccessException {
-        databaseUserDataAccess.clear();
+    databaseUserDataAccess.createUser(
+      userData.username(),
+      userData.password(),
+      userData.email()
+    );
+    this.gameID = databaseGameDataAccess.createNewGame("gameOne");
+  }
 
-        assertEquals(0, databaseUserDataAccess.listUsers().size());
-    }
+  @Test
+  void clear() throws DataAccessException {
+    databaseUserDataAccess.clear();
 
-    @Test
-    void createNewGame() throws DataAccessException {
-        databaseGameDataAccess.createNewGame("newGame");
+    assertEquals(0, databaseUserDataAccess.listUsers().size());
+  }
 
-        assertEquals(2, databaseGameDataAccess.listGames().size());
-    }
+  @Test
+  void createNewGame() throws DataAccessException {
+    databaseGameDataAccess.createNewGame("newGame");
 
-    @Test
-    void createNewGameFail() {
-        assertThrows(DataAccessException.class, () ->
-                databaseGameDataAccess.createNewGame("newGame );"));
-    }
+    assertEquals(2, databaseGameDataAccess.listGames().size());
+  }
 
-    @Test
-    void joinGame() throws DataAccessException {
-        databaseGameDataAccess.joinGame("WHITE", gameID, "Player1");
+  @Test
+  void createNewGameFail() {
+    assertThrows(DataAccessException.class, () ->
+      databaseGameDataAccess.createNewGame("newGame );")
+    );
+  }
 
-        assertEquals("Player1", databaseGameDataAccess.listGames().getFirst().whiteUsername());
-    }
+  @Test
+  void joinGame() throws DataAccessException {
+    databaseGameDataAccess.joinGame("WHITE", gameID, "Player1");
 
-    @Test
-    void joinGameFail() {
-        assertThrows(DataAccessException.class, () ->
-                databaseGameDataAccess.joinGame("WHITE", gameID+143, "Player1"));
-    }
+    assertEquals(
+      "Player1",
+      databaseGameDataAccess.listGames().getFirst().whiteUsername()
+    );
+  }
 
-    @Test
-    void getGame() throws DataAccessException {
-        assertNotNull(databaseGameDataAccess.getGame(gameID));
-    }
+  @Test
+  void joinGameFail() {
+    assertThrows(DataAccessException.class, () ->
+      databaseGameDataAccess.joinGame("WHITE", gameID + 143, "Player1")
+    );
+  }
 
-    @Test
-    void getGameFail() throws DataAccessException {
-        assertNull(databaseGameDataAccess.getGame(gameID+573));
-    }
+  @Test
+  void getGame() throws DataAccessException {
+    assertNotNull(databaseGameDataAccess.getGame(gameID));
+  }
 
-    @Test
-    void listGames() throws DataAccessException {
-        databaseGameDataAccess.createNewGame("secondGame");
+  @Test
+  void getGameFail() throws DataAccessException {
+    assertNull(databaseGameDataAccess.getGame(gameID + 573));
+  }
 
-        assertEquals("gameOne", databaseGameDataAccess.listGames().getFirst().gameName());
-        assertEquals("secondGame", databaseGameDataAccess.listGames().getLast().gameName());
-    }
+  @Test
+  void listGames() throws DataAccessException {
+    databaseGameDataAccess.createNewGame("secondGame");
 
+    assertEquals(
+      "gameOne",
+      databaseGameDataAccess.listGames().getFirst().gameName()
+    );
+    assertEquals(
+      "secondGame",
+      databaseGameDataAccess.listGames().getLast().gameName()
+    );
+  }
 }

@@ -16,21 +16,27 @@ import passoff.chess.TestUtilities;
  */
 public class EnPassantTests {
 
-    @Test
-    @DisplayName("White En Passant Right")
-    public void enPassantWhiteRight() throws InvalidMoveException {
-        ChessBoard board = TestUtilities.loadBoard("""
-                | | | | | | | | |
-                | | |p| | | | | |
-                | | | | | | | | |
-                | |P| | | | | | |
-                | | | | | | | |k|
-                | | | | | | | | |
-                | | | | | | | | |
-                | | | | |K| | | |
-                """);
-        ChessMove setupMove = new ChessMove(new ChessPosition(7, 3), new ChessPosition(5, 3), null);
-        /*
+  @Test
+  @DisplayName("White En Passant Right")
+  public void enPassantWhiteRight() throws InvalidMoveException {
+    ChessBoard board = TestUtilities.loadBoard(
+      """
+      | | | | | | | | |
+      | | |p| | | | | |
+      | | | | | | | | |
+      | |P| | | | | | |
+      | | | | | | | |k|
+      | | | | | | | | |
+      | | | | | | | | |
+      | | | | |K| | | |
+      """
+    );
+    ChessMove setupMove = new ChessMove(
+      new ChessPosition(7, 3),
+      new ChessPosition(5, 3),
+      null
+    );
+    /*
                 | | | | | | | | |
                 | | | | | | | | |
                 | | | | | | | | |
@@ -41,38 +47,55 @@ public class EnPassantTests {
                 | | | | |K| | | |
          */
 
-        ChessMove enPassantMove = new ChessMove(new ChessPosition(5, 2), new ChessPosition(6, 3), null);
-        ChessBoard endBoard = TestUtilities.loadBoard("""
-                | | | | | | | | |
-                | | | | | | | | |
-                | | |P| | | | | |
-                | | | | | | | | |
-                | | | | | | | |k|
-                | | | | | | | | |
-                | | | | | | | | |
-                | | | | |K| | | |
-                """);
+    ChessMove enPassantMove = new ChessMove(
+      new ChessPosition(5, 2),
+      new ChessPosition(6, 3),
+      null
+    );
+    ChessBoard endBoard = TestUtilities.loadBoard(
+      """
+      | | | | | | | | |
+      | | | | | | | | |
+      | | |P| | | | | |
+      | | | | | | | | |
+      | | | | | | | |k|
+      | | | | | | | | |
+      | | | | | | | | |
+      | | | | |K| | | |
+      """
+    );
 
-        assertValidEnPassant(board, ChessGame.TeamColor.BLACK, setupMove, enPassantMove, endBoard);
-    }
+    assertValidEnPassant(
+      board,
+      ChessGame.TeamColor.BLACK,
+      setupMove,
+      enPassantMove,
+      endBoard
+    );
+  }
 
+  @Test
+  @DisplayName("White En Passant Left")
+  public void enPassantWhiteLeft() throws InvalidMoveException {
+    ChessBoard board = TestUtilities.loadBoard(
+      """
+      | | | | | | | | |
+      | | |p| | | | | |
+      | | | | | | | | |
+      | | | |P| | | | |
+      | | | | | | | |k|
+      | | | | | | | | |
+      | | | | | | | | |
+      | | | | |K| | | |
+      """
+    );
 
-    @Test
-    @DisplayName("White En Passant Left")
-    public void enPassantWhiteLeft() throws InvalidMoveException {
-        ChessBoard board = TestUtilities.loadBoard("""
-                | | | | | | | | |
-                | | |p| | | | | |
-                | | | | | | | | |
-                | | | |P| | | | |
-                | | | | | | | |k|
-                | | | | | | | | |
-                | | | | | | | | |
-                | | | | |K| | | |
-                """);
-
-        ChessMove setupMove = new ChessMove(new ChessPosition(7, 3), new ChessPosition(5, 3), null);
-        /*
+    ChessMove setupMove = new ChessMove(
+      new ChessPosition(7, 3),
+      new ChessPosition(5, 3),
+      null
+    );
+    /*
                 | | | | | | | | |
                 | | | | | | | | |
                 | | | | | | | | |
@@ -82,37 +105,54 @@ public class EnPassantTests {
                 | | | | | | | | |
                 | | | | |K| | | |
          */
-        ChessMove enPassantMove = new ChessMove(new ChessPosition(5, 4), new ChessPosition(6, 3), null);
-        ChessBoard endBoard = TestUtilities.loadBoard("""
-                | | | | | | | | |
-                | | | | | | | | |
-                | | |P| | | | | |
-                | | | | | | | | |
-                | | | | | | | |k|
-                | | | | | | | | |
-                | | | | | | | | |
-                | | | | |K| | | |
-                """);
+    ChessMove enPassantMove = new ChessMove(
+      new ChessPosition(5, 4),
+      new ChessPosition(6, 3),
+      null
+    );
+    ChessBoard endBoard = TestUtilities.loadBoard(
+      """
+      | | | | | | | | |
+      | | | | | | | | |
+      | | |P| | | | | |
+      | | | | | | | | |
+      | | | | | | | |k|
+      | | | | | | | | |
+      | | | | | | | | |
+      | | | | |K| | | |
+      """
+    );
 
-        assertValidEnPassant(board, ChessGame.TeamColor.BLACK, setupMove, enPassantMove, endBoard);
-    }
+    assertValidEnPassant(
+      board,
+      ChessGame.TeamColor.BLACK,
+      setupMove,
+      enPassantMove,
+      endBoard
+    );
+  }
 
-
-    @Test
-    @DisplayName("Black En Passant Right")
-    public void enPassantBlackRight() throws InvalidMoveException {
-        ChessBoard board = TestUtilities.loadBoard("""
-                | | | |k| | | | |
-                | | | | | | | | |
-                | | | | | | | | |
-                |K| | | | | | | |
-                | | | | | |p| | |
-                | | | | | | | | |
-                | | | | | | |P| |
-                | | | | | | | | |
-                """);
-        ChessMove setupMove = new ChessMove(new ChessPosition(2, 7), new ChessPosition(4, 7), null);
-        /*
+  @Test
+  @DisplayName("Black En Passant Right")
+  public void enPassantBlackRight() throws InvalidMoveException {
+    ChessBoard board = TestUtilities.loadBoard(
+      """
+      | | | |k| | | | |
+      | | | | | | | | |
+      | | | | | | | | |
+      |K| | | | | | | |
+      | | | | | |p| | |
+      | | | | | | | | |
+      | | | | | | |P| |
+      | | | | | | | | |
+      """
+    );
+    ChessMove setupMove = new ChessMove(
+      new ChessPosition(2, 7),
+      new ChessPosition(4, 7),
+      null
+    );
+    /*
                 | | | |k| | | | |
                 | | | | | | | | |
                 | | | | | | | | |
@@ -122,37 +162,54 @@ public class EnPassantTests {
                 | | | | | | | | |
                 | | | | | | | | |
          */
-        ChessMove enPassantMove = new ChessMove(new ChessPosition(4, 6), new ChessPosition(3, 7), null);
-        ChessBoard endBoard = TestUtilities.loadBoard("""
-                | | | |k| | | | |
-                | | | | | | | | |
-                | | | | | | | | |
-                |K| | | | | | | |
-                | | | | | | | | |
-                | | | | | | |p| |
-                | | | | | | | | |
-                | | | | | | | | |
-                """);
+    ChessMove enPassantMove = new ChessMove(
+      new ChessPosition(4, 6),
+      new ChessPosition(3, 7),
+      null
+    );
+    ChessBoard endBoard = TestUtilities.loadBoard(
+      """
+      | | | |k| | | | |
+      | | | | | | | | |
+      | | | | | | | | |
+      |K| | | | | | | |
+      | | | | | | | | |
+      | | | | | | |p| |
+      | | | | | | | | |
+      | | | | | | | | |
+      """
+    );
 
-        assertValidEnPassant(board, ChessGame.TeamColor.WHITE, setupMove, enPassantMove, endBoard);
-    }
+    assertValidEnPassant(
+      board,
+      ChessGame.TeamColor.WHITE,
+      setupMove,
+      enPassantMove,
+      endBoard
+    );
+  }
 
-
-    @Test
-    @DisplayName("Black En Passant Left")
-    public void enPassantBlackLeft() throws InvalidMoveException {
-        ChessBoard board = TestUtilities.loadBoard("""
-                | | | |k| | | | |
-                | | | | | | | | |
-                | | | | | | | | |
-                |K| | | | | | | |
-                | | | | | | | |p|
-                | | | | | | | | |
-                | | | | | | |P| |
-                | | | | | | | | |
-                """);
-        ChessMove setupMove = new ChessMove(new ChessPosition(2, 7), new ChessPosition(4, 7), null);
-        /*
+  @Test
+  @DisplayName("Black En Passant Left")
+  public void enPassantBlackLeft() throws InvalidMoveException {
+    ChessBoard board = TestUtilities.loadBoard(
+      """
+      | | | |k| | | | |
+      | | | | | | | | |
+      | | | | | | | | |
+      |K| | | | | | | |
+      | | | | | | | |p|
+      | | | | | | | | |
+      | | | | | | |P| |
+      | | | | | | | | |
+      """
+    );
+    ChessMove setupMove = new ChessMove(
+      new ChessPosition(2, 7),
+      new ChessPosition(4, 7),
+      null
+    );
+    /*
                 | | | |k| | | | |
                 | | | | | | | | |
                 | | | | | | | | |
@@ -162,41 +219,56 @@ public class EnPassantTests {
                 | | | | | | | | |
                 | | | | | | | | |
          */
-        ChessMove enPassantMove = new ChessMove(new ChessPosition(4, 8), new ChessPosition(3, 7), null);
-        ChessBoard endBoard = TestUtilities.loadBoard("""
-                | | | |k| | | | |
-                | | | | | | | | |
-                | | | | | | | | |
-                |K| | | | | | | |
-                | | | | | | | | |
-                | | | | | | |p| |
-                | | | | | | | | |
-                | | | | | | | | |
-                """);
-        assertValidEnPassant(board, ChessGame.TeamColor.WHITE, setupMove, enPassantMove, endBoard);
-    }
+    ChessMove enPassantMove = new ChessMove(
+      new ChessPosition(4, 8),
+      new ChessPosition(3, 7),
+      null
+    );
+    ChessBoard endBoard = TestUtilities.loadBoard(
+      """
+      | | | |k| | | | |
+      | | | | | | | | |
+      | | | | | | | | |
+      |K| | | | | | | |
+      | | | | | | | | |
+      | | | | | | |p| |
+      | | | | | | | | |
+      | | | | | | | | |
+      """
+    );
+    assertValidEnPassant(
+      board,
+      ChessGame.TeamColor.WHITE,
+      setupMove,
+      enPassantMove,
+      endBoard
+    );
+  }
 
+  @Test
+  @DisplayName("Can Only En Passant on Next Turn")
+  public void missedEnPassant() throws InvalidMoveException {
+    ChessBoard board = TestUtilities.loadBoard(
+      """
+      | | | | |k| | | |
+      | | |p| | | | | |
+      | | | | | | | |P|
+      | |P| | | | | | |
+      | | | | | | | | |
+      | | | | | | | |p|
+      | | | | | | | | |
+      | | | |K| | | | |
+      """
+    );
+    ChessGame game = new ChessGame();
+    game.setBoard(board);
+    game.setTeamTurn(ChessGame.TeamColor.BLACK);
 
-    @Test
-    @DisplayName("Can Only En Passant on Next Turn")
-    public void missedEnPassant() throws InvalidMoveException {
-        ChessBoard board = TestUtilities.loadBoard("""
-                | | | | |k| | | |
-                | | |p| | | | | |
-                | | | | | | | |P|
-                | |P| | | | | | |
-                | | | | | | | | |
-                | | | | | | | |p|
-                | | | | | | | | |
-                | | | |K| | | | |
-                """);
-        ChessGame game = new ChessGame();
-        game.setBoard(board);
-        game.setTeamTurn(ChessGame.TeamColor.BLACK);
-
-        //move black piece 2 spaces
-        game.makeMove(new ChessMove(new ChessPosition(7, 3), new ChessPosition(5, 3), null));
-        /*
+    //move black piece 2 spaces
+    game.makeMove(
+      new ChessMove(new ChessPosition(7, 3), new ChessPosition(5, 3), null)
+    );
+    /*
                 | | | | |k| | | |
                 | | | | | | | | |
                 | | | | | | | |P|
@@ -207,10 +279,14 @@ public class EnPassantTests {
                 | | | |K| | | | |
          */
 
-        //filler moves
-        game.makeMove(new ChessMove(new ChessPosition(6, 8), new ChessPosition(7, 8), null));
-        game.makeMove(new ChessMove(new ChessPosition(3, 8), new ChessPosition(2, 8), null));
-        /*
+    //filler moves
+    game.makeMove(
+      new ChessMove(new ChessPosition(6, 8), new ChessPosition(7, 8), null)
+    );
+    game.makeMove(
+      new ChessMove(new ChessPosition(3, 8), new ChessPosition(2, 8), null)
+    );
+    /*
                 | | | | |k| | | |
                 | | | | | | | |P|
                 | | | | | | | | |
@@ -221,29 +297,45 @@ public class EnPassantTests {
                 | | | |K| | | | |
          */
 
-        //make sure pawn cannot do En Passant move
-        ChessPosition enPassantPosition = new ChessPosition(5, 2);
-        ChessMove enPassantMove = new ChessMove(enPassantPosition, new ChessPosition(6, 3), null);
-        Assertions.assertFalse(game.validMoves(enPassantPosition).contains(enPassantMove),
-                "ChessGame validMoves contained a En Passant move after the move became invalid");
-    }
+    //make sure pawn cannot do En Passant move
+    ChessPosition enPassantPosition = new ChessPosition(5, 2);
+    ChessMove enPassantMove = new ChessMove(
+      enPassantPosition,
+      new ChessPosition(6, 3),
+      null
+    );
+    Assertions.assertFalse(
+      game.validMoves(enPassantPosition).contains(enPassantMove),
+      "ChessGame validMoves contained a En Passant move after the move became invalid"
+    );
+  }
 
-    private void assertValidEnPassant(ChessBoard board, ChessGame.TeamColor turn, ChessMove setupMove,
-                                      ChessMove enPassantMove, ChessBoard endBoard) throws InvalidMoveException {
-        ChessGame game = new ChessGame();
-        game.setBoard(board);
-        game.setTeamTurn(turn);
+  private void assertValidEnPassant(
+    ChessBoard board,
+    ChessGame.TeamColor turn,
+    ChessMove setupMove,
+    ChessMove enPassantMove,
+    ChessBoard endBoard
+  ) throws InvalidMoveException {
+    ChessGame game = new ChessGame();
+    game.setBoard(board);
+    game.setTeamTurn(turn);
 
-        //setup prior move for en passant
-        game.makeMove(setupMove);
+    //setup prior move for en passant
+    game.makeMove(setupMove);
 
-        //make sure pawn has En Passant move
-        Assertions.assertTrue(game.validMoves(enPassantMove.getStartPosition()).contains(enPassantMove),
-                "ChessGame validMoves did not contain a valid En Passant move");
+    //make sure pawn has En Passant move
+    Assertions.assertTrue(
+      game.validMoves(enPassantMove.getStartPosition()).contains(enPassantMove),
+      "ChessGame validMoves did not contain a valid En Passant move"
+    );
 
-        //en passant move works correctly
-        Assertions.assertDoesNotThrow(() -> game.makeMove(enPassantMove));
-        Assertions.assertEquals(endBoard, game.getBoard(), "Incorrect Board after En Passant Move");
-    }
-
+    //en passant move works correctly
+    Assertions.assertDoesNotThrow(() -> game.makeMove(enPassantMove));
+    Assertions.assertEquals(
+      endBoard,
+      game.getBoard(),
+      "Incorrect Board after En Passant Move"
+    );
+  }
 }
