@@ -4,7 +4,14 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.*;
 import com.google.gson.Gson;
+import model.CreateGameRequest;
+import model.JoinGameRequest;
+import model.LoginRequest;
+import model.RegisterRequest;
+
 import java.io.*;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ServerFacade {
 
@@ -14,13 +21,52 @@ public class ServerFacade {
         this.serverUrl = url;
     }
 
-    private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass) throws RuntimeException {
+    public Object registerUser(String username, String password, String email) {
+        String path = "/user";
+        return this.makeRequest("POST", path, null, new RegisterRequest(username, password, email), RegisterRequest.class);
+    }
+
+    public Object loginUser(String username, String password) {
+        String path = "/session";
+        return this.makeRequest("POST", path, null, new LoginRequest(username, password), LoginRequest.class);
+    }
+
+    public Object createGame(String authToken, String gameName) {
+        String path = "/game";
+        return this.makeRequest("POST", path, mapAuthToken(authToken), gameName, CreateGameRequest.class);
+    }
+
+    /**
+     * Connects a player to a game if possible
+     * @param authToken authToken
+     * @param playerColor this is either "WHITE" or "BLACK"
+     * @param gameID game ID
+     * @return response from server
+     */
+    public Object joinGame(String authToken, String playerColor, int gameID) {
+        String path = "/game";
+        return this.makeRequest("PUT", path, mapAuthToken(authToken), new JoinGameRequest(playerColor, gameID), JoinGameRequest.class);
+    }
+
+    private HashMap<String, String> mapAuthToken(String authToken) {
+        var mappedAuthToken = new HashMap<String, String>();
+        mappedAuthToken.put("Authorization", authToken);
+        return mappedAuthToken;
+    }
+
+    private <T> T makeRequest(String method, String path, Map<String,String> headers, Object request, Class<T> responseClass) throws RuntimeException {
         try {
 
             URL url = (new URI(serverUrl + path)).toURL();
             HttpURLConnection http = (HttpURLConnection) url.openConnection();
             http.setRequestMethod(method);
             http.setDoOutput(true);
+
+            if (headers != null) {
+                for (Map.Entry<String, String> header : headers.entrySet()) {
+                    http.setRequestProperty(header.getKey(), header.getValue());
+                }
+            }
 
             writeBody(request, http);
             http.connect();
