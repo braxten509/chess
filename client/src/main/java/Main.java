@@ -10,6 +10,8 @@ public class Main {
   public static void main(String[] args) {
     Scanner scanner = new Scanner(System.in);
 
+    String userStatus = "LOGGED_OUT";
+
     printf(
       "♕ Welcome to Chess! Type 'help' to get started ♕",
       SpacingType.UNDER,
@@ -17,7 +19,7 @@ public class Main {
     );
 
     while (true) {
-      System.out.print(">>> ");
+      System.out.print("[" + userStatus + "] >>> ");
       String response = scanner.next();
 
       switch (response.toLowerCase()) {
