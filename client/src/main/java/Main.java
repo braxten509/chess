@@ -1,4 +1,3 @@
-import static ui.EscapeSequences.*;
 import static ui.PrintFunctions.*;
 
 import java.util.Scanner;
@@ -23,16 +22,9 @@ public class Main {
       String response = scanner.next();
 
       switch (response.toLowerCase()) {
-        case "help":
-          PrintFunctions.helpText();
-          break;
-        case "login":
-          PrintFunctions.loginText();
-          break;
-        case "register":
-          PrintFunctions.registerText();
-          break;
-        default:
+        case "help" -> PrintFunctions.loggedOutHelpText();
+        case "login" -> PrintFunctions.loginText();
+        case "register" -> PrintFunctions.registerText();
       }
 
       if (

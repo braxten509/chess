@@ -19,23 +19,17 @@ public class PrintFunctions {
     String spacingEnding = "\n";
 
     switch (spacing) {
-      case NONE:
-        spacingEnding = "";
-        break;
-      case REGULAR:
-        break;
-      case UNDER:
-        spacingEnding += "\n";
-        break;
-      case SURROUND:
-        spacingBeginning += "\n";
-        spacingEnding += "\n";
-        break;
-      case DOUBLE_SURROUND:
+      case NONE -> spacingEnding = "";
+      case REGULAR -> {}
+      case UNDER -> spacingEnding += "\n";
+      case SURROUND -> {
+          spacingBeginning += "\n";
+          spacingEnding += "\n";
+      }
+      case DOUBLE_SURROUND -> {
         spacingBeginning += "\n\n";
         spacingEnding += "\n\n";
-        break;
-      default:
+      }
     }
 
     if (formatting != null) {
@@ -47,7 +41,7 @@ public class PrintFunctions {
     System.out.print(RESET_ALL);
   }
 
-  public static void helpText() {
+  public static void loggedOutHelpText() {
     printf(
       "AVAILABLE COMMANDS",
       SpacingType.SURROUND,
