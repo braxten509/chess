@@ -1,12 +1,43 @@
-import chess.*;
+import static ui.EscapeSequences.*;
+import static ui.PrintFunctions.*;
+
+import java.util.Scanner;
+import ui.PrintFunctions;
+import ui.SpacingType;
 
 public class Main {
 
   public static void main(String[] args) {
-    var piece = new ChessPiece(
-      ChessGame.TeamColor.WHITE,
-      ChessPiece.PieceType.PAWN
+    Scanner scanner = new Scanner(System.in);
+
+    printf(
+      "♕ Welcome to Chess! Type 'help' to get started ♕",
+      SpacingType.UNDER,
+      null
     );
-    System.out.println("♕ 240 Chess Client: " + piece);
+
+    while (true) {
+      System.out.print(">>> ");
+      String response = scanner.next();
+
+      switch (response.toLowerCase()) {
+        case "help":
+          PrintFunctions.helpText();
+          break;
+        case "login":
+          PrintFunctions.loginText();
+          break;
+        case "register":
+          PrintFunctions.registerText();
+          break;
+        default:
+      }
+
+      if (
+        response.equalsIgnoreCase("quit") || response.equalsIgnoreCase("exit")
+      ) {
+        break;
+      }
+    }
   }
 }

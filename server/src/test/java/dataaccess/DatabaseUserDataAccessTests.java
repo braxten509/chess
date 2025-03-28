@@ -43,11 +43,13 @@ public class DatabaseUserDataAccessTests {
 
   @Test
   void createUserFail() {
-    assertThrows(DataAccessException.class, () -> databaseUserDataAccess.createUser(
-      "USERNAME);",
-      "))));;;",
-      "valid@gmail.com"
-    ));
+    assertThrows(DataAccessException.class, () ->
+      databaseUserDataAccess.createUser(
+        "USERNAME);",
+        "))));;;",
+        "valid@gmail.com"
+      )
+    );
   }
 
   @Test

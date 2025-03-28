@@ -44,7 +44,9 @@ public class DatabaseAuthDataAccessTests {
 
   @Test
   void createAuthFail() {
-    assertThrows(DataAccessException.class, () -> databaseAuthDataAccess.createAuth("newUser DRP TBLE ();"));
+    assertThrows(DataAccessException.class, () ->
+      databaseAuthDataAccess.createAuth("newUser DRP TBLE ();")
+    );
   }
 
   @Test
