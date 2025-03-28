@@ -1,15 +1,21 @@
-import static ui.PrintFunctions.*;
+import static server.ServerCommands.*;
 
 import java.util.Scanner;
-import ui.PrintFunctions;
+
+import server.ServerFacade;
+import server.ServerCommands;
 import ui.SpacingType;
 
 public class Main {
 
   public static void main(String[] args) {
-    Scanner scanner = new Scanner(System.in);
+    var serverUrl = "http://localhost:8080";
+    if (args.length == 1) {
+      serverUrl = args[0];
+    }
 
-    String userStatus = "LOGGED_OUT";
+    ServerFacade serverFacade = new ServerFacade(serverUrl);
+    Scanner scanner = new Scanner(System.in);
 
     printf(
       "♕ Welcome to Chess! Type 'help' to get started ♕",
@@ -21,10 +27,19 @@ public class Main {
       System.out.print("[" + userStatus + "] >>> ");
       String response = scanner.next();
 
-      switch (response.toLowerCase()) {
-        case "help" -> PrintFunctions.loggedOutHelpText();
-        case "login" -> PrintFunctions.loginText();
-        case "register" -> PrintFunctions.registerText();
+      if (userStatus.equals("LOGGED_OUT")) {
+        switch (response.toLowerCase()) {
+          case "help" -> ServerCommands.helpCommand();
+          case "login" -> ServerCommands.loginCommand(serverFacade);
+          case "register" -> ServerCommands.registerCommand(serverFacade);
+          case "clear" -> ServerCommands.clearCommand();
+        }
+      } else {
+        switch (response.toLowerCase()) {
+          case "help" -> ServerCommands.helpCommand();
+          case "logout" -> ServerCommands.logoutCommand(serverFacade);
+          case "clear" -> ServerCommands.clearCommand();
+        }
       }
 
       if (
