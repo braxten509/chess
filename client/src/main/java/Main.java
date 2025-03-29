@@ -26,7 +26,7 @@ public class Main {
 
     while (true) {
       System.out.print("[" + userStatus + "] >>> ");
-      String response = scanner.next();
+      String response = scanner.nextLine();
 
       if (userStatus.equals("LOGGED_OUT")) {
         switch (response.toLowerCase()) {
@@ -40,7 +40,7 @@ public class Main {
         switch (response.toLowerCase()) {
           case "help" -> ServerCommands.helpCommand();
           case "logout" -> ServerCommands.logoutCommand(serverFacade);
-          case "create" -> ServerCommands.createCommand(serverFacade);
+          case String s when s.matches("create\\s+[a-zA-Z0-9]{1,20}") -> ServerCommands.createCommand(serverFacade, response);
           case "list" -> ServerCommands.listCommand(serverFacade);
           case "clear" -> ServerCommands.clearCommand();
           default -> printf("Unknown or unavailable command. Type 'help' for a list of valid commands.", SpacingType.UNDER, EscapeSequences.SET_TEXT_COLOR_LIGHT_GREY);

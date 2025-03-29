@@ -214,21 +214,8 @@ public class ServerCommands {
     }
   }
 
-  public static void createCommand(ServerFacade serverFacade) {
-    String gameName;
-    printf(
-            "GAME CREATION",
-            SpacingType.ABOVE,
-            SET_TEXT_COLOR_YELLOW + SET_TEXT_BOLD
-    );
-
-    printf("Type desired game name: ", SpacingType.REGULAR, SET_TEXT_COLOR_BLUE);
-    printf(">>> ", SpacingType.NONE, null);
-    gameName = scanner.next();
-    if (checkForQuit(gameName)) {
-      printf("", SpacingType.REGULAR, null);
-      return;
-    }
+  public static void createCommand(ServerFacade serverFacade, String input) {
+    String gameName = input.split("\\s+")[1];
 
     try {
       serverFacade.createGame(authToken, gameName);
