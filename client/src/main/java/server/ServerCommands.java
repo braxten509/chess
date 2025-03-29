@@ -1,22 +1,21 @@
 package server;
 
-import model.AuthData;
-import model.GameData;
-import ui.SpacingType;
+import static ui.EscapeSequences.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Scanner;
-import static ui.EscapeSequences.*;
+import model.AuthData;
+import model.GameData;
+import ui.SpacingType;
 
 public class ServerCommands {
 
   public static String userStatus = "LOGGED_OUT";
   private static final Scanner scanner = new Scanner(System.in);
   private static String authToken = "";
-  private static String playerName = "";
 
-  private static HashMap<Integer, Integer> listedGames = new HashMap<>();
+  private static final HashMap<Integer, Integer> listedGames = new HashMap<>();
 
   /**
    * Returns the same output as System.out.print() but with formatting
@@ -38,8 +37,8 @@ public class ServerCommands {
       case ABOVE -> spacingBeginning += "\n";
       case UNDER -> spacingEnding += "\n";
       case SURROUND -> {
-          spacingBeginning += "\n";
-          spacingEnding += "\n";
+        spacingBeginning += "\n";
+        spacingEnding += "\n";
       }
       case DOUBLE_SURROUND -> {
         spacingBeginning += "\n\n";
@@ -60,14 +59,16 @@ public class ServerCommands {
     printf("", SpacingType.REGULAR, ERASE_SCREEN);
     System.out.flush();
     printf(
-            "♕ Welcome to Chess! Type 'help' to get started ♕",
-            SpacingType.UNDER,
-            null
+      "♕ Welcome to Chess! Type 'help' to get started ♕",
+      SpacingType.UNDER,
+      null
     );
   }
 
   public static boolean checkForQuit(String response) {
-      return response.equalsIgnoreCase("quit") | response.equalsIgnoreCase("exit");
+    return (
+      response.equalsIgnoreCase("quit") | response.equalsIgnoreCase("exit")
+    );
   }
 
   public static void helpCommand() {
@@ -90,7 +91,11 @@ public class ServerCommands {
       printf(" : create a new game", SpacingType.REGULAR, null);
       printf("list", SpacingType.NONE, SET_TEXT_COLOR_YELLOW);
       printf(" : list games", SpacingType.REGULAR, null);
-      printf("join <ID> [WHITE|BLACK]", SpacingType.NONE, SET_TEXT_COLOR_YELLOW);
+      printf(
+        "join <ID> [WHITE|BLACK]",
+        SpacingType.NONE,
+        SET_TEXT_COLOR_YELLOW
+      );
       printf(" : join an existing game", SpacingType.REGULAR, null);
       printf("observe <ID>", SpacingType.NONE, SET_TEXT_COLOR_YELLOW);
       printf(" : watch an ongoing game", SpacingType.REGULAR, null);
@@ -106,9 +111,9 @@ public class ServerCommands {
   public static void loginCommand(ServerFacade serverFacade) {
     String username, password;
     printf(
-            "LOGIN PANEL",
-            SpacingType.ABOVE,
-            SET_TEXT_COLOR_YELLOW + SET_TEXT_BOLD
+      "LOGIN PANEL",
+      SpacingType.ABOVE,
+      SET_TEXT_COLOR_YELLOW + SET_TEXT_BOLD
     );
 
     printf("Enter username: ", SpacingType.REGULAR, SET_TEXT_COLOR_BLUE);
@@ -130,12 +135,20 @@ public class ServerCommands {
     try {
       AuthData authData = serverFacade.loginUser(username, password);
       authToken = authData.authToken();
-      playerName = authData.username();
+      loadValues(serverFacade);
 
-      printf("Success! You have been logged in", SpacingType.SURROUND, SET_TEXT_COLOR_GREEN);
+      printf(
+        "Success! You have been logged in",
+        SpacingType.SURROUND,
+        SET_TEXT_COLOR_GREEN
+      );
       userStatus = username.toUpperCase();
     } catch (Exception e) {
-      printf("Error: Invalid credentials", SpacingType.ABOVE, SET_TEXT_COLOR_RED);
+      printf(
+        "Error: Invalid credentials",
+        SpacingType.ABOVE,
+        SET_TEXT_COLOR_RED
+      );
       loginCommand(serverFacade);
     }
   }
@@ -147,16 +160,20 @@ public class ServerCommands {
       userStatus = "LOGGED_OUT";
       printf("Logout successful!", SpacingType.SURROUND, SET_TEXT_COLOR_GREEN);
     } catch (Exception e) {
-      printf("Error logging out: " + e.getMessage(), SpacingType.SURROUND, SET_TEXT_COLOR_RED);
+      printf(
+        "Error logging out: " + e.getMessage(),
+        SpacingType.SURROUND,
+        SET_TEXT_COLOR_RED
+      );
     }
   }
 
   public static void registerCommand(ServerFacade serverFacade) {
     String username, password, email;
     printf(
-            "USER REGISTRATION",
-            SpacingType.ABOVE,
-            SET_TEXT_COLOR_YELLOW + SET_TEXT_BOLD
+      "USER REGISTRATION",
+      SpacingType.ABOVE,
+      SET_TEXT_COLOR_YELLOW + SET_TEXT_BOLD
     );
 
     printf("Type desired username: ", SpacingType.REGULAR, SET_TEXT_COLOR_BLUE);
@@ -185,7 +202,11 @@ public class ServerCommands {
       }
 
       if (!password.equals(passwordConfirmation)) {
-        printf("Error: Passwords do not match", SpacingType.ABOVE, SET_TEXT_COLOR_RED);
+        printf(
+          "Error: Passwords do not match",
+          SpacingType.ABOVE,
+          SET_TEXT_COLOR_RED
+        );
       } else {
         break;
       }
@@ -206,11 +227,25 @@ public class ServerCommands {
       AuthData authData = serverFacade.loginUser(username, password);
       authToken = authData.authToken();
 
-      printf("Success! You have been logged in", SpacingType.UNDER, SET_TEXT_COLOR_GREEN);
+      printf(
+        "Success! You have been logged in",
+        SpacingType.UNDER,
+        SET_TEXT_COLOR_GREEN
+      );
       userStatus = username.toUpperCase();
     } catch (Exception e) {
-      if (e.getMessage().equals("java.lang.RuntimeException: (403) ERROR: {\"message\":\"Error: already taken\"}")) {
-        printf("Error: Username already taken", SpacingType.REGULAR, SET_TEXT_COLOR_RED);
+      if (
+        e
+          .getMessage()
+          .equals(
+            "java.lang.RuntimeException: (403) ERROR: {\"message\":\"Error: already taken\"}"
+          )
+      ) {
+        printf(
+          "Error: Username already taken",
+          SpacingType.REGULAR,
+          SET_TEXT_COLOR_RED
+        );
         registerCommand(serverFacade);
       }
     }
@@ -218,51 +253,176 @@ public class ServerCommands {
 
   public static void createCommand(ServerFacade serverFacade, String input) {
     String gameName = input.split("\\s+")[1];
-
     try {
       serverFacade.createGame(authToken, gameName);
-      printf("Success creating game with name '" + gameName + "'!", SpacingType.SURROUND, SET_TEXT_COLOR_GREEN);
+      loadValues(serverFacade);
+      printf(
+        "Success creating game with name '" + gameName + "'!",
+        SpacingType.SURROUND,
+        SET_TEXT_COLOR_GREEN
+      );
     } catch (Exception e) {
-      printf("Error creating game: " + e.getMessage(), SpacingType.SURROUND, SET_TEXT_COLOR_RED);
+      printf(
+        "Error creating game: " + e.getMessage(),
+        SpacingType.SURROUND,
+        SET_TEXT_COLOR_RED
+      );
     }
   }
 
   private static void inGame(String playerColor) {
+    String[][] chessPieceGrid = {{}};
     if (playerColor.equalsIgnoreCase("white")) {
-      String[][] chessPieceGrid = { // starts at bottom 0,0
-       {WHITE_ROOK, " ", " ", " ", " ", " ", " ", " "},
-       {" ", " ", " ", " ", " ", " ", " ", " "},
-       {" ", " ", " ", " ", " ", " ", " ", " "},
-       {" ", " ", " ", " ", " ", " ", " ", " "},
-       {" ", " ", " ", " ", " ", " ", " ", " "},
-       {" ", " ", " ", " ", " ", " ", " ", " "},
-       {" ", " ", " ", " ", " ", " ", " ", " "},
-       {BLACK_ROOK, " ", " ", " ", " ", " ", " ", " "},
+      // starts at bottom 0,0
+      chessPieceGrid = new String[][] {
+        {
+          WHITE_ROOK,
+          WHITE_KNIGHT,
+          WHITE_BISHOP,
+          WHITE_QUEEN,
+          WHITE_KING,
+          WHITE_BISHOP,
+          WHITE_KNIGHT,
+          WHITE_ROOK,
+        },
+        {
+          WHITE_PAWN,
+          WHITE_PAWN,
+          WHITE_PAWN,
+          WHITE_PAWN,
+          WHITE_PAWN,
+          WHITE_PAWN,
+          WHITE_PAWN,
+          WHITE_PAWN,
+        },
+        { " ", " ", " ", " ", " ", " ", " ", " " },
+        { " ", " ", " ", " ", " ", " ", " ", " " },
+        { " ", " ", " ", " ", " ", " ", " ", " " },
+        { " ", " ", " ", " ", " ", " ", " ", " " },
+        {
+          BLACK_PAWN,
+          BLACK_PAWN,
+          BLACK_PAWN,
+          BLACK_PAWN,
+          BLACK_PAWN,
+          BLACK_PAWN,
+          BLACK_PAWN,
+          BLACK_PAWN,
+        },
+        {
+          BLACK_ROOK,
+          BLACK_KNIGHT,
+          BLACK_BISHOP,
+          BLACK_QUEEN,
+          BLACK_KING,
+          BLACK_BISHOP,
+          BLACK_KNIGHT,
+          BLACK_ROOK,
+        },
       };
-      int squareColor = 1; // starts first square as black
-      for (int indexX = 8; indexX > 0; indexX--) {
+    }
+    else if (playerColor.equalsIgnoreCase("black")) {
+      // starts at bottom 0,0
+      chessPieceGrid = new String[][] {
+              {
+                      BLACK_ROOK,
+                      BLACK_KNIGHT,
+                      BLACK_BISHOP,
+                      BLACK_QUEEN,
+                      BLACK_KING,
+                      BLACK_BISHOP,
+                      BLACK_KNIGHT,
+                      BLACK_ROOK,
+              },
+              {
+                      BLACK_PAWN,
+                      BLACK_PAWN,
+                      BLACK_PAWN,
+                      BLACK_PAWN,
+                      BLACK_PAWN,
+                      BLACK_PAWN,
+                      BLACK_PAWN,
+                      BLACK_PAWN,
+              },
+              { " ", " ", " ", " ", " ", " ", " ", " " },
+              { " ", " ", " ", " ", " ", " ", " ", " " },
+              { " ", " ", " ", " ", " ", " ", " ", " " },
+              { " ", " ", " ", " ", " ", " ", " ", " " },
+              {
+                      WHITE_PAWN,
+                      WHITE_PAWN,
+                      WHITE_PAWN,
+                      WHITE_PAWN,
+                      WHITE_PAWN,
+                      WHITE_PAWN,
+                      WHITE_PAWN,
+                      WHITE_PAWN,
+              },
+              {
+                      WHITE_ROOK,
+                      WHITE_KNIGHT,
+                      WHITE_BISHOP,
+                      WHITE_QUEEN,
+                      WHITE_KING,
+                      WHITE_BISHOP,
+                      WHITE_KNIGHT,
+                      WHITE_ROOK,
+              },
+      };
+    }
 
-        for (int indexY = 0; indexY < 8; indexY++) {
-          int currentColor = squareColor % 2;
-          if (currentColor == 1) {
+    int squareColor = (playerColor.equals("WHITE")) ? 1 : 0;
+    for (int indexX = 8; indexX > 0; indexX--) {
+      for (int indexY = 0; indexY < 8; indexY++) {
+        int currentColor = squareColor % 2;
+        String currentPiece = chessPieceGrid[indexX - 1][indexY];
+        if (currentColor == 1) {
+          if (!currentPiece.equalsIgnoreCase(" ")) {
             printf("", SpacingType.NONE, SET_BG_COLOR_DARK_GREY);
 
-            printf(String.valueOf(chessPieceGrid[indexX-1][indexY]), SpacingType.NONE, SET_BG_COLOR_DARK_GREY);
+            printf(currentPiece, SpacingType.NONE, SET_BG_COLOR_DARK_GREY);
 
-            printf("  ", SpacingType.NONE, SET_BG_COLOR_DARK_GREY);
+            printf("", SpacingType.NONE, SET_BG_COLOR_DARK_GREY);
           } else {
-            printf("", SpacingType.NONE, SET_BG_COLOR_WHITE);
+            printf(" ", SpacingType.NONE, SET_BG_COLOR_DARK_GREY);
 
-            printf(String.valueOf(chessPieceGrid[indexX-1][indexY]), SpacingType.NONE, SET_BG_COLOR_WHITE);
+            printf(currentPiece, SpacingType.NONE, SET_BG_COLOR_DARK_GREY);
 
-            printf("  ", SpacingType.NONE, SET_BG_COLOR_WHITE);
+            printf(" ", SpacingType.NONE, SET_BG_COLOR_DARK_GREY);
           }
-          squareColor += 1;
+        } else {
+          if (!currentPiece.equalsIgnoreCase(" ")) {
+            printf("", SpacingType.NONE, SET_BG_COLOR_LIGHT_GREY);
+
+            printf(currentPiece, SpacingType.NONE, SET_BG_COLOR_LIGHT_GREY);
+
+            printf("", SpacingType.NONE, SET_BG_COLOR_LIGHT_GREY);
+          } else {
+            printf(" ", SpacingType.NONE, SET_BG_COLOR_LIGHT_GREY);
+
+            printf(currentPiece, SpacingType.NONE, SET_BG_COLOR_LIGHT_GREY);
+
+            printf(" ", SpacingType.NONE, SET_BG_COLOR_LIGHT_GREY);
+          }
         }
         squareColor += 1;
-        printf("", SpacingType.REGULAR, null);
+      }
+      squareColor += 1;
+      printf("", SpacingType.REGULAR, null);
+    }
+
+    printf("", SpacingType.REGULAR, null);
+
+    // game loop
+    while (true) {
+      System.out.print("[" + userStatus + " - " + playerColor + "] >>> ");
+      String response = scanner.next();
+
+      if (checkForQuit(response)) {
+        break;
       }
     }
+
     printf("", SpacingType.REGULAR, null);
   }
 
@@ -270,23 +430,39 @@ public class ServerCommands {
     int listedGameId = Integer.parseInt(input.split("\\s+")[1]);
     String playerColor = (input.split("\\s+")[2]).toUpperCase();
 
+    if (listedGameId > listedGames.size()) {
+      printf("Error: Game does not exist", SpacingType.SURROUND, SET_TEXT_COLOR_RED);
+      return;
+    }
+
     int trueGameId = listedGames.get(listedGameId);
 
     try {
       serverFacade.joinGame(authToken, playerColor, trueGameId);
-      printf("Success joining game!", SpacingType.SURROUND, SET_TEXT_COLOR_GREEN);
+      printf(
+        "Success joining game!",
+        SpacingType.SURROUND,
+        SET_TEXT_COLOR_GREEN
+      );
       inGame(playerColor);
     } catch (Exception e) {
-      printf("Error joining game: " + e.getMessage(), SpacingType.SURROUND, SET_TEXT_COLOR_RED);
+      printf(
+        "Error joining game: " + e.getMessage(),
+        SpacingType.SURROUND,
+        SET_TEXT_COLOR_RED
+      );
     }
   }
 
-  public static void listCommand(ServerFacade serverFacade) {
+  public static void observeCommand(ServerFacade serverFacade) {
 
+  }
+
+  public static void listCommand(ServerFacade serverFacade) {
     printf(
-            "CURRENT GAMES",
-            SpacingType.ABOVE,
-            SET_TEXT_COLOR_YELLOW + SET_TEXT_BOLD
+      "CURRENT GAMES",
+      SpacingType.ABOVE,
+      SET_TEXT_COLOR_YELLOW + SET_TEXT_BOLD
     );
     ArrayList<GameData> games = serverFacade.listGames(authToken).games();
 
@@ -303,18 +479,37 @@ public class ServerCommands {
         playerBlack = game.blackUsername().toUpperCase();
         playerCount += 1;
       }
-      printf(gameNumber + ". " + game.gameName() + " ", SpacingType.NONE, SET_TEXT_COLOR_BLUE);
+      printf(
+        gameNumber + ". " + game.gameName() + " ",
+        SpacingType.NONE,
+        SET_TEXT_COLOR_BLUE
+      );
       if (playerCount < 2) {
         printf(playerCount + "/2", SpacingType.REGULAR, SET_TEXT_COLOR_GREEN);
       } else {
         printf(playerCount + "/2", SpacingType.REGULAR, SET_TEXT_COLOR_YELLOW);
       }
       printf("   " + playerWhite, SpacingType.REGULAR, null);
-      printf("   " + playerBlack, SpacingType.REGULAR, SET_TEXT_COLOR_LIGHT_GREY);
+      printf(
+        "   " + playerBlack,
+        SpacingType.REGULAR,
+        SET_TEXT_COLOR_LIGHT_GREY
+      );
 
       listedGames.put(gameNumber, game.gameID());
       gameNumber += 1;
     }
     printf("", SpacingType.REGULAR, null);
+  }
+
+  public static void loadValues(ServerFacade serverFacade) {
+    ArrayList<GameData> games = serverFacade.listGames(authToken).games();
+    listedGames.clear();
+    int gameNumber = 1;
+
+    for (GameData game : games) {
+      listedGames.put(gameNumber, game.gameID());
+      gameNumber += 1;
+    }
   }
 }
