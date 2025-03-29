@@ -225,6 +225,20 @@ public class ServerCommands {
     }
   }
 
+  public static void joinCommand(ServerFacade serverFacade, String input) {
+    int listedGameId = Integer.parseInt(input.split("\\s+")[1]);
+    String playerColor = (input.split("\\s+")[2]).toUpperCase();
+
+    int trueGameId = listedGames.get(listedGameId);
+
+    try {
+      serverFacade.joinGame(authToken, playerColor, trueGameId);
+      printf("Success joining game!", SpacingType.SURROUND, SET_TEXT_COLOR_GREEN);
+    } catch (Exception e) {
+      printf("Error joining game: " + e.getMessage(), SpacingType.SURROUND, SET_TEXT_COLOR_RED);
+    }
+  }
+
   public static void listCommand(ServerFacade serverFacade) {
 
     printf(
