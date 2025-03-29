@@ -1,7 +1,11 @@
 package server;
 
 import model.AuthData;
+import model.GameData;
 import ui.SpacingType;
+
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Scanner;
 import static ui.EscapeSequences.*;
 
@@ -59,6 +63,10 @@ public class ServerCommands {
     );
   }
 
+  public static boolean checkForQuit(String response) {
+      return response.equalsIgnoreCase("quit") | response.equalsIgnoreCase("exit");
+  }
+
   public static void helpCommand() {
     printf(
       "AVAILABLE COMMANDS",
@@ -103,10 +111,18 @@ public class ServerCommands {
     printf("Enter username: ", SpacingType.REGULAR, SET_TEXT_COLOR_BLUE);
     printf(">>> ", SpacingType.NONE, null);
     username = scanner.next();
+    if (checkForQuit(username)) {
+      printf("", SpacingType.REGULAR, null);
+      return;
+    }
 
     printf("Enter password: ", SpacingType.ABOVE, SET_TEXT_COLOR_BLUE);
     printf(">>> ", SpacingType.NONE, null);
     password = scanner.next();
+    if (checkForQuit(password)) {
+      printf("", SpacingType.REGULAR, null);
+      return;
+    }
 
     try {
       AuthData authData = serverFacade.loginUser(username, password);
@@ -123,10 +139,11 @@ public class ServerCommands {
   public static void logoutCommand(ServerFacade serverFacade) {
     try {
       serverFacade.logoutUser(authToken);
+      authToken = "";
       userStatus = "LOGGED_OUT";
       printf("Logout successful!", SpacingType.SURROUND, SET_TEXT_COLOR_GREEN);
     } catch (Exception e) {
-      printf("Error logging out", SpacingType.SURROUND, SET_TEXT_COLOR_RED);
+      printf("Error logging out: " + e.getMessage(), SpacingType.SURROUND, SET_TEXT_COLOR_RED);
     }
   }
 
@@ -141,15 +158,27 @@ public class ServerCommands {
     printf("Type desired username: ", SpacingType.REGULAR, SET_TEXT_COLOR_BLUE);
     printf(">>> ", SpacingType.NONE, null);
     username = scanner.next();
+    if (checkForQuit(username)) {
+      printf("", SpacingType.REGULAR, null);
+      return;
+    }
 
     while (true) {
       printf("Type desired password: ", SpacingType.ABOVE, SET_TEXT_COLOR_BLUE);
       printf(">>> ", SpacingType.NONE, null);
       password = scanner.next();
+      if (checkForQuit(password)) {
+        printf("", SpacingType.REGULAR, null);
+        return;
+      }
 
       printf("Confirm password: ", SpacingType.ABOVE, SET_TEXT_COLOR_BLUE);
       printf(">>> ", SpacingType.NONE, null);
       String passwordConfirmation = scanner.next();
+      if (checkForQuit(passwordConfirmation)) {
+        printf("", SpacingType.REGULAR, null);
+        return;
+      }
 
       if (!password.equals(passwordConfirmation)) {
         printf("Error: Passwords do not match", SpacingType.ABOVE, SET_TEXT_COLOR_RED);
@@ -161,6 +190,10 @@ public class ServerCommands {
     printf("Type desired email: ", SpacingType.ABOVE, SET_TEXT_COLOR_BLUE);
     printf(">>> ", SpacingType.NONE, null);
     email = scanner.next();
+    if (checkForQuit(email)) {
+      printf("", SpacingType.REGULAR, null);
+      return;
+    }
     printf("", SpacingType.REGULAR, null);
 
     try {
@@ -177,5 +210,58 @@ public class ServerCommands {
         registerCommand(serverFacade);
       }
     }
+  }
+
+  public static void createCommand(ServerFacade serverFacade) {
+    String gameName;
+    printf(
+            "GAME CREATION",
+            SpacingType.ABOVE,
+            SET_TEXT_COLOR_YELLOW + SET_TEXT_BOLD
+    );
+
+    printf("Type desired game name: ", SpacingType.REGULAR, SET_TEXT_COLOR_BLUE);
+    printf(">>> ", SpacingType.NONE, null);
+    gameName = scanner.next();
+    if (checkForQuit(gameName)) {
+      printf("", SpacingType.REGULAR, null);
+      return;
+    }
+
+    try {
+      serverFacade.createGame(authToken, gameName);
+      printf("Success creating game with name '" + gameName + "'!", SpacingType.SURROUND, SET_TEXT_COLOR_GREEN);
+    } catch (Exception e) {
+      printf("Error creating game: " + e.getMessage(), SpacingType.SURROUND, SET_TEXT_COLOR_RED);
+    }
+  }
+
+  public static void listCommand(ServerFacade serverFacade) {
+
+    printf(
+            "CURRENT GAMES",
+            SpacingType.ABOVE,
+            SET_TEXT_COLOR_YELLOW + SET_TEXT_BOLD
+    );
+    ArrayList<GameData> games = serverFacade.listGames(authToken).games();
+
+    int gameNumber = 1;
+    for (GameData game : games) {
+      int playerCount = 0;
+      if (game.whiteUsername() != null) {
+        playerCount += 1;
+      }
+      if (game.blackUsername() != null) {
+        playerCount += 1;
+      }
+      printf(gameNumber + ". " + game.gameName() + " Players: ", SpacingType.NONE, SET_TEXT_COLOR_BLUE);
+      if (playerCount < 2) {
+        printf(playerCount + "/2", SpacingType.REGULAR, SET_TEXT_COLOR_GREEN);
+      } else {
+        printf(playerCount + "/2", SpacingType.REGULAR, SET_TEXT_COLOR_YELLOW);
+      }
+      gameNumber += 1;
+    }
+    printf("", SpacingType.REGULAR, null);
   }
 }

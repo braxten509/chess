@@ -71,7 +71,7 @@ public class ServerFacade {
         path,
         header,
         new JoinGameRequest(null, playerColor, gameID),
-        Void.class
+        null
       );
   }
 
@@ -84,13 +84,13 @@ public class ServerFacade {
   public void logoutUser(String authToken) {
     String path = "/session";
     HashMap<String, String> header = mapAuthToken(authToken);
-    this.makeRequest("DELETE", path, header, null, Void.class);
+    this.makeRequest("DELETE", path, header, null, null);
   }
 
   public void clearDatabase(String authToken) {
     String path = "/db";
     HashMap<String, String> header = mapAuthToken(authToken);
-    this.makeRequest("DELETE", path, header, null, Void.class);
+    this.makeRequest("DELETE", path, header, null, null);
   }
 
   private HashMap<String, String> mapAuthToken(String authToken) {

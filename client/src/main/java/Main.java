@@ -4,6 +4,7 @@ import java.util.Scanner;
 
 import server.ServerFacade;
 import server.ServerCommands;
+import ui.EscapeSequences;
 import ui.SpacingType;
 
 public class Main {
@@ -33,18 +34,20 @@ public class Main {
           case "login" -> ServerCommands.loginCommand(serverFacade);
           case "register" -> ServerCommands.registerCommand(serverFacade);
           case "clear" -> ServerCommands.clearCommand();
+          default -> printf("Unknown or unavailable command. Type 'help' for a list of valid commands.", SpacingType.UNDER, EscapeSequences.SET_TEXT_COLOR_LIGHT_GREY);
         }
       } else {
         switch (response.toLowerCase()) {
           case "help" -> ServerCommands.helpCommand();
           case "logout" -> ServerCommands.logoutCommand(serverFacade);
+          case "create" -> ServerCommands.createCommand(serverFacade);
+          case "list" -> ServerCommands.listCommand(serverFacade);
           case "clear" -> ServerCommands.clearCommand();
+          default -> printf("Unknown or unavailable command. Type 'help' for a list of valid commands.", SpacingType.UNDER, EscapeSequences.SET_TEXT_COLOR_LIGHT_GREY);
         }
       }
 
-      if (
-        response.equalsIgnoreCase("quit") || response.equalsIgnoreCase("exit")
-      ) {
+      if (checkForQuit(response)) {
         break;
       }
     }
