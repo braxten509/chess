@@ -15,6 +15,8 @@ public class ServerCommands {
   private static final Scanner scanner = new Scanner(System.in);
   private static String authToken = "";
 
+  private static HashMap<Integer, Integer> listedGames = new HashMap<>();
+
   /**
    * Returns the same output as System.out.print() but with formatting
    * @param text text to print (everything will be formatted as specified)
@@ -245,23 +247,35 @@ public class ServerCommands {
     );
     ArrayList<GameData> games = serverFacade.listGames(authToken).games();
 
+    listedGames.clear();
     int gameNumber = 1;
+    String playerWhite = "EMPTY", playerBlack = "EMPTY";
     for (GameData game : games) {
       int playerCount = 0;
       if (game.whiteUsername() != null) {
+        playerWhite = game.whiteUsername().toUpperCase();
         playerCount += 1;
       }
       if (game.blackUsername() != null) {
+        playerBlack = game.blackUsername().toUpperCase();
         playerCount += 1;
       }
-      printf(gameNumber + ". " + game.gameName() + " Players: ", SpacingType.NONE, SET_TEXT_COLOR_BLUE);
+      printf(gameNumber + ". " + game.gameName() + " ", SpacingType.NONE, SET_TEXT_COLOR_BLUE);
       if (playerCount < 2) {
         printf(playerCount + "/2", SpacingType.REGULAR, SET_TEXT_COLOR_GREEN);
       } else {
         printf(playerCount + "/2", SpacingType.REGULAR, SET_TEXT_COLOR_YELLOW);
       }
+      printf("   " + playerWhite, SpacingType.REGULAR, null);
+      printf("   " + playerBlack, SpacingType.REGULAR, SET_TEXT_COLOR_LIGHT_GREY);
+
+      listedGames.put(gameNumber, game.gameID());
       gameNumber += 1;
     }
     printf("", SpacingType.REGULAR, null);
+  }
+
+  public static void playCommand(ServerCommands serverCommands) {
+
   }
 }
