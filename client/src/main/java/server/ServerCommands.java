@@ -229,15 +229,15 @@ public class ServerCommands {
 
   private static void inGame(String playerColor) {
     if (playerColor.equalsIgnoreCase("white")) {
-      char[][] chessPieceGrid = { // starts at bottom 0,0
-              {'R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R'},
-              {'P', 'P', 'P', 'P', 'P', 'P', 'P', 'P'},
-              {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
-              {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
-              {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
-              {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
-              {'p', 'p', 'p', 'p', 'p', 'p', 'p', 'p'},
-              {'r', 'n', 'b', 'q', 'k', 'b', 'n', 'r'},
+      String[][] chessPieceGrid = { // starts at bottom 0,0
+       {WHITE_ROOK, " ", " ", " ", " ", " ", " ", " "},
+       {" ", " ", " ", " ", " ", " ", " ", " "},
+       {" ", " ", " ", " ", " ", " ", " ", " "},
+       {" ", " ", " ", " ", " ", " ", " ", " "},
+       {" ", " ", " ", " ", " ", " ", " ", " "},
+       {" ", " ", " ", " ", " ", " ", " ", " "},
+       {" ", " ", " ", " ", " ", " ", " ", " "},
+       {BLACK_ROOK, " ", " ", " ", " ", " ", " ", " "},
       };
       int squareColor = 1; // starts first square as black
       for (int indexX = 8; indexX > 0; indexX--) {
@@ -245,29 +245,17 @@ public class ServerCommands {
         for (int indexY = 0; indexY < 8; indexY++) {
           int currentColor = squareColor % 2;
           if (currentColor == 1) {
-            printf(" ", SpacingType.NONE, SET_BG_COLOR_DARK_GREY);
+            printf("", SpacingType.NONE, SET_BG_COLOR_DARK_GREY);
 
-            if (Character.isUpperCase(chessPieceGrid[indexX-1][indexY])) {
-              printf(String.valueOf(chessPieceGrid[indexX-1][indexY]), SpacingType.NONE, SET_TEXT_COLOR_BLUE + SET_BG_COLOR_DARK_GREY);
-            } else if (Character.isLowerCase(chessPieceGrid[indexX-1][indexY])){
-              printf(String.valueOf(chessPieceGrid[indexX-1][indexY]), SpacingType.NONE, SET_TEXT_COLOR_LIGHT_GREY + SET_BG_COLOR_DARK_GREY);
-            } else {
-              printf(String.valueOf(chessPieceGrid[indexX-1][indexY]), SpacingType.NONE, SET_TEXT_COLOR_MAGENTA + SET_BG_COLOR_DARK_GREY);
-            }
+            printf(String.valueOf(chessPieceGrid[indexX-1][indexY]), SpacingType.NONE, SET_BG_COLOR_DARK_GREY);
 
-            printf(" ", SpacingType.NONE, SET_BG_COLOR_DARK_GREY);
+            printf("  ", SpacingType.NONE, SET_BG_COLOR_DARK_GREY);
           } else {
-            printf(" ", SpacingType.NONE, SET_BG_COLOR_WHITE);
+            printf("", SpacingType.NONE, SET_BG_COLOR_WHITE);
 
-            if (Character.isUpperCase(chessPieceGrid[indexX-1][indexY])) {
-              printf(String.valueOf(chessPieceGrid[indexX-1][indexY]), SpacingType.NONE, SET_TEXT_COLOR_BLUE + SET_BG_COLOR_WHITE);
-            } else if (Character.isLowerCase(chessPieceGrid[indexX-1][indexY])){
-              printf(String.valueOf(chessPieceGrid[indexX-1][indexY]), SpacingType.NONE, SET_TEXT_COLOR_LIGHT_GREY+ SET_BG_COLOR_WHITE);
-            } else {
-              printf(String.valueOf(chessPieceGrid[indexX-1][indexY]), SpacingType.NONE, SET_TEXT_COLOR_MAGENTA + SET_BG_COLOR_WHITE);
-            }
+            printf(String.valueOf(chessPieceGrid[indexX-1][indexY]), SpacingType.NONE, SET_BG_COLOR_WHITE);
 
-            printf(" ", SpacingType.NONE, SET_BG_COLOR_WHITE);
+            printf("  ", SpacingType.NONE, SET_BG_COLOR_WHITE);
           }
           squareColor += 1;
         }
