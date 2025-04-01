@@ -13,10 +13,10 @@ import model.*;
 
 public class ServerFacade {
 
-  private final String serverUrl;
+  private final int port;
 
-  public ServerFacade(String url) {
-    this.serverUrl = url;
+  public ServerFacade(int port) {
+    this.port = port;
   }
 
   public RegisterResult registerUser(
@@ -106,7 +106,7 @@ public class ServerFacade {
     Class<T> responseClass
   ) throws RuntimeException {
     try {
-      URL url = (new URI(serverUrl + path)).toURL();
+      URL url = (new URI("http://localhost:" + port + path)).toURL();
       HttpURLConnection http = (HttpURLConnection) url.openConnection();
       http.setRequestMethod(method);
 

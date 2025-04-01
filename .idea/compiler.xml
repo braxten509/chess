@@ -9,11 +9,11 @@
         <module name="client" />
         <module name="server" />
         <module name="shared" />
-        <module name="chesss" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="chess" target="21" />
+      <module name="chesss" target="21" />
     </bytecodeTargetLevel>
   </component>
 </project>

@@ -9,12 +9,12 @@ import ui.SpacingType;
 public class Main {
 
   public static void main(String[] args) {
-    var serverUrl = "http://localhost:8080";
+    int serverPort = 8080;
     if (args.length == 1) {
-      serverUrl = args[0];
+      serverPort = Integer.parseInt(args[0]);
     }
 
-    ServerFacade serverFacade = new ServerFacade(serverUrl);
+    ServerFacade serverFacade = new ServerFacade(serverPort);
     Scanner scanner = new Scanner(System.in);
 
     printf(
