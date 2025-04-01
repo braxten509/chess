@@ -72,14 +72,7 @@ public class ServerFacadeTests {
   }
 
   @Test
-  void joinGame() {
-    CreateGameResult createGameResult = facade.createGame(authToken, "TestGame");
-    facade.joinGame(authToken, "WHITE", createGameResult.gameID());
-    assertThrows(Exception.class, () -> facade.joinGame(authToken, "WHITE", createGameResult.gameID()));
-  }
-
-  @Test
-  void joinGameFail() {
+  void joinGameAndJoinFailTest() {
     CreateGameResult createGameResult = facade.createGame(authToken, "TestGame");
     facade.joinGame(authToken, "WHITE", createGameResult.gameID());
     assertThrows(Exception.class, () -> facade.joinGame(authToken, "WHITE", createGameResult.gameID()));
