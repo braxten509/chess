@@ -87,10 +87,9 @@ public class ServerFacade {
     this.makeRequest("DELETE", path, header, null, null);
   }
 
-  public void clearDatabase(String authToken) {
+  public void clearDatabase() {
     String path = "/db";
-    HashMap<String, String> header = mapAuthToken(authToken);
-    this.makeRequest("DELETE", path, header, null, null);
+    this.makeRequest("DELETE", path, null, null, null);
   }
 
   private HashMap<String, String> mapAuthToken(String authToken) {
