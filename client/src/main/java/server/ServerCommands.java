@@ -12,10 +12,10 @@ import ui.SpacingType;
 public class ServerCommands {
 
   public static String userStatus = "LOGGED_OUT";
-  private static final Scanner scanner = new Scanner(System.in);
+  private static final Scanner SCANNER = new Scanner(System.in);
   private static String authToken = "";
 
-  private static final HashMap<Integer, Integer> listedGames = new HashMap<>();
+  private static final HashMap<Integer, Integer> LISTED_GAMES = new HashMap<>();
 
   /**
    * Returns the same output as System.out.print() but with formatting
@@ -161,7 +161,7 @@ public class ServerCommands {
     String email = input.split("\\s")[3];
 
     printf("\nPlease confirm Password: ", SpacingType.NONE, SET_TEXT_BOLD);
-    String confirmedPassword = scanner.next();
+    String confirmedPassword = SCANNER.next();
 
     if (!password.equals(confirmedPassword)) {
       printf(
@@ -366,7 +366,7 @@ public class ServerCommands {
     // game loop
     while (true) {
       System.out.print("[" + userStatus + " - " + playerColor + "] >>> ");
-      String response = scanner.next();
+      String response = SCANNER.next();
 
       if (checkForQuit(response)) {
         break;
@@ -380,7 +380,7 @@ public class ServerCommands {
     int listedGameId = Integer.parseInt(input.split("\\s+")[1]);
     String playerColor = (input.split("\\s+")[2]).toUpperCase();
 
-    if (listedGameId > listedGames.size()) {
+    if (listedGameId > LISTED_GAMES.size()) {
       printf(
         "Error: Game does not exist",
         SpacingType.SURROUND,
@@ -389,7 +389,7 @@ public class ServerCommands {
       return;
     }
 
-    int trueGameId = listedGames.get(listedGameId);
+    int trueGameId = LISTED_GAMES.get(listedGameId);
 
     try {
       serverFacade.joinGame(authToken, playerColor, trueGameId);
@@ -409,7 +409,7 @@ public class ServerCommands {
   }
 
   public static void observeCommand(int id) {
-    if (listedGames.containsKey(id)) {
+    if (LISTED_GAMES.containsKey(id)) {
       printf("Now observing game" + id, SpacingType.SURROUND, SET_TEXT_BOLD);
     } else {
       printf("Error: game does not exist", SpacingType.SURROUND, SET_TEXT_COLOR_RED);
@@ -424,7 +424,7 @@ public class ServerCommands {
     );
     ArrayList<GameData> games = serverFacade.listGames(authToken).games();
 
-    listedGames.clear();
+    LISTED_GAMES.clear();
     int gameNumber = 1;
     for (GameData game : games) {
       String playerWhite = "EMPTY", playerBlack = "EMPTY";
@@ -454,7 +454,7 @@ public class ServerCommands {
         SET_TEXT_COLOR_LIGHT_GREY
       );
 
-      listedGames.put(gameNumber, game.gameID());
+      LISTED_GAMES.put(gameNumber, game.gameID());
       gameNumber += 1;
     }
     printf("", SpacingType.REGULAR, null);
@@ -462,11 +462,11 @@ public class ServerCommands {
 
   public static void loadValues(ServerFacade serverFacade) {
     ArrayList<GameData> games = serverFacade.listGames(authToken).games();
-    listedGames.clear();
+    LISTED_GAMES.clear();
     int gameNumber = 1;
 
     for (GameData game : games) {
-      listedGames.put(gameNumber, game.gameID());
+      LISTED_GAMES.put(gameNumber, game.gameID());
       gameNumber += 1;
     }
   }
