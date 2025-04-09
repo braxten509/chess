@@ -89,8 +89,10 @@ public class Main {
       var joinRegex = "join\\s+[0-9]+\\s+(white|black)";
       var observeRegex = "observe\\s+[0-9]+";
 
+      userResponse = userResponse.toLowerCase();
+
       if (userStatus.equals("LOGGED_OUT")) {
-        switch (userResponse.toLowerCase()) {
+        switch (userResponse) {
           case String s when s.matches(
               "\\bhelp\\b.*"
           ) -> {

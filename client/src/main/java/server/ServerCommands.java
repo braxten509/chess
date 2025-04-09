@@ -24,9 +24,34 @@ public class ServerCommands {
   private static void inGame(String playerColor) {
     String[][] chessPieceGrid = getChessPieceGrid(playerColor);
 
+    String[] whiteSpaceNumbers = "1 2 3 4 5 6 7 8".split("\\s");
+    String[] whiteSpaceLetters = "a b c d e f g h".split("\\s");
+
+    String[] blackSpaceNumbers = "8 7 6 5 4 3 2 1".split("\\s");
+    String[] blackSpaceLetters = "h g f e d c b a".split("\\s");
+
+    for (int index = -2; index < 8; index++) {
+      if (index >= 0 && (playerColor.equals("WHITE") || playerColor.equals("OBSERVER"))) {
+        printf(" " + whiteSpaceLetters[index] + " ", SpacingType.NONE, null);
+      } else if (index >= 0 && playerColor.equals("BLACK")) {
+        printf(" " + blackSpaceLetters[index] + " ", SpacingType.NONE, null);
+      } else {
+        printf(" ", SpacingType.NONE, null);
+      }
+    }
+
+    printf("", SpacingType.REGULAR, null);
+
     /* BlackSquare = 1, WhiteSquare = 0 */
-    int squareColor = (playerColor.equals("WHITE")) ? 1 : 0;
+    int squareColor = (playerColor.equals("WHITE") || playerColor.equals("OBSERVER")) ? 1 : 0;
     for (int indexX = 8; indexX > 0; indexX--) {
+
+      if (playerColor.equals("WHITE") || playerColor.equals("OBSERVER")) {
+        printf(whiteSpaceNumbers[indexX - 1] + " ", SpacingType.NONE, null);
+      } else {
+        printf(blackSpaceNumbers[indexX - 1] + " ", SpacingType.NONE, null);
+      }
+
       for (int indexY = 0; indexY < 8; indexY++) {
         int currentColor = squareColor % 2;
         String currentPiece = chessPieceGrid[indexX - 1][indexY];
@@ -61,8 +86,25 @@ public class ServerCommands {
         }
         squareColor += 1;
       }
+
+      if (playerColor.equals("WHITE") || playerColor.equals("OBSERVER")) {
+        printf(" " + whiteSpaceNumbers[indexX - 1] + " ", SpacingType.NONE, null);
+      } else {
+        printf(" " + blackSpaceNumbers[indexX - 1] + " ", SpacingType.NONE, null);
+      }
+
       squareColor += 1;
       printf("", SpacingType.REGULAR, null);
+    }
+
+    for (int index = -2; index < 8; index++) {
+      if (index >= 0 && (playerColor.equals("WHITE") || playerColor.equals("OBSERVER"))) {
+        printf(" " + whiteSpaceLetters[index] + " ", SpacingType.NONE, null);
+      } else if (index >= 0 && playerColor.equals("BLACK")) {
+        printf(" " + blackSpaceLetters[index] + " ", SpacingType.NONE, null);
+      } else {
+        printf(" ", SpacingType.NONE, null);
+      }
     }
 
     printf("", SpacingType.REGULAR, null);
@@ -448,7 +490,7 @@ public class ServerCommands {
   public static void observeCommand(int id) {
     if (LISTED_GAMES.containsKey(id)) {
       printf("Now observing game" + id, SpacingType.SURROUND, SET_TEXT_BOLD);
-      inGame("observer");
+      inGame("OBSERVER");
     } else {
       printf("Error: game does not exist", SpacingType.SURROUND, SET_TEXT_COLOR_RED);
     }
