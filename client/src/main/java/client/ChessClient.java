@@ -1,6 +1,7 @@
 package client;
 
 import client.formatting.SpacingType;
+import client.websocket.WebSocketFacade;
 
 import java.util.Scanner;
 
@@ -9,6 +10,7 @@ import static client.formatting.EscapeSequences.RESET_ALL;
 public class ChessClient {
 
   private final int port;
+  private WebSocketFacade ws;
 
   public static String userStatus = "LOGGED_OUT";
 
