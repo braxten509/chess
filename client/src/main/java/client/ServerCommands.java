@@ -1,13 +1,12 @@
-package server;
-
-import static ui.EscapeSequences.*;
+package client;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Scanner;
 import model.AuthData;
 import model.GameData;
-import ui.SpacingType;
+import client.formatting.SpacingType;
+import static client.formatting.EscapeSequences.*;
 
 /**
  * Class that contains all the commands that can be executed by the user,

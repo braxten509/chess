@@ -1,4 +1,4 @@
-package ui;
+package client.formatting;
 
 /**
  * This class contains constants and functions relating to ANSI Escape

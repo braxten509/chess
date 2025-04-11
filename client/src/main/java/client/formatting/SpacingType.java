@@ -1,4 +1,4 @@
-package ui;
+package client.formatting;
 
 public enum SpacingType {
   NONE,
