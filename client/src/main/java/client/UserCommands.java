@@ -6,15 +6,17 @@ import java.util.Scanner;
 import model.AuthData;
 import model.GameData;
 import client.formatting.SpacingType;
+
+import static client.ChessClient.printf;
+import static client.ChessClient.userStatus;
 import static client.formatting.EscapeSequences.*;
 
 /**
  * Class that contains all the commands that can be executed by the user,
  * including some helper methods.
  */
-public class ServerCommands {
+public class UserCommands {
 
-  public static String userStatus = "LOGGED_OUT";
   private static final Scanner SCANNER = new Scanner(System.in);
   private static String authToken = "";
 
@@ -184,46 +186,6 @@ public class ServerCommands {
       LISTED_GAMES.put(gameNumber, game.gameID());
       gameNumber += 1;
     }
-  }
-
-  /**
-   * Returns the same output as System.out.print() but with formatting
-   *
-   * @param text       text to print (everything will be formatted as specified)
-   * @param formatting formatting. Include multiple with '+'
-   * @param spacing    specifies spacing around text
-   */
-  public static void printf(
-      String text,
-      SpacingType spacing,
-      String formatting
-  ) {
-    String spacingBeginning = "";
-    String spacingEnding = "\n";
-
-    switch (spacing) {
-      case NONE -> spacingEnding = "";
-      case ABOVE -> spacingBeginning += "\n";
-      case UNDER -> spacingEnding += "\n";
-      case SURROUND -> {
-        spacingBeginning += "\n";
-        spacingEnding += "\n";
-      }
-      case DOUBLE_SURROUND -> {
-        spacingBeginning += "\n\n";
-        spacingEnding += "\n\n";
-      }
-      case null, default -> {
-      }
-    }
-
-    if (formatting != null) {
-      System.out.print(formatting);
-    }
-
-    System.out.print(spacingBeginning + text + spacingEnding);
-
-    System.out.print(RESET_ALL);
   }
 
   /**
@@ -545,6 +507,5 @@ public class ServerCommands {
     }
     printf("", SpacingType.REGULAR, null);
   }
-
 
 }

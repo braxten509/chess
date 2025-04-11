@@ -2,59 +2,62 @@ package client;
 
 import client.formatting.SpacingType;
 
-import java.util.Arrays;
 import java.util.Scanner;
 
-import static client.ServerCommands.printf;
-import static client.ServerCommands.userStatus;
-import static client.formatting.EscapeSequences.SET_TEXT_COLOR_YELLOW;
+import static client.formatting.EscapeSequences.RESET_ALL;
 
 public class ChessClient {
-  private static boolean validNumberOfParameters(
-      int expectedParameters,
-      String userInput
-  ) {
 
-    String[] userInputSpliced = userInput.split("\\s+");
+  private final int port;
 
-    int numberOfGivenParams = 0;
-    if (userInputSpliced.length > 1) {
-      numberOfGivenParams = Arrays.copyOfRange(userInputSpliced, 1, userInputSpliced.length).length;
-    }
+  public static String userStatus = "LOGGED_OUT";
 
-    return numberOfGivenParams == expectedParameters;
+  public ChessClient(int port) {
+    this.port = port;
   }
 
-  public static boolean expectedParameters(
-      int expectedNumberOfParams,
-      String regex,
-      String userInput
+  /**
+   * Returns the same output as System.out.print() but with formatting
+   *
+   * @param text       text to print (everything will be formatted as specified)
+   * @param formatting formatting. Include multiple with '+'
+   * @param spacing    specifies spacing around text
+   */
+  public static void printf(
+      String text,
+      SpacingType spacing,
+      String formatting
   ) {
-    if (validNumberOfParameters(expectedNumberOfParams, userInput)) {
+    String spacingBeginning = "";
+    String spacingEnding = "\n";
 
-      if (regex != null && userInput.matches(regex)) {
-        return true;
+    switch (spacing) {
+      case NONE -> spacingEnding = "";
+      case ABOVE -> spacingBeginning += "\n";
+      case UNDER -> spacingEnding += "\n";
+      case SURROUND -> {
+        spacingBeginning += "\n";
+        spacingEnding += "\n";
       }
-      if (regex != null && !userInput.matches(regex)) {
-        printf("Improper type of parameters. Type 'help' for proper syntax.",
-            SpacingType.SURROUND, SET_TEXT_COLOR_YELLOW);
-        return false;
+      case DOUBLE_SURROUND -> {
+        spacingBeginning += "\n\n";
+        spacingEnding += "\n\n";
       }
-      return regex == null;
-
-    } else {
-
-      printf("Improper number of parameters. Expected "
-              + expectedNumberOfParams + ". Type 'help' for proper syntax.",
-          SpacingType.SURROUND, SET_TEXT_COLOR_YELLOW);
-      return false;
-
+      case null, default -> {
+      }
     }
+
+    if (formatting != null) {
+      System.out.print(formatting);
+    }
+
+    System.out.print(spacingBeginning + text + spacingEnding);
+
+    System.out.print(RESET_ALL);
   }
 
-  public static void run(int serverPort) {
-
-    ServerFacade serverFacade = new ServerFacade(serverPort);
+  public void run() {
+    ServerFacade serverFacade = new ServerFacade(port);
     RequestProcessor requestProcessor = new RequestProcessor(serverFacade);
     Scanner scanner = new Scanner(System.in);
 
@@ -67,7 +70,7 @@ public class ChessClient {
     while (true) {
       System.out.print("[" + userStatus + "] >>> ");
       String userResponse = scanner.nextLine();
-      /* checks to see if a request to quit is given */
+      /* Executes command user inputs. Also checks to see if a request to quit is given */
       if (requestProcessor.processRequest(userResponse)) {
         break;
       }

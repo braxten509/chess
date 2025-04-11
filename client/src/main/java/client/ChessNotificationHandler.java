@@ -10,6 +10,7 @@ import static client.formatting.EscapeSequences.*;
  * Handles notifications received from WebSocketFacade. Prints these messages to the terminal.
  */
 public class ChessNotificationHandler implements NotificationHandler {
+
   /**
    * Prints the message received to the terminal.
    *

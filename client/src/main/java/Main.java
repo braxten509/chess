@@ -16,6 +16,6 @@ public class Main {
       serverPort = Integer.parseInt(args[0]);
     }
 
-    ChessClient.run(serverPort);
+    new ChessClient(serverPort).run();
   }
 }
