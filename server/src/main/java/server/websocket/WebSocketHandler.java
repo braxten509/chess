@@ -27,7 +27,7 @@ public class WebSocketHandler {
     AuthData authData = userService.getAuthData(command.getAuthToken());
     String username = authData.username();
 
-    System.out.println("onMessage executed");
+    System.out.println("(Server.WebSocketHandler::onMessage) onMessage triggered by " + username);
 
     switch (commandType) {
       case CONNECT -> join(username, session);
@@ -37,7 +37,7 @@ public class WebSocketHandler {
 
   private void join(String username, Session session) throws IOException {
     connections.add(username, session);
-    System.out.println(connections);
+    System.out.println("(Server.WebSocketHandler::join) join triggered by " + username);
     var message = String.format("%s joined the game", username);
     var serverMessage = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION);
     connections.broadcast(username, serverMessage);

@@ -111,7 +111,7 @@ public class UserCommands {
       }
     }
 
-    printf("", SpacingType.REGULAR, null);
+    printf("", SpacingType.ABOVE, null);
 
     // game loop
     while (true) {

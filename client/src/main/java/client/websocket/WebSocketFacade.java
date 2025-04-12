@@ -1,9 +1,13 @@
 package client.websocket;
 
+import client.formatting.SpacingType;
 import com.google.gson.Gson;
 import websocket.commands.UserGameCommand;
+import websocket.messages.ServerMessage;
 
-import javax.management.Notification;
+import static client.ChessClient.printf;
+import static client.formatting.EscapeSequences.*;
+
 import javax.websocket.*;
 import java.io.IOException;
 import java.net.URI;
@@ -45,8 +49,13 @@ public class WebSocketFacade extends Endpoint {
          */
         @Override
         public void onMessage(String message) {
-          Notification notification = new Gson().fromJson(message, Notification.class);
-          notificationHandler.notify(notification);
+          try {
+            notificationHandler.notify(new Gson().fromJson(message, ServerMessage.class));
+            printf("(Client.WebSocketFacade::onMessage) executed successfully", SpacingType.UNDER, SET_TEXT_COLOR_LIGHT_GREY);
+          } catch (Exception e) {
+            printf("(Client.WebSocketFacade::onMessage) got an error: " + e.getMessage(), SpacingType.SURROUND, SET_TEXT_COLOR_RED);
+          }
+          printf(">>> ", SpacingType.NONE, null);
         }
       });
     } catch (DeploymentException | IOException | URISyntaxException exception) {
@@ -67,10 +76,15 @@ public class WebSocketFacade extends Endpoint {
 
   public void sendCommand(UserGameCommand command) {
     try {
-      System.out.println(this.session.isOpen());
+      printf("(Client.WebSocketFacade::sendCommand) WebSocketFacade session open?: " + this.session.isOpen(),
+          SpacingType.REGULAR, SET_TEXT_COLOR_LIGHT_GREY);
+
       this.session.getBasicRemote().sendText(new Gson().toJson(command));
+
+      printf("(Client.WebSocketFacade::sendCommand) WebSocketFacade command sent to server " ,
+          SpacingType.UNDER, SET_TEXT_COLOR_LIGHT_GREY);
     } catch (IOException exception) {
-      System.out.println("ERROR (500): " + exception);
+      printf("ERROR (500): " + exception.getMessage(), SpacingType.SURROUND, SET_TEXT_COLOR_RED);
     }
   }
 
