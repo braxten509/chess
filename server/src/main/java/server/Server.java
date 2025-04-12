@@ -1,6 +1,7 @@
 package server;
 
 import dataaccess.DatabaseManager;
+import server.websocket.WebSocketHandler;
 import spark.*;
 
 public class Server {
@@ -18,6 +19,8 @@ public class Server {
     } catch (Exception e) {
       System.out.println("ERROR: " + e);
     }
+
+    Spark.webSocket("/ws", WebSocketHandler.class);
 
     // Register your endpoints and handle exceptions here.
     Spark.post("/user", ServerHandler::registerUser);

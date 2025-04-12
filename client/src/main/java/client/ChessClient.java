@@ -3,14 +3,16 @@ package client;
 import client.formatting.SpacingType;
 import client.websocket.WebSocketFacade;
 
+import java.net.URI;
 import java.util.Scanner;
 
 import static client.formatting.EscapeSequences.RESET_ALL;
+import static client.formatting.EscapeSequences.SET_TEXT_COLOR_RED;
 
 public class ChessClient {
 
   private final int port;
-  private WebSocketFacade ws;
+  private WebSocketFacade webSocketFacade;
 
   public static String userStatus = "LOGGED_OUT";
 
@@ -58,9 +60,21 @@ public class ChessClient {
     System.out.print(RESET_ALL);
   }
 
+  /**
+   * Runs the entire client program.
+   */
   public void run() {
+    String url = "http://localhost:" + port;
+
+    try {
+      webSocketFacade = new WebSocketFacade(url, new ChessNotificationHandler());
+    } catch (Exception exception) {
+      printf("ERROR: WebSocket not initiated", SpacingType.ABOVE, SET_TEXT_COLOR_RED);
+      printf(exception.getMessage(), SpacingType.UNDER, SET_TEXT_COLOR_RED);
+    }
+
     ServerFacade serverFacade = new ServerFacade(port);
-    RequestProcessor requestProcessor = new RequestProcessor(serverFacade);
+    RequestProcessor requestProcessor = new RequestProcessor(serverFacade, webSocketFacade);
     Scanner scanner = new Scanner(System.in);
 
     printf(

@@ -2,6 +2,7 @@ package client;
 
 import client.formatting.EscapeSequences;
 import client.formatting.SpacingType;
+import client.websocket.WebSocketFacade;
 
 import java.util.Arrays;
 
@@ -13,9 +14,11 @@ import static client.formatting.EscapeSequences.SET_TEXT_COLOR_YELLOW;
 public class RequestProcessor {
 
   private final ServerFacade serverFacade;
+  private final WebSocketFacade webSocketFacade;
 
-  public RequestProcessor(ServerFacade serverFacade) {
+  public RequestProcessor(ServerFacade serverFacade, WebSocketFacade webSocketFacade) {
     this.serverFacade = serverFacade;
+    this.webSocketFacade = webSocketFacade;
   }
 
   private boolean validNumberOfParameters(
@@ -154,7 +157,7 @@ public class RequestProcessor {
           "\\bjoin\\b.*"
       ) -> {
         if (expectedParameters(2, joinRegex, command)) {
-          joinCommand(serverFacade, command);
+          joinCommand(serverFacade, webSocketFacade, command);
         }
       }
 

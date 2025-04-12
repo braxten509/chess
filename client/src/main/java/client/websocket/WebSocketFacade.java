@@ -1,6 +1,7 @@
 package client.websocket;
 
 import com.google.gson.Gson;
+import websocket.commands.UserGameCommand;
 
 import javax.management.Notification;
 import javax.websocket.*;
@@ -18,7 +19,7 @@ public class WebSocketFacade extends Endpoint {
   NotificationHandler notificationHandler;
 
   /**
-   * Constructs the facade for WebSocket to use.
+   * Upgrades client connection to a Websocket connection.
    * First: formats url to -> ws://{url}/ws (as a URI object).
    * Second: makes a new session identified by the URI.
    * Third: onMessage sends that message to a NotificationHandler when WebSocketFacade receives a message.
@@ -63,4 +64,22 @@ public class WebSocketFacade extends Endpoint {
   @Override
   public void onOpen(Session session, EndpointConfig endpointConfig) {
   }
+
+  public void sendCommand(UserGameCommand command) {
+    try {
+      System.out.println(this.session.isOpen());
+      this.session.getBasicRemote().sendText(new Gson().toJson(command));
+    } catch (IOException exception) {
+      System.out.println("ERROR (500): " + exception);
+    }
+  }
+
+//  public void joinGame(UserGameCommand command) throws Exception {
+//    try {
+//      this.session.getBasicRemote().sendText(new Gson().toJson(command));
+//    } catch (Exception exception) {
+//      System.out.println("ERROR (500): " + exception.getMessage());
+//    }
+//  }
+
 }

@@ -3,9 +3,12 @@ package client;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Scanner;
+
+import client.websocket.WebSocketFacade;
 import model.AuthData;
 import model.GameData;
 import client.formatting.SpacingType;
+import websocket.commands.UserGameCommand;
 
 import static client.ChessClient.printf;
 import static client.ChessClient.userStatus;
@@ -411,11 +414,11 @@ public class UserCommands {
    * @param serverFacade serverFacade to use
    * @param userInput user userInput to use
    */
-  public static void joinCommand(ServerFacade serverFacade, String userInput) {
-    int listedGameId = Integer.parseInt(userInput.split("\\s+")[1]);
+  public static void joinCommand(ServerFacade serverFacade, WebSocketFacade webSocketFacade, String userInput) {
+    int userGivenGameID = Integer.parseInt(userInput.split("\\s+")[1]);
     String playerColor = (userInput.split("\\s+")[2]).toUpperCase();
 
-    if (listedGameId > LISTED_GAMES.size()) {
+    if (userGivenGameID > LISTED_GAMES.size()) {
       printf(
           "Error: Game does not exist",
           SpacingType.SURROUND,
@@ -424,7 +427,7 @@ public class UserCommands {
       return;
     }
 
-    int trueGameId = LISTED_GAMES.get(listedGameId);
+    int trueGameId = LISTED_GAMES.get(userGivenGameID);
 
     try {
       serverFacade.joinGame(authToken, playerColor, trueGameId);
@@ -433,6 +436,12 @@ public class UserCommands {
           SpacingType.SURROUND,
           SET_TEXT_COLOR_GREEN
       );
+
+      UserGameCommand joinCommand =
+          new UserGameCommand(UserGameCommand.CommandType.CONNECT, authToken, trueGameId);
+
+      webSocketFacade.sendCommand(joinCommand);
+
       inGame(playerColor);
     } catch (Exception e) {
       printf(
