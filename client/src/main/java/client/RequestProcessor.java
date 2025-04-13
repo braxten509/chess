@@ -165,8 +165,8 @@ public class RequestProcessor {
           "\\bobserve\\b.*"
       ) -> {
         if (expectedParameters(1, observeRegex, command)) {
-          int gameId = Integer.parseInt(command.split("\\s")[1]);
-          observeCommand(gameId);
+          int gameID = Integer.parseInt(command.split("\\s")[1]);
+          observeCommand(serverFacade, gameID);
         }
       }
 

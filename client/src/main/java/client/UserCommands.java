@@ -4,10 +4,15 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Scanner;
 
+import chess.ChessBoard;
+import chess.ChessGame;
+import chess.ChessPiece;
+import chess.ChessPosition;
 import client.websocket.WebSocketFacade;
 import model.AuthData;
 import model.GameData;
 import client.formatting.SpacingType;
+import org.apache.commons.lang.ArrayUtils;
 import websocket.commands.UserGameCommand;
 
 import static client.ChessClient.printf;
@@ -25,8 +30,8 @@ public class UserCommands {
 
   private static final HashMap<Integer, Integer> LISTED_GAMES = new HashMap<>();
 
-  private static void inGame(String playerColor) {
-    String[][] chessPieceGrid = getChessPieceGrid(playerColor);
+  private static void inGame(String playerColor, GameData gameData) {
+    String[][] chessPieceGrid = getChessPieceGrid(playerColor, gameData);
 
     String[] whiteSpaceNumbers = "1 2 3 4 5 6 7 8".split("\\s");
     String[] whiteSpaceLetters = "a b c d e f g h".split("\\s");
@@ -126,9 +131,49 @@ public class UserCommands {
     printf("", SpacingType.REGULAR, null);
   }
 
-  private static String[][] getChessPieceGrid(String playerColor) {
-    String[][] chessPieceGrid = {{}};
-    if (playerColor.equalsIgnoreCase("white") || playerColor.equalsIgnoreCase("observer")) {
+  private static String[][] getChessPieceGrid(String playerColor, GameData gameData) {
+    String[][] chessPieceGrid = new String[8][8];
+
+    ChessBoard chessBoard = gameData.game().getBoard();
+
+    for (int row = 0; row < 8; row++) {
+      for (int col = 0; col < 8; col++) {
+        ChessPiece currentPiece = chessBoard.getPiece(new ChessPosition(row + 1, col + 1));
+
+        if (currentPiece == null) {
+          chessPieceGrid[row][col] = " ";
+          continue;
+        }
+
+        if (currentPiece.getTeamColor().equals(ChessGame.TeamColor.WHITE)) {
+          switch (currentPiece.getPieceType()) {
+            case PAWN -> chessPieceGrid[row][col] = WHITE_PAWN;
+            case ROOK -> chessPieceGrid[row][col] = WHITE_ROOK;
+            case KNIGHT -> chessPieceGrid[row][col] = WHITE_KNIGHT;
+            case BISHOP -> chessPieceGrid[row][col] = WHITE_BISHOP;
+            case QUEEN -> chessPieceGrid[row][col] = WHITE_QUEEN;
+            case KING -> chessPieceGrid[row][col] = WHITE_KING;
+            case null, default -> chessPieceGrid[row][col] = " ";
+          }
+        } else {
+          switch (currentPiece.getPieceType()) {
+            case PAWN -> chessPieceGrid[row][col] = BLACK_PAWN;
+            case ROOK -> chessPieceGrid[row][col] = BLACK_ROOK;
+            case KNIGHT -> chessPieceGrid[row][col] = BLACK_KNIGHT;
+            case BISHOP -> chessPieceGrid[row][col] = BLACK_BISHOP;
+            case QUEEN -> chessPieceGrid[row][col] = BLACK_QUEEN;
+            case KING -> chessPieceGrid[row][col] = BLACK_KING;
+            case null, default -> chessPieceGrid[row][col] = " ";
+          }
+        }
+      }
+    }
+
+    if (playerColor.equals("BLACK")) {
+      ArrayUtils.reverse(chessPieceGrid);
+    }
+
+    /*if (playerColor.equalsIgnoreCase("white") || playerColor.equalsIgnoreCase("observer")) {
       // starts at bottom 0,0
       chessPieceGrid = new String[][]{
           {
@@ -176,7 +221,7 @@ public class UserCommands {
               WHITE_KING, WHITE_BISHOP, WHITE_KNIGHT, WHITE_ROOK,
           },
       };
-    }
+    } */
     return chessPieceGrid;
   }
 
@@ -437,12 +482,15 @@ public class UserCommands {
           SET_TEXT_COLOR_GREEN
       );
 
+      GameData gameData = serverFacade.getGame(trueGameId);
+      // printf(gameData.game().toString(), SpacingType.SURROUND, null);
+
       UserGameCommand joinCommand =
           new UserGameCommand(UserGameCommand.CommandType.CONNECT, authToken, trueGameId);
 
       webSocketFacade.sendCommand(joinCommand);
 
-      inGame(playerColor);
+      inGame(playerColor, gameData);
     } catch (Exception e) {
       printf(
           "Error joining game: " + e.getMessage(),
@@ -455,12 +503,17 @@ public class UserCommands {
   /**
    * Command to observe a game.
    *
-   * @param id of the game
+   * @param userGivenGameID of the game
    */
-  public static void observeCommand(int id) {
-    if (LISTED_GAMES.containsKey(id)) {
-      printf("Now observing game" + id, SpacingType.SURROUND, SET_TEXT_BOLD);
-      inGame("OBSERVER");
+  public static void observeCommand(ServerFacade serverFacade, int userGivenGameID) {
+    if (LISTED_GAMES.containsKey(userGivenGameID)) {
+      printf("Now observing game" + userGivenGameID, SpacingType.SURROUND, SET_TEXT_BOLD);
+
+      int trueGameId = LISTED_GAMES.get(userGivenGameID);
+
+      GameData gameData = serverFacade.getGame(trueGameId);
+
+      inGame("OBSERVER", gameData);
     } else {
       printf("Error: game does not exist", SpacingType.SURROUND, SET_TEXT_COLOR_RED);
     }

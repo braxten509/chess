@@ -49,6 +49,11 @@ public class ChessGame {
     turn = team;
   }
 
+  @Override
+  public String toString() {
+    return "Turn: " + turn + "\n\n" + board.toString();
+  }
+
   /**
    * Enum identifying the 2 possible teams in a chess game
    */

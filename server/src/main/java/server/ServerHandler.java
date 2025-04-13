@@ -147,6 +147,28 @@ public class ServerHandler {
     }
   }
 
+  /**
+   * Gets the requested game state
+   *
+   * @param req server request
+   * @param res server response
+   * @return serialized "GameData" object
+   */
+  public static Object getGame(Request req, Response res) {
+    try {
+      res.type("application/json");
+      int gameID = Integer.parseInt(req.params(":id"));
+
+      GameData gameData = GAME_SERVICE.getGame(gameID);
+
+      res.status(200);
+      return turnIntoJson(gameData);
+    } catch (Exception e) {
+      res.status(500);
+      return turnIntoJson("message", "Error: " + e.getMessage());
+    }
+  }
+
   public static Object createGame(Request req, Response res) {
     try {
       res.type("application/json; charset=utf-8");

@@ -27,6 +27,7 @@ public class Server {
     Spark.post("/session", ServerHandler::loginUser);
     Spark.post("/game", ServerHandler::createGame);
     Spark.put("/game", ServerHandler::joinGame);
+    Spark.get("/game/:id", ServerHandler::getGame);
     Spark.get("/game", ServerHandler::listGames);
     Spark.delete("/session", ServerHandler::logoutUser);
     Spark.delete("/db", ServerHandler::clearDatabase);

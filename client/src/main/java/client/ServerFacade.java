@@ -45,9 +45,22 @@ public class ServerFacade {
       );
   }
 
+  public GameData getGame(int gameID) {
+    String path = "/game/" + gameID;
+
+    return this.makeRequest(
+        "GET",
+        path,
+        null,
+        null,
+        GameData.class
+    );
+  }
+
   public CreateGameResult createGame(String authToken, String gameName) {
     String path = "/game";
     HashMap<String, String> header = mapAuthToken(authToken);
+
     return this.makeRequest(
         "POST",
         path,
@@ -66,6 +79,7 @@ public class ServerFacade {
   public void joinGame(String authToken, String playerColor, int gameID) {
     String path = "/game";
     HashMap<String, String> header = mapAuthToken(authToken);
+
     this.makeRequest(
         "PUT",
         path,
