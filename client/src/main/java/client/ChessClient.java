@@ -3,7 +3,6 @@ package client;
 import client.formatting.SpacingType;
 import client.websocket.WebSocketFacade;
 
-import java.net.URI;
 import java.util.Scanner;
 
 import static client.formatting.EscapeSequences.RESET_ALL;
@@ -15,6 +14,7 @@ public class ChessClient {
   private WebSocketFacade webSocketFacade;
 
   public static String userStatus = "LOGGED_OUT";
+  public static boolean loading = false;
 
   public ChessClient(int port) {
     this.port = port;
@@ -67,7 +67,7 @@ public class ChessClient {
     String url = "http://localhost:" + port;
 
     try {
-      webSocketFacade = new WebSocketFacade(url, new ChessNotificationHandler());
+      webSocketFacade = new WebSocketFacade(url, new ChessMessageHandler());
     } catch (Exception exception) {
       printf("ERROR: WebSocket not initiated", SpacingType.ABOVE, SET_TEXT_COLOR_RED);
       printf(exception.getMessage(), SpacingType.UNDER, SET_TEXT_COLOR_RED);
@@ -84,7 +84,9 @@ public class ChessClient {
     );
 
     while (true) {
-      System.out.print("[" + userStatus + "] >>> ");
+      if (!loading) {
+        System.out.print("[" + userStatus + "] >>> ");
+      }
       String userResponse = scanner.nextLine();
       /* Executes command user inputs. Also checks to see if a request to quit is given */
       if (requestProcessor.processRequest(userResponse)) {

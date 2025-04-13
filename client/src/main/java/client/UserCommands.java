@@ -15,8 +15,7 @@ import client.formatting.SpacingType;
 import org.apache.commons.lang.ArrayUtils;
 import websocket.commands.UserGameCommand;
 
-import static client.ChessClient.printf;
-import static client.ChessClient.userStatus;
+import static client.ChessClient.*;
 import static client.formatting.EscapeSequences.*;
 
 /**
@@ -30,97 +29,11 @@ public class UserCommands {
 
   private static final HashMap<Integer, Integer> LISTED_GAMES = new HashMap<>();
 
-  private static void inGame(String playerColor, GameData gameData) {
-    String[][] chessPieceGrid = getChessPieceGrid(playerColor, gameData);
-
-    String[] whiteSpaceNumbers = "1 2 3 4 5 6 7 8".split("\\s");
-    String[] whiteSpaceLetters = "a b c d e f g h".split("\\s");
-
-    String[] blackSpaceNumbers = "8 7 6 5 4 3 2 1".split("\\s");
-    String[] blackSpaceLetters = "h g f e d c b a".split("\\s");
-
-    for (int index = -2; index < 8; index++) {
-      if (index >= 0 && (playerColor.equals("WHITE") || playerColor.equals("OBSERVER"))) {
-        printf(" " + whiteSpaceLetters[index] + " ", SpacingType.NONE, null);
-      } else if (index >= 0 && playerColor.equals("BLACK")) {
-        printf(" " + blackSpaceLetters[index] + " ", SpacingType.NONE, null);
-      } else {
-        printf(" ", SpacingType.NONE, null);
-      }
-    }
-
-    printf("", SpacingType.REGULAR, null);
-
-    /* BlackSquare = 1, WhiteSquare = 0 */
-    int squareColor = (playerColor.equals("WHITE") || playerColor.equals("OBSERVER")) ? 1 : 0;
-    for (int indexX = 8; indexX > 0; indexX--) {
-
-      if (playerColor.equals("WHITE") || playerColor.equals("OBSERVER")) {
-        printf(whiteSpaceNumbers[indexX - 1] + " ", SpacingType.NONE, null);
-      } else {
-        printf(blackSpaceNumbers[indexX - 1] + " ", SpacingType.NONE, null);
-      }
-
-      for (int indexY = 0; indexY < 8; indexY++) {
-        int currentColor = squareColor % 2;
-        String currentPiece = chessPieceGrid[indexX - 1][indexY];
-        if (currentColor == 1) {
-          if (!currentPiece.equalsIgnoreCase(" ")) {
-            printf("", SpacingType.NONE, SET_BG_COLOR_DARK_GREY);
-
-            printf(currentPiece, SpacingType.NONE, SET_BG_COLOR_DARK_GREY);
-
-            printf("", SpacingType.NONE, SET_BG_COLOR_DARK_GREY);
-          } else {
-            printf(" ", SpacingType.NONE, SET_BG_COLOR_DARK_GREY);
-
-            printf(currentPiece, SpacingType.NONE, SET_BG_COLOR_DARK_GREY);
-
-            printf(" ", SpacingType.NONE, SET_BG_COLOR_DARK_GREY);
-          }
-        } else {
-          if (!currentPiece.equalsIgnoreCase(" ")) {
-            printf("", SpacingType.NONE, SET_BG_COLOR_LIGHT_GREY);
-
-            printf(currentPiece, SpacingType.NONE, SET_BG_COLOR_LIGHT_GREY);
-
-            printf("", SpacingType.NONE, SET_BG_COLOR_LIGHT_GREY);
-          } else {
-            printf(" ", SpacingType.NONE, SET_BG_COLOR_LIGHT_GREY);
-
-            printf(currentPiece, SpacingType.NONE, SET_BG_COLOR_LIGHT_GREY);
-
-            printf(" ", SpacingType.NONE, SET_BG_COLOR_LIGHT_GREY);
-          }
-        }
-        squareColor += 1;
-      }
-
-      if (playerColor.equals("WHITE") || playerColor.equals("OBSERVER")) {
-        printf(" " + whiteSpaceNumbers[indexX - 1] + " ", SpacingType.NONE, null);
-      } else {
-        printf(" " + blackSpaceNumbers[indexX - 1] + " ", SpacingType.NONE, null);
-      }
-
-      squareColor += 1;
-      printf("", SpacingType.REGULAR, null);
-    }
-
-    for (int index = -2; index < 8; index++) {
-      if (index >= 0 && (playerColor.equals("WHITE") || playerColor.equals("OBSERVER"))) {
-        printf(" " + whiteSpaceLetters[index] + " ", SpacingType.NONE, null);
-      } else if (index >= 0 && playerColor.equals("BLACK")) {
-        printf(" " + blackSpaceLetters[index] + " ", SpacingType.NONE, null);
-      } else {
-        printf(" ", SpacingType.NONE, null);
-      }
-    }
-
-    printf("", SpacingType.ABOVE, null);
-
+  protected static void inGame(String playerColor, GameData gameData) {
     // game loop
+    loading = false;
     while (true) {
-      System.out.print("[" + userStatus + " - " + playerColor.toUpperCase() + "] >>> ");
+      printf("[(" + playerColor.toUpperCase() + ") " + userStatus + "] >>> ", SpacingType.NONE, null);
       String response = SCANNER.nextLine();
 
       if (checkForQuit(response)) {
@@ -234,6 +147,101 @@ public class UserCommands {
       LISTED_GAMES.put(gameNumber, game.gameID());
       gameNumber += 1;
     }
+  }
+
+  /**
+   * Draws the chessboard for the client
+   *
+   * @param playerColor playerColor
+   * @param gameData gameData
+   */
+  public static void drawChessboard(String playerColor, GameData gameData) {
+    String[][] chessPieceGrid = getChessPieceGrid(playerColor, gameData);
+
+    String[] whiteSpaceNumbers = "1 2 3 4 5 6 7 8".split("\\s");
+    String[] whiteSpaceLetters = "a b c d e f g h".split("\\s");
+
+    String[] blackSpaceNumbers = "8 7 6 5 4 3 2 1".split("\\s");
+    String[] blackSpaceLetters = "h g f e d c b a".split("\\s");
+
+    for (int index = -2; index < 8; index++) {
+      if (index >= 0 && (playerColor.equals("WHITE") || playerColor.equals("OBSERVER"))) {
+        printf(" " + whiteSpaceLetters[index] + " ", SpacingType.NONE, null);
+      } else if (index >= 0 && playerColor.equals("BLACK")) {
+        printf(" " + blackSpaceLetters[index] + " ", SpacingType.NONE, null);
+      } else {
+        printf(" ", SpacingType.NONE, null);
+      }
+    }
+
+    printf("", SpacingType.REGULAR, null);
+
+    /* BlackSquare = 1, WhiteSquare = 0 */
+    int squareColor = (playerColor.equals("WHITE") || playerColor.equals("OBSERVER")) ? 1 : 0;
+    for (int indexX = 8; indexX > 0; indexX--) {
+
+      if (playerColor.equals("WHITE") || playerColor.equals("OBSERVER")) {
+        printf(whiteSpaceNumbers[indexX - 1] + " ", SpacingType.NONE, null);
+      } else {
+        printf(blackSpaceNumbers[indexX - 1] + " ", SpacingType.NONE, null);
+      }
+
+      for (int indexY = 0; indexY < 8; indexY++) {
+        int currentColor = squareColor % 2;
+        String currentPiece = chessPieceGrid[indexX - 1][indexY];
+        if (currentColor == 1) {
+          if (!currentPiece.equalsIgnoreCase(" ")) {
+            printf("", SpacingType.NONE, SET_BG_COLOR_DARK_GREY);
+
+            printf(currentPiece, SpacingType.NONE, SET_BG_COLOR_DARK_GREY);
+
+            printf("", SpacingType.NONE, SET_BG_COLOR_DARK_GREY);
+          } else {
+            printf(" ", SpacingType.NONE, SET_BG_COLOR_DARK_GREY);
+
+            printf(currentPiece, SpacingType.NONE, SET_BG_COLOR_DARK_GREY);
+
+            printf(" ", SpacingType.NONE, SET_BG_COLOR_DARK_GREY);
+          }
+        } else {
+          if (!currentPiece.equalsIgnoreCase(" ")) {
+            printf("", SpacingType.NONE, SET_BG_COLOR_LIGHT_GREY);
+
+            printf(currentPiece, SpacingType.NONE, SET_BG_COLOR_LIGHT_GREY);
+
+            printf("", SpacingType.NONE, SET_BG_COLOR_LIGHT_GREY);
+          } else {
+            printf(" ", SpacingType.NONE, SET_BG_COLOR_LIGHT_GREY);
+
+            printf(currentPiece, SpacingType.NONE, SET_BG_COLOR_LIGHT_GREY);
+
+            printf(" ", SpacingType.NONE, SET_BG_COLOR_LIGHT_GREY);
+          }
+        }
+        squareColor += 1;
+      }
+
+      if (playerColor.equals("WHITE") || playerColor.equals("OBSERVER")) {
+        printf(" " + whiteSpaceNumbers[indexX - 1] + " ", SpacingType.NONE, null);
+      } else {
+        printf(" " + blackSpaceNumbers[indexX - 1] + " ", SpacingType.NONE, null);
+      }
+
+      squareColor += 1;
+      printf("", SpacingType.REGULAR, null);
+    }
+
+    for (int index = -2; index < 8; index++) {
+      if (index >= 0 && (playerColor.equals("WHITE") || playerColor.equals("OBSERVER"))) {
+        printf(" " + whiteSpaceLetters[index] + " ", SpacingType.NONE, null);
+      } else if (index >= 0 && playerColor.equals("BLACK")) {
+        printf(" " + blackSpaceLetters[index] + " ", SpacingType.NONE, null);
+      } else {
+        printf(" ", SpacingType.NONE, null);
+      }
+    }
+
+    printf("", SpacingType.ABOVE, null);
   }
 
   /**
@@ -476,21 +484,13 @@ public class UserCommands {
 
     try {
       serverFacade.joinGame(authToken, playerColor, trueGameId);
-      printf(
-          "Success joining game!",
-          SpacingType.SURROUND,
-          SET_TEXT_COLOR_GREEN
-      );
 
-      GameData gameData = serverFacade.getGame(trueGameId);
-      // printf(gameData.game().toString(), SpacingType.SURROUND, null);
+      loading = true;
+      printf("", SpacingType.REGULAR, null);
 
       UserGameCommand joinCommand =
           new UserGameCommand(UserGameCommand.CommandType.CONNECT, authToken, trueGameId);
-
       webSocketFacade.sendCommand(joinCommand);
-
-      inGame(playerColor, gameData);
     } catch (Exception e) {
       printf(
           "Error joining game: " + e.getMessage(),

@@ -1,5 +1,6 @@
 package client.websocket;
 
+import client.ChessMessageHandler;
 import client.formatting.SpacingType;
 import com.google.gson.Gson;
 import websocket.commands.UserGameCommand;
@@ -20,7 +21,7 @@ import java.net.URISyntaxException;
 public class WebSocketFacade extends Endpoint {
 
   Session session;
-  NotificationHandler notificationHandler;
+  ChessMessageHandler chessMessageHandler;
 
   /**
    * Upgrades client connection to a Websocket connection.
@@ -29,14 +30,14 @@ public class WebSocketFacade extends Endpoint {
    * Third: onMessage sends that message to a NotificationHandler when WebSocketFacade receives a message.
    *
    * @param url server URL
-   * @param notificationHandler class to handle notifications the server receives
+   * @param chessMessageHandler class to handle notifications the server receives
    * @throws Exception any errors
    */
-  public WebSocketFacade(String url, NotificationHandler notificationHandler) throws Exception {
+  public WebSocketFacade(String url, ChessMessageHandler chessMessageHandler) throws Exception {
     try {
       url = url.replace("http", "ws");
       URI socketURI = new URI(url + "/ws");
-      this.notificationHandler = notificationHandler;
+      this.chessMessageHandler = chessMessageHandler;
 
       WebSocketContainer container = ContainerProvider.getWebSocketContainer();
       this.session = container.connectToServer(this, socketURI);
@@ -45,17 +46,16 @@ public class WebSocketFacade extends Endpoint {
         /**
          * What the WebSocketFacade does when a message is received.
          *
-         * @param message message
+         * @param jsonMessage json formatted message
          */
         @Override
-        public void onMessage(String message) {
+        public void onMessage(String jsonMessage) {
           try {
-            notificationHandler.notify(new Gson().fromJson(message, ServerMessage.class));
+            chessMessageHandler.handleMessage(jsonMessage);
             printf("(Client.WebSocketFacade::onMessage) executed successfully", SpacingType.UNDER, SET_TEXT_COLOR_LIGHT_GREY);
           } catch (Exception e) {
-            printf("(Client.WebSocketFacade::onMessage) got an error: " + e.getMessage(), SpacingType.SURROUND, SET_TEXT_COLOR_RED);
+            printf("\n(Client.WebSocketFacade::onMessage) got an error: " + e.getMessage(), SpacingType.SURROUND, SET_TEXT_COLOR_RED);
           }
-          printf(">>> ", SpacingType.NONE, null);
         }
       });
     } catch (DeploymentException | IOException | URISyntaxException exception) {
@@ -76,13 +76,13 @@ public class WebSocketFacade extends Endpoint {
 
   public void sendCommand(UserGameCommand command) {
     try {
-      printf("(Client.WebSocketFacade::sendCommand) WebSocketFacade session open?: " + this.session.isOpen(),
-          SpacingType.REGULAR, SET_TEXT_COLOR_LIGHT_GREY);
+//      printf("(Client.WebSocketFacade::sendCommand) WebSocketFacade session open?: " + this.session.isOpen(),
+//          SpacingType.REGULAR, SET_TEXT_COLOR_LIGHT_GREY);
 
       this.session.getBasicRemote().sendText(new Gson().toJson(command));
 
-      printf("(Client.WebSocketFacade::sendCommand) WebSocketFacade command sent to server " ,
-          SpacingType.UNDER, SET_TEXT_COLOR_LIGHT_GREY);
+//      printf("(Client.WebSocketFacade::sendCommand) WebSocketFacade command sent to server " ,
+//          SpacingType.UNDER, SET_TEXT_COLOR_LIGHT_GREY);
     } catch (IOException exception) {
       printf("ERROR (500): " + exception.getMessage(), SpacingType.SURROUND, SET_TEXT_COLOR_RED);
     }
