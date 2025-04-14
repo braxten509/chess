@@ -483,6 +483,15 @@ public class UserCommands {
     int trueGameId = LISTED_GAMES.get(userGivenGameID);
 
     try {
+      GameData gameData = serverFacade.getGame(trueGameId);
+
+      String username = userStatus.toLowerCase();
+
+      if (username.equals(gameData.blackUsername()) || username.equals(gameData.whiteUsername())) {
+        printf("You are already in this game!", SpacingType.SURROUND, SET_TEXT_COLOR_YELLOW);
+        return;
+      }
+
       serverFacade.joinGame(authToken, playerColor, trueGameId);
 
       loading = true;
