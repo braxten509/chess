@@ -51,6 +51,7 @@ public class WebSocketFacade extends Endpoint {
         @Override
         public void onMessage(String jsonMessage) {
           try {
+            printf("(Client.WebSocketFacade::onMessage) received message", SpacingType.REGULAR, SET_TEXT_COLOR_LIGHT_GREY);
             chessMessageHandler.handleMessage(jsonMessage);
             printf("(Client.WebSocketFacade::onMessage) executed successfully", SpacingType.UNDER, SET_TEXT_COLOR_LIGHT_GREY);
           } catch (Exception e) {
@@ -76,24 +77,9 @@ public class WebSocketFacade extends Endpoint {
 
   public void sendCommand(UserGameCommand command) {
     try {
-//      printf("(Client.WebSocketFacade::sendCommand) WebSocketFacade session open?: " + this.session.isOpen(),
-//          SpacingType.REGULAR, SET_TEXT_COLOR_LIGHT_GREY);
-
       this.session.getBasicRemote().sendText(new Gson().toJson(command));
-
-//      printf("(Client.WebSocketFacade::sendCommand) WebSocketFacade command sent to server " ,
-//          SpacingType.UNDER, SET_TEXT_COLOR_LIGHT_GREY);
     } catch (IOException exception) {
       printf("ERROR (500): " + exception.getMessage(), SpacingType.SURROUND, SET_TEXT_COLOR_RED);
     }
   }
-
-//  public void joinGame(UserGameCommand command) throws Exception {
-//    try {
-//      this.session.getBasicRemote().sendText(new Gson().toJson(command));
-//    } catch (Exception exception) {
-//      System.out.println("ERROR (500): " + exception.getMessage());
-//    }
-//  }
-
 }

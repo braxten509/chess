@@ -13,7 +13,6 @@ import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import service.GameService;
 import service.UserService;
 import websocket.commands.UserGameCommand;
-import websocket.messages.ServerMessage;
 
 import java.io.IOException;
 
@@ -32,17 +31,24 @@ public class WebSocketHandler {
     int gameID = command.getGameID();
     String username = authData.username();
 
-    System.out.println("(Server.WebSocketHandler::onMessage) onMessage triggered by " + username);
+    System.out.println("(Server.WebSocketHandler::onMessage) onMessage triggered by '" + username + "'");
 
     switch (commandType) {
       case CONNECT -> join(username, gameID, session);
+      case MAKE_MOVE -> notify(username);
       case null, default -> System.out.println("Invalid Command.");
     }
   }
 
+  private void notify(String triggeringUser) throws IOException {
+    System.out.println("(Server.WebSocketHandler::notify) notify triggered by '" + triggeringUser + "'");
+
+    connections.broadcast(triggeringUser, triggeringUser + " made a move");
+  }
+
   private void join(String username, int gameID, Session session) throws IOException, DataAccessException {
     connections.add(username, session);
-    System.out.println("(Server.WebSocketHandler::join) join triggered by " + username);
+    System.out.println("(Server.WebSocketHandler::join) join triggered by '" + username + "'");
 
     GameData gameData = gameService.getGame(gameID);
 

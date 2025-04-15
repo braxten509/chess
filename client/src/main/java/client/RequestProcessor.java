@@ -4,6 +4,7 @@ import client.formatting.EscapeSequences;
 import client.formatting.SpacingType;
 import client.websocket.WebSocketFacade;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 
 import static client.ChessClient.printf;
@@ -36,30 +37,48 @@ public class RequestProcessor {
     return numberOfGivenParams == expectedParameters;
   }
 
+  private void printCommandError(String command) {
+    printf("\nImproper syntax. Expected: ",
+        SpacingType.NONE, SET_TEXT_COLOR_YELLOW);
+
+    switch (command.toLowerCase()) {
+      case "help" -> printf("help", SpacingType.NONE, SET_TEXT_COLOR_YELLOW);
+      case "login" -> printf("login <username> <password>", SpacingType.NONE, SET_TEXT_COLOR_YELLOW);
+      case "register" -> printf("register <username> <password> <email>", SpacingType.NONE, SET_TEXT_COLOR_YELLOW);
+      case "clear" -> printf("clear", SpacingType.NONE, SET_TEXT_COLOR_YELLOW);
+      case "quit" -> printf("quit", SpacingType.NONE, SET_TEXT_COLOR_YELLOW);
+      case "exit" -> printf("exit", SpacingType.NONE, SET_TEXT_COLOR_YELLOW);
+      case "logout" -> printf("logout", SpacingType.NONE, SET_TEXT_COLOR_YELLOW);
+      case "create" -> printf("create <gameName>", SpacingType.NONE, SET_TEXT_COLOR_YELLOW);
+      case "list" -> printf("list", SpacingType.NONE, SET_TEXT_COLOR_YELLOW);
+      case "join" -> printf("join <gameNumber>", SpacingType.NONE, SET_TEXT_COLOR_YELLOW);
+      case "observe" -> printf("observe <gameNumber>", SpacingType.NONE, SET_TEXT_COLOR_YELLOW);
+    }
+
+    printf("", SpacingType.UNDER, null);
+  }
+
   private boolean expectedParameters(
       int expectedNumberOfParams,
       String regex,
       String userInput
   ) {
+    String userCommand = userInput.split(" ")[0];
+
     if (validNumberOfParameters(expectedNumberOfParams, userInput)) {
 
       if (regex != null && userInput.matches(regex)) {
         return true;
       }
       if (regex != null && !userInput.matches(regex)) {
-        printf("Improper type of parameters. Type 'help' for proper syntax.",
-            SpacingType.SURROUND, SET_TEXT_COLOR_YELLOW);
+        printCommandError(userCommand);
         return false;
       }
       return regex == null;
 
     } else {
-
-      printf("Improper number of parameters. Expected "
-              + expectedNumberOfParams + ". Type 'help' for proper syntax.",
-          SpacingType.SURROUND, SET_TEXT_COLOR_YELLOW);
+      printCommandError(userCommand);
       return false;
-
     }
   }
 

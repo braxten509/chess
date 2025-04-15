@@ -19,6 +19,10 @@ public class ChessClient {
   public ChessClient(int port) {
     this.port = port;
   }
+  
+  public static void printf(String text) {
+    System.out.println(text);
+  }
 
   /**
    * Returns the same output as System.out.print() but with formatting

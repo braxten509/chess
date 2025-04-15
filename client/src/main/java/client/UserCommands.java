@@ -26,6 +26,7 @@ public class UserCommands {
 
   private static final Scanner SCANNER = new Scanner(System.in);
   private static String authToken = "";
+  private static WebSocketFacade webSocketFacade;
 
   private static final HashMap<Integer, Integer> LISTED_GAMES = new HashMap<>();
 
@@ -500,6 +501,11 @@ public class UserCommands {
       UserGameCommand joinCommand =
           new UserGameCommand(UserGameCommand.CommandType.CONNECT, authToken, trueGameId);
       webSocketFacade.sendCommand(joinCommand);
+
+      UserGameCommand notifyCommand =
+          new UserGameCommand(UserGameCommand.CommandType.MAKE_MOVE, authToken, trueGameId);
+      webSocketFacade.sendCommand(notifyCommand);
+
     } catch (Exception e) {
       printf(
           "Error joining game: " + e.getMessage(),

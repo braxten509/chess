@@ -26,16 +26,17 @@ public class ConnectionManager {
     connections.put(username, connection);
   }
 
-  public void broadcast(String triggeringUser, String message) {
+  public void broadcast(String triggeringUser, String message) throws IOException {
     removeClosedConnections();
+    var connection2 = connections.get(triggeringUser);
+    connection2.send(new Gson().toJson(new WebSocketResult(new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION), message, null, null)));
 
     for (Connection connection : connections.values()) {
-
       if (!connection.username.equals(triggeringUser)) {
         try {
           ServerMessage serverMessage = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION);
           connection.send(new Gson().toJson(new WebSocketResult(serverMessage, message, null, null)));
-          System.out.println("(Server.ConnectionManager::broadcast) successfully sent message to everyone except " + triggeringUser + ": " + message);
+          System.out.println("(Server.ConnectionManager::broadcast) successfully sent message '" + message + "' to '" + connection.username + "'");
         } catch (Exception e) {
           System.out.println("(Server.ConnectionManager::broadcast) error while sending message back to client: " + e.getMessage());
         }
@@ -46,9 +47,7 @@ public class ConnectionManager {
   public void loadGame(String username, GameData gameData) throws IOException {
     var connection = connections.get(username);
     var serverMessage = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME);
-    broadcast(username, username + " joined the game");
 
     connection.send(new Gson().toJson(new WebSocketResult(serverMessage, null, username, gameData)));
-
   }
 }

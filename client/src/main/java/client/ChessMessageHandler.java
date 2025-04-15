@@ -20,8 +20,6 @@ public class ChessMessageHandler {
 
     WebSocketResult webSocketResult = new Gson().fromJson(message, WebSocketResult.class);
 
-    System.out.println(webSocketResult);
-
     ServerMessage serverMessage = webSocketResult.serverMessage();
     String toBroadcastMessage = webSocketResult.message();
     String username = webSocketResult.username();
@@ -46,12 +44,13 @@ public class ChessMessageHandler {
    * @param toBroadcastMessage notification
    */
   private void notify(String toBroadcastMessage, String userColor) {
-      printf(toBroadcastMessage, SpacingType.SURROUND, SET_BG_COLOR_YELLOW);
+      printf(toBroadcastMessage, SpacingType.SURROUND, SET_TEXT_COLOR_YELLOW);
       printf("[(" + userColor.toUpperCase() + ") " + userStatus + "] >>> ", SpacingType.REGULAR, null);
   }
 
   private void loadGame(String username, String userColor, GameData gameData) {
     if (userColor.equals("WHITE")) {
+      printf("LOAD GAME");
       UserCommands.drawChessboard("WHITE", gameData);
       printf(
           "Success joining game!",
