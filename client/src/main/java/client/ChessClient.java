@@ -1,7 +1,10 @@
 package client;
 
+import client.facade.ServerFacade;
 import client.formatting.SpacingType;
-import client.websocket.WebSocketFacade;
+import client.handler.ChessMessageHandler;
+import client.facade.WebSocketFacade;
+import client.handler.UserInputHandler;
 
 import java.util.Scanner;
 
@@ -11,15 +14,19 @@ import static client.formatting.EscapeSequences.SET_TEXT_COLOR_RED;
 public class ChessClient {
 
   private final int port;
-  private WebSocketFacade webSocketFacade;
 
   public static String userStatus = "LOGGED_OUT";
-  public static boolean loading = false;
+  public static boolean inGame = false;
 
   public ChessClient(int port) {
     this.port = port;
   }
-  
+
+  /**
+   * Returns the same output as System.out.println()
+   *
+   * @param text       text to print (everything will be formatted as specified)
+   */
   public static void printf(String text) {
     System.out.println(text);
   }
@@ -28,8 +35,8 @@ public class ChessClient {
    * Returns the same output as System.out.print() but with formatting
    *
    * @param text       text to print (everything will be formatted as specified)
-   * @param formatting formatting. Include multiple with '+'
    * @param spacing    specifies spacing around text
+   * @param formatting formatting. Include multiple with '+'
    */
   public static void printf(
       String text,
@@ -69,33 +76,36 @@ public class ChessClient {
    */
   public void run() {
     String url = "http://localhost:" + port;
+    WebSocketFacade webSocketFacade;
 
     try {
       webSocketFacade = new WebSocketFacade(url, new ChessMessageHandler());
+      ServerFacade serverFacade = new ServerFacade(port);
+      UserInputHandler requestProcessor = new UserInputHandler(serverFacade, webSocketFacade);
+
+      Scanner scanner = new Scanner(System.in);
+
+      printf(
+          "♕ Welcome to Chess! Type 'help' to get started ♕",
+          SpacingType.UNDER,
+          null
+      );
+
+      while (true) {
+        if (!inGame) {
+          System.out.print("[" + userStatus + "] >>> ");
+          String userResponse = scanner.nextLine();
+
+          /* Executes command user inputs. Also checks to see if a request to quit is given */
+          if (requestProcessor.processRequest(userResponse)) {
+            break;
+          }
+        }
+      }
     } catch (Exception exception) {
-      printf("ERROR: WebSocket not initiated", SpacingType.ABOVE, SET_TEXT_COLOR_RED);
+      printf("ERROR: " + exception, SpacingType.ABOVE, SET_TEXT_COLOR_RED);
       printf(exception.getMessage(), SpacingType.UNDER, SET_TEXT_COLOR_RED);
     }
 
-    ServerFacade serverFacade = new ServerFacade(port);
-    RequestProcessor requestProcessor = new RequestProcessor(serverFacade, webSocketFacade);
-    Scanner scanner = new Scanner(System.in);
-
-    printf(
-        "♕ Welcome to Chess! Type 'help' to get started ♕",
-        SpacingType.UNDER,
-        null
-    );
-
-    while (true) {
-      if (!loading) {
-        System.out.print("[" + userStatus + "] >>> ");
-      }
-      String userResponse = scanner.nextLine();
-      /* Executes command user inputs. Also checks to see if a request to quit is given */
-      if (requestProcessor.processRequest(userResponse)) {
-        break;
-      }
-    }
   }
 }

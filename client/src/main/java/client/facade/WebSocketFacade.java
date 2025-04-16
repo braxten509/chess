@@ -1,10 +1,9 @@
-package client.websocket;
+package client.facade;
 
-import client.ChessMessageHandler;
+import client.handler.ChessMessageHandler;
 import client.formatting.SpacingType;
 import com.google.gson.Gson;
 import websocket.commands.UserGameCommand;
-import websocket.messages.ServerMessage;
 
 import static client.ChessClient.printf;
 import static client.formatting.EscapeSequences.*;
@@ -73,6 +72,7 @@ public class WebSocketFacade extends Endpoint {
    */
   @Override
   public void onOpen(Session session, EndpointConfig endpointConfig) {
+    ChessMessageHandler.webSocketFacade = this;
   }
 
   public void sendCommand(UserGameCommand command) {

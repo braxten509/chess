@@ -1,18 +1,14 @@
-package client;
+package client.handler;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Scanner;
 
-import chess.ChessBoard;
-import chess.ChessGame;
-import chess.ChessPiece;
-import chess.ChessPosition;
-import client.websocket.WebSocketFacade;
+import client.facade.ServerFacade;
+import client.facade.WebSocketFacade;
 import model.AuthData;
 import model.GameData;
 import client.formatting.SpacingType;
-import org.apache.commons.lang.ArrayUtils;
 import websocket.commands.UserGameCommand;
 
 import static client.ChessClient.*;
@@ -22,122 +18,12 @@ import static client.formatting.EscapeSequences.*;
  * Class that contains all the commands that can be executed by the user,
  * including some helper methods.
  */
-public class UserCommands {
+public class CommandHandler {
 
   private static final Scanner SCANNER = new Scanner(System.in);
   private static String authToken = "";
-  private static WebSocketFacade webSocketFacade;
 
   private static final HashMap<Integer, Integer> LISTED_GAMES = new HashMap<>();
-
-  protected static void inGame(String playerColor, GameData gameData) {
-    // game loop
-    loading = false;
-    while (true) {
-      printf("[(" + playerColor.toUpperCase() + ") " + userStatus + "] >>> ", SpacingType.NONE, null);
-      String response = SCANNER.nextLine();
-
-      if (checkForQuit(response)) {
-        break;
-      }
-    }
-
-    printf("", SpacingType.REGULAR, null);
-  }
-
-  private static String[][] getChessPieceGrid(String playerColor, GameData gameData) {
-    String[][] chessPieceGrid = new String[8][8];
-
-    ChessBoard chessBoard = gameData.game().getBoard();
-
-    for (int row = 0; row < 8; row++) {
-      for (int col = 0; col < 8; col++) {
-        ChessPiece currentPiece = chessBoard.getPiece(new ChessPosition(row + 1, col + 1));
-
-        if (currentPiece == null) {
-          chessPieceGrid[row][col] = " ";
-          continue;
-        }
-
-        if (currentPiece.getTeamColor().equals(ChessGame.TeamColor.WHITE)) {
-          switch (currentPiece.getPieceType()) {
-            case PAWN -> chessPieceGrid[row][col] = WHITE_PAWN;
-            case ROOK -> chessPieceGrid[row][col] = WHITE_ROOK;
-            case KNIGHT -> chessPieceGrid[row][col] = WHITE_KNIGHT;
-            case BISHOP -> chessPieceGrid[row][col] = WHITE_BISHOP;
-            case QUEEN -> chessPieceGrid[row][col] = WHITE_QUEEN;
-            case KING -> chessPieceGrid[row][col] = WHITE_KING;
-            case null, default -> chessPieceGrid[row][col] = " ";
-          }
-        } else {
-          switch (currentPiece.getPieceType()) {
-            case PAWN -> chessPieceGrid[row][col] = BLACK_PAWN;
-            case ROOK -> chessPieceGrid[row][col] = BLACK_ROOK;
-            case KNIGHT -> chessPieceGrid[row][col] = BLACK_KNIGHT;
-            case BISHOP -> chessPieceGrid[row][col] = BLACK_BISHOP;
-            case QUEEN -> chessPieceGrid[row][col] = BLACK_QUEEN;
-            case KING -> chessPieceGrid[row][col] = BLACK_KING;
-            case null, default -> chessPieceGrid[row][col] = " ";
-          }
-        }
-      }
-    }
-
-    if (playerColor.equals("BLACK")) {
-      ArrayUtils.reverse(chessPieceGrid);
-    }
-
-    /*if (playerColor.equalsIgnoreCase("white") || playerColor.equalsIgnoreCase("observer")) {
-      // starts at bottom 0,0
-      chessPieceGrid = new String[][]{
-          {
-              WHITE_ROOK, WHITE_KNIGHT, WHITE_BISHOP, WHITE_QUEEN,
-              WHITE_KING, WHITE_BISHOP, WHITE_KNIGHT, WHITE_ROOK,
-          },
-          {
-              WHITE_PAWN, WHITE_PAWN, WHITE_PAWN, WHITE_PAWN,
-              WHITE_PAWN, WHITE_PAWN, WHITE_PAWN, WHITE_PAWN,
-          },
-          {" ", " ", " ", " ", " ", " ", " ", " "},
-          {" ", " ", " ", " ", " ", " ", " ", " "},
-          {" ", " ", " ", " ", " ", " ", " ", " "},
-          {" ", " ", " ", " ", " ", " ", " ", " "},
-          {
-              BLACK_PAWN, BLACK_PAWN, BLACK_PAWN, BLACK_PAWN,
-              BLACK_PAWN, BLACK_PAWN, BLACK_PAWN, BLACK_PAWN,
-          },
-          {
-              BLACK_ROOK, BLACK_KNIGHT, BLACK_BISHOP, BLACK_QUEEN,
-              BLACK_KING, BLACK_BISHOP, BLACK_KNIGHT, BLACK_ROOK,
-          },
-      };
-    } else if (playerColor.equalsIgnoreCase("black")) {
-      // starts at bottom 0,0
-      chessPieceGrid = new String[][]{
-          {
-              BLACK_ROOK, BLACK_KNIGHT, BLACK_BISHOP, BLACK_QUEEN,
-              BLACK_KING, BLACK_BISHOP, BLACK_KNIGHT, BLACK_ROOK,
-          },
-          {
-              BLACK_PAWN, BLACK_PAWN, BLACK_PAWN, BLACK_PAWN,
-              BLACK_PAWN, BLACK_PAWN, BLACK_PAWN, BLACK_PAWN,
-          },
-          {" ", " ", " ", " ", " ", " ", " ", " "},
-          {" ", " ", " ", " ", " ", " ", " ", " "},
-          {" ", " ", " ", " ", " ", " ", " ", " "},
-          {" ", " ", " ", " ", " ", " ", " ", " "},
-          {
-              WHITE_PAWN, WHITE_PAWN, WHITE_PAWN, WHITE_PAWN,
-              WHITE_PAWN, WHITE_PAWN, WHITE_PAWN, WHITE_PAWN,
-          },
-          {
-              WHITE_ROOK, WHITE_KNIGHT, WHITE_BISHOP, WHITE_QUEEN,
-              WHITE_KING, WHITE_BISHOP, WHITE_KNIGHT, WHITE_ROOK,
-          },
-      };
-    } */
-    return chessPieceGrid;
-  }
 
   private static void loadValues(ServerFacade serverFacade) {
     ArrayList<GameData> games = serverFacade.listGames(authToken).games();
@@ -148,101 +34,6 @@ public class UserCommands {
       LISTED_GAMES.put(gameNumber, game.gameID());
       gameNumber += 1;
     }
-  }
-
-  /**
-   * Draws the chessboard for the client
-   *
-   * @param playerColor playerColor
-   * @param gameData gameData
-   */
-  public static void drawChessboard(String playerColor, GameData gameData) {
-    String[][] chessPieceGrid = getChessPieceGrid(playerColor, gameData);
-
-    String[] whiteSpaceNumbers = "1 2 3 4 5 6 7 8".split("\\s");
-    String[] whiteSpaceLetters = "a b c d e f g h".split("\\s");
-
-    String[] blackSpaceNumbers = "8 7 6 5 4 3 2 1".split("\\s");
-    String[] blackSpaceLetters = "h g f e d c b a".split("\\s");
-
-    for (int index = -2; index < 8; index++) {
-      if (index >= 0 && (playerColor.equals("WHITE") || playerColor.equals("OBSERVER"))) {
-        printf(" " + whiteSpaceLetters[index] + " ", SpacingType.NONE, null);
-      } else if (index >= 0 && playerColor.equals("BLACK")) {
-        printf(" " + blackSpaceLetters[index] + " ", SpacingType.NONE, null);
-      } else {
-        printf(" ", SpacingType.NONE, null);
-      }
-    }
-
-    printf("", SpacingType.REGULAR, null);
-
-    /* BlackSquare = 1, WhiteSquare = 0 */
-    int squareColor = (playerColor.equals("WHITE") || playerColor.equals("OBSERVER")) ? 1 : 0;
-    for (int indexX = 8; indexX > 0; indexX--) {
-
-      if (playerColor.equals("WHITE") || playerColor.equals("OBSERVER")) {
-        printf(whiteSpaceNumbers[indexX - 1] + " ", SpacingType.NONE, null);
-      } else {
-        printf(blackSpaceNumbers[indexX - 1] + " ", SpacingType.NONE, null);
-      }
-
-      for (int indexY = 0; indexY < 8; indexY++) {
-        int currentColor = squareColor % 2;
-        String currentPiece = chessPieceGrid[indexX - 1][indexY];
-        if (currentColor == 1) {
-          if (!currentPiece.equalsIgnoreCase(" ")) {
-            printf("", SpacingType.NONE, SET_BG_COLOR_DARK_GREY);
-
-            printf(currentPiece, SpacingType.NONE, SET_BG_COLOR_DARK_GREY);
-
-            printf("", SpacingType.NONE, SET_BG_COLOR_DARK_GREY);
-          } else {
-            printf(" ", SpacingType.NONE, SET_BG_COLOR_DARK_GREY);
-
-            printf(currentPiece, SpacingType.NONE, SET_BG_COLOR_DARK_GREY);
-
-            printf(" ", SpacingType.NONE, SET_BG_COLOR_DARK_GREY);
-          }
-        } else {
-          if (!currentPiece.equalsIgnoreCase(" ")) {
-            printf("", SpacingType.NONE, SET_BG_COLOR_LIGHT_GREY);
-
-            printf(currentPiece, SpacingType.NONE, SET_BG_COLOR_LIGHT_GREY);
-
-            printf("", SpacingType.NONE, SET_BG_COLOR_LIGHT_GREY);
-          } else {
-            printf(" ", SpacingType.NONE, SET_BG_COLOR_LIGHT_GREY);
-
-            printf(currentPiece, SpacingType.NONE, SET_BG_COLOR_LIGHT_GREY);
-
-            printf(" ", SpacingType.NONE, SET_BG_COLOR_LIGHT_GREY);
-          }
-        }
-        squareColor += 1;
-      }
-
-      if (playerColor.equals("WHITE") || playerColor.equals("OBSERVER")) {
-        printf(" " + whiteSpaceNumbers[indexX - 1] + " ", SpacingType.NONE, null);
-      } else {
-        printf(" " + blackSpaceNumbers[indexX - 1] + " ", SpacingType.NONE, null);
-      }
-
-      squareColor += 1;
-      printf("", SpacingType.REGULAR, null);
-    }
-
-    for (int index = -2; index < 8; index++) {
-      if (index >= 0 && (playerColor.equals("WHITE") || playerColor.equals("OBSERVER"))) {
-        printf(" " + whiteSpaceLetters[index] + " ", SpacingType.NONE, null);
-      } else if (index >= 0 && playerColor.equals("BLACK")) {
-        printf(" " + blackSpaceLetters[index] + " ", SpacingType.NONE, null);
-      } else {
-        printf(" ", SpacingType.NONE, null);
-      }
-    }
-
-    printf("", SpacingType.ABOVE, null);
   }
 
   /**
@@ -470,13 +261,18 @@ public class UserCommands {
    */
   public static void joinCommand(ServerFacade serverFacade, WebSocketFacade webSocketFacade, String userInput) {
     int userGivenGameID = Integer.parseInt(userInput.split("\\s+")[1]);
-    String playerColor = (userInput.split("\\s+")[2]).toUpperCase();
+    String playerColor;
+    if (userInput.split("\\s+").length > 2) {
+      playerColor = (userInput.split("\\s+")[2]).toUpperCase();
+    } else {
+      playerColor = "OBSERVER";
+    }
 
-    if (userGivenGameID > LISTED_GAMES.size()) {
+    if (!LISTED_GAMES.containsKey(userGivenGameID)) {
       printf(
-          "Error: Game does not exist",
+          "Game does not exist.",
           SpacingType.SURROUND,
-          SET_TEXT_COLOR_RED
+          SET_TEXT_COLOR_YELLOW
       );
       return;
     }
@@ -485,26 +281,19 @@ public class UserCommands {
 
     try {
       GameData gameData = serverFacade.getGame(trueGameId);
-
       String username = userStatus.toLowerCase();
-
       if (username.equals(gameData.blackUsername()) || username.equals(gameData.whiteUsername())) {
         printf("You are already in this game!", SpacingType.SURROUND, SET_TEXT_COLOR_YELLOW);
         return;
       }
 
       serverFacade.joinGame(authToken, playerColor, trueGameId);
-
-      loading = true;
+      inGame = true;
       printf("", SpacingType.REGULAR, null);
 
       UserGameCommand joinCommand =
           new UserGameCommand(UserGameCommand.CommandType.CONNECT, authToken, trueGameId);
       webSocketFacade.sendCommand(joinCommand);
-
-      UserGameCommand notifyCommand =
-          new UserGameCommand(UserGameCommand.CommandType.MAKE_MOVE, authToken, trueGameId);
-      webSocketFacade.sendCommand(notifyCommand);
 
     } catch (Exception e) {
       printf(
@@ -512,25 +301,6 @@ public class UserCommands {
           SpacingType.SURROUND,
           SET_TEXT_COLOR_RED
       );
-    }
-  }
-
-  /**
-   * Command to observe a game.
-   *
-   * @param userGivenGameID of the game
-   */
-  public static void observeCommand(ServerFacade serverFacade, int userGivenGameID) {
-    if (LISTED_GAMES.containsKey(userGivenGameID)) {
-      printf("Now observing game" + userGivenGameID, SpacingType.SURROUND, SET_TEXT_BOLD);
-
-      int trueGameId = LISTED_GAMES.get(userGivenGameID);
-
-      GameData gameData = serverFacade.getGame(trueGameId);
-
-      inGame("OBSERVER", gameData);
-    } else {
-      printf("Error: game does not exist", SpacingType.SURROUND, SET_TEXT_COLOR_RED);
     }
   }
 

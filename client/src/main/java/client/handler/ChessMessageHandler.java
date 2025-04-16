@@ -1,10 +1,14 @@
-package client;
+package client.handler;
 
+import client.GameClient;
 import client.formatting.SpacingType;
+import client.facade.WebSocketFacade;
 import com.google.gson.Gson;
 import model.GameData;
 import model.WebSocketResult;
 import websocket.messages.ServerMessage;
+
+import java.util.ArrayList;
 
 import static client.ChessClient.*;
 import static client.formatting.EscapeSequences.*;
@@ -13,6 +17,10 @@ import static client.formatting.EscapeSequences.*;
  * Handles notifications received from WebSocketFacade. Prints these messages to the terminal.
  */
 public class ChessMessageHandler {
+
+  private static final ArrayList<Integer> gamesOpenByID = new ArrayList<>();
+
+  public static WebSocketFacade webSocketFacade;
 
   public void handleMessage(String message) {
 
@@ -49,27 +57,21 @@ public class ChessMessageHandler {
   }
 
   private void loadGame(String username, String userColor, GameData gameData) {
-    if (userColor.equals("WHITE")) {
-      printf("LOAD GAME");
-      UserCommands.drawChessboard("WHITE", gameData);
-      printf(
-          "Success joining game!",
-          SpacingType.UNDER,
-          SET_TEXT_COLOR_GREEN
-      );
 
-      UserCommands.inGame("WHITE", gameData);
-    } else if (userColor.equals("BLACK")) {
-      UserCommands.drawChessboard("BLACK", gameData);
-      printf(
-          "Success joining game!",
-          SpacingType.UNDER,
-          SET_TEXT_COLOR_GREEN
-      );
-
-      UserCommands.inGame("BLACK", gameData);
-    } else {
-      printf(username + " is not in the game!", SpacingType.SURROUND, SET_TEXT_COLOR_RED);
+    if (gameData == null) {
+      printf("ERROR: gameData is null!", SpacingType.SURROUND, SET_TEXT_COLOR_RED);
+      return;
     }
+
+    for (Integer gameID : gamesOpenByID) {
+      if (gameID == gameData.gameID()) {
+        return;
+      }
+    }
+
+    GameClient gameClient = new GameClient(username, userColor, gameData, webSocketFacade);
+    gameClient.run();
+    gamesOpenByID.add(gameData.gameID());
+
   }
 }

@@ -1,23 +1,23 @@
-package client;
+package client.handler;
 
+import client.facade.ServerFacade;
 import client.formatting.EscapeSequences;
 import client.formatting.SpacingType;
-import client.websocket.WebSocketFacade;
+import client.facade.WebSocketFacade;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 
 import static client.ChessClient.printf;
 import static client.ChessClient.userStatus;
-import static client.UserCommands.*;
+import static client.handler.CommandHandler.*;
 import static client.formatting.EscapeSequences.SET_TEXT_COLOR_YELLOW;
 
-public class RequestProcessor {
+public class UserInputHandler {
 
   private final ServerFacade serverFacade;
   private final WebSocketFacade webSocketFacade;
 
-  public RequestProcessor(ServerFacade serverFacade, WebSocketFacade webSocketFacade) {
+  public UserInputHandler(ServerFacade serverFacade, WebSocketFacade webSocketFacade) {
     this.serverFacade = serverFacade;
     this.webSocketFacade = webSocketFacade;
   }
@@ -51,7 +51,7 @@ public class RequestProcessor {
       case "logout" -> printf("logout", SpacingType.NONE, SET_TEXT_COLOR_YELLOW);
       case "create" -> printf("create <gameName>", SpacingType.NONE, SET_TEXT_COLOR_YELLOW);
       case "list" -> printf("list", SpacingType.NONE, SET_TEXT_COLOR_YELLOW);
-      case "join" -> printf("join <gameNumber>", SpacingType.NONE, SET_TEXT_COLOR_YELLOW);
+      case "join" -> printf("join <gameNumber> <BLACK|WHITE>", SpacingType.NONE, SET_TEXT_COLOR_YELLOW);
       case "observe" -> printf("observe <gameNumber>", SpacingType.NONE, SET_TEXT_COLOR_YELLOW);
     }
 
@@ -184,8 +184,7 @@ public class RequestProcessor {
           "\\bobserve\\b.*"
       ) -> {
         if (expectedParameters(1, observeRegex, command)) {
-          int gameID = Integer.parseInt(command.split("\\s")[1]);
-          observeCommand(serverFacade, gameID);
+          joinCommand(serverFacade, webSocketFacade, command);
         }
       }
 

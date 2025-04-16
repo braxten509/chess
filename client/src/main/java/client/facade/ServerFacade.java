@@ -1,4 +1,4 @@
-package client;
+package client.facade;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonIOException;
@@ -73,7 +73,7 @@ public class ServerFacade {
   /**
    * Connects a player to a game if possible
    * @param authToken authToken
-   * @param playerColor this is either "WHITE" or "BLACK"
+   * @param playerColor this is either "WHITE", "BLACK", or "OBSERVER"
    * @param gameID game ID
    */
   public void joinGame(String authToken, String playerColor, int gameID) {

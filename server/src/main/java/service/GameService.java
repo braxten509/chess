@@ -57,7 +57,8 @@ public class GameService {
       joinGameRequest == null ||
       joinGameRequest.authToken().isEmpty() ||
       (!Objects.equals(joinGameRequest.playerColor(), "WHITE") &&
-        (!Objects.equals(joinGameRequest.playerColor(), "BLACK")))
+        (!Objects.equals(joinGameRequest.playerColor(), "BLACK")) &&
+          (!Objects.equals(joinGameRequest.playerColor(), "OBSERVER")))
     ) {
       throw new DataAccessException("bad request");
     }
