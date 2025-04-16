@@ -62,7 +62,12 @@ public class CommandHandler {
           SpacingType.SURROUND, SET_TEXT_COLOR_YELLOW);
       return false;
     } else {
-      return userInput.matches("\\bquit\\b") || userInput.matches("\\bexit\\b");
+      if (userInput.matches("\\bquit\\b") || userInput.matches("\\bexit\\b")) {
+        inGame = false;
+        return true;
+      } else {
+        return false;
+      }
     }
   }
 

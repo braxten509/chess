@@ -22,7 +22,9 @@ public class GameClient {
   private final String username;
   private final String playerColor;
   private final WebSocketFacade webSocketFacade;
-  private GameData initialGameData;
+  private final GameData initialGameData;
+
+  private boolean running = true;
 
   public GameClient(String username, String playerColor, GameData initialGameData, WebSocketFacade webSocketFacade) {
     this.username = username;
@@ -42,15 +44,20 @@ public class GameClient {
         SET_TEXT_COLOR_GREEN
     );
 
-    while (true) {
+    while (running) {
       printf("[(" + playerColor.toUpperCase() + ") " + userStatus + "] >>> ", SpacingType.NONE, null);
       String response = scanner.nextLine();
 
       if (checkForQuit(response)) {
         printf("", SpacingType.REGULAR, null);
-        break;
+        this.stop();
       }
     }
+    inGame = false;
+  }
+
+  public void stop() {
+    running = false;
   }
 
   /**
@@ -59,7 +66,7 @@ public class GameClient {
    * @param playerColor playerColor
    * @param gameData gameData
    */
-  public static void drawChessboard(String playerColor, GameData gameData) {
+  private static void drawChessboard(String playerColor, GameData gameData) {
     String[][] chessPieceGrid = getChessPieceGrid(playerColor, gameData);
 
     String[] whiteSpaceNumbers = "1 2 3 4 5 6 7 8".split("\\s");

@@ -70,8 +70,8 @@ public class ChessMessageHandler {
     }
 
     GameClient gameClient = new GameClient(username, userColor, gameData, webSocketFacade);
-    gameClient.run();
     gamesOpenByID.add(gameData.gameID());
+    gameClient.run();
 
   }
 }
