@@ -13,6 +13,8 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+/*Updated commit*/
+
 /**
  * Receives requests from Client to upgrade the connection to a WebSocket connection.
  * Responses are sent to NotificationHandler
