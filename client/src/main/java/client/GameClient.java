@@ -7,7 +7,7 @@ import chess.ChessPosition;
 import client.formatting.SpacingType;
 import client.facade.WebSocketFacade;
 import model.GameData;
-import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.Scanner;
 
