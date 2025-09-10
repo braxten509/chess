@@ -7,7 +7,6 @@ import chess.ChessPosition;
 import client.formatting.SpacingType;
 import client.facade.WebSocketFacade;
 import model.GameData;
-import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.Scanner;
 
@@ -194,7 +193,12 @@ public class GameClient {
     }
 
     if (playerColor.equals("BLACK")) {
-      ArrayUtils.reverse(chessPieceGrid);
+      // reverse array
+      for (int i = 0; i < chessPieceGrid.length / 2; i++) {
+        String[] temp = chessPieceGrid[i];
+        chessPieceGrid[i] = chessPieceGrid[chessPieceGrid.length - 1 - i];
+        chessPieceGrid[chessPieceGrid.length - 1 - i] = temp;
+      }
     }
 
     /*if (playerColor.equalsIgnoreCase("white") || playerColor.equalsIgnoreCase("observer")) {
