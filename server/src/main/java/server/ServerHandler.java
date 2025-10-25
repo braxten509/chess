@@ -15,7 +15,6 @@ import io.javalin.http.Context;
 import model.*;
 import service.GameService;
 import service.UserService;
-import io.javalin.Javalin;
 
 public class ServerHandler {
 
