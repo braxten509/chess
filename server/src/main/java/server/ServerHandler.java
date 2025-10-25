@@ -10,11 +10,12 @@ import dataaccess.memory.MemoryGameDataAccess;
 import dataaccess.memory.MemoryUserDataAccess;
 import java.util.ArrayList;
 import java.util.Map;
+
+import io.javalin.http.Context;
 import model.*;
 import service.GameService;
 import service.UserService;
-import spark.Request;
-import spark.Response;
+import io.javalin.Javalin;
 
 public class ServerHandler {
 
@@ -37,123 +38,87 @@ public class ServerHandler {
     AUTH_DATA_ACCESS
   );
 
-  private static void showErrors(Response res, Exception e) {
+  private static void showErrors(Context ctx, Exception e) {
     if (e.getMessage().equals("unauthorized")) {
-      res.status(401);
+      ctx.status(401);
     } else {
-      res.status(400);
+      ctx.status(400);
     }
   }
 
   /**
-   * turns a JSON string into an object
-   * @param req request object
-   * @param classOfT type of object (Object.class)
-   * @return returns object 'T', whatever it is defined as
-   * @param <T> labels as a generic method
-   */
-  private static <T> T turnIntoObject(Request req, Class<T> classOfT) {
-    return GSON.fromJson(req.body(), classOfT);
-  }
-
-  /**
-   * @param object the input (usually an Object or String)
-   * @return "param1"
-   */
-  private static <T> String turnIntoJson(T object) {
-    return GSON.toJson(object);
-  }
-
-  /**
-   * @param keyword what the keyword is
-   * @param definition what the second parameter is
-   * @return {"param1", "definition of param1 [param2]"}
-   */
-  @SuppressWarnings("SameParameterValue")
-  private static <T> String turnIntoJson(String keyword, T definition) {
-    return GSON.toJson(Map.of(keyword, definition));
-  }
-
-  /**
    * Creates a new account for an unregistered user
-   * @param req request object
-   * @param res response object
    * @return returns an Object, likely a JSON formatted String
    */
-  public static Object registerUser(Request req, Response res) {
+  public static void registerUser(Context ctx) {
     try {
-      res.type("application/json");
-      RegisterRequest registerRequest = turnIntoObject(
-        req,
-        RegisterRequest.class
-      );
+      ctx.contentType("application/json");
+      RegisterRequest registerRequest = ctx.bodyAsClass(RegisterRequest.class);
 
       AuthData authData = USER_SERVICE.registerUser(registerRequest);
 
-      res.status(200);
-      return turnIntoJson(authData);
+      ctx.status(200);
+      ctx.json(authData);
     } catch (DataAccessException e) {
       if (e.getMessage().equals("already taken")) {
-        res.status(403);
+        ctx.status(403);
       } else {
-        res.status(400);
+        ctx.status(400);
       }
-      return turnIntoJson("message", "Error: " + e.getMessage());
+      ctx.json(Map.of("message", "Error: " + e.getMessage()));
     } catch (Exception e) {
-      res.status(500);
-      return turnIntoJson("message", "Error: " + e.getMessage());
+      ctx.status(500);
+      ctx.json(Map.of("message", "Error: " + e.getMessage()));
     }
   }
 
   /**
    * Logins an existing user
-   * @param req request object
-   * @param res response object
    * @return returns an Object, likely a JSON formatted String
    */
-  public static Object loginUser(Request req, Response res) {
+  public static void loginUser(Context ctx) {
     try {
-      res.type("application/json");
+      ctx.contentType("application/json");
 
-      LoginRequest loginRequest = turnIntoObject(req, LoginRequest.class);
+      LoginRequest loginRequest = ctx.bodyAsClass(LoginRequest.class);
 
       AuthData authData = USER_SERVICE.loginUser(loginRequest);
-      res.status(200);
-      return turnIntoJson(authData);
+      ctx.status(200);
+      ctx.json(authData);
     } catch (DataAccessException e) {
-      showErrors(res, e);
-      return turnIntoJson("message", "Error: " + e.getMessage());
+      showErrors(ctx, e);
+      ctx.json(Map.of("message", "Error: " + e.getMessage()));
     } catch (Exception e) {
-      res.status(500);
-      return turnIntoJson("message", "Error: " + e.getMessage());
+      ctx.status(500);
+      ctx.json(Map.of("message", "Error: " + e.getMessage()));
     }
   }
 
-  public static Object logoutUser(Request req, Response res) {
+  public static void logoutUser(Context ctx) {
     try {
-      res.type("application/json");
+      ctx.contentType("application/json");
 
-      String authToken = req.headers("Authorization");
+      String authToken = ctx.header("Authorization");
 
       USER_SERVICE.logoutUser(authToken);
-      res.status(200);
-      return turnIntoJson(new JsonObject());
+      ctx.status(200);
+      ctx.json(new JsonObject());
     } catch (DataAccessException e) {
-      res.status(401);
-      return turnIntoJson("message", "Error: " + e.getMessage());
+      ctx.status(401);
+      ctx.json(Map.of("message", "Error: " + e.getMessage()));
     } catch (Exception e) {
-      res.status(500);
-      return turnIntoJson("message", "Error: " + e.getMessage());
+      ctx.status(500);
+      ctx.json(Map.of("message", "Error: " + e.getMessage()));
     }
   }
 
-  public static Object createGame(Request req, Response res) {
+  public static void createGame(Context ctx) {
     try {
-      res.type("application/json; charset=utf-8");
-      String authToken = req.headers("Authorization");
+      ctx.contentType("application/json; charset=utf-8");
+      String authToken = ctx.header("Authorization");
 
       JsonObject jsonObject = JsonParser.parseString(
-        req.body()
+        ctx.body()
       ).getAsJsonObject();
       String gameName = jsonObject.get("gameName").getAsString();
 
@@ -163,21 +128,21 @@ public class ServerHandler {
       );
 
       int id = GAME_SERVICE.createGame(createGameRequest);
-      return turnIntoJson("gameID", id);
+      ctx.json(Map.of("gameID", id));
     } catch (DataAccessException e) {
-      showErrors(res, e);
-      return turnIntoJson("message", "Error: " + e.getMessage());
+      showErrors(ctx, e);
+      ctx.json(Map.of("message", "Error: " + e.getMessage()));
     } catch (Exception e) {
-      res.status(500);
-      return turnIntoJson("message", "Error: " + e.getMessage());
+      ctx.status(500);
+      ctx.json(Map.of("message", "Error: " + e.getMessage()));
     }
   }
 
-  public static Object joinGame(Request req, Response res) {
+  public static void joinGame(Context ctx) {
     try {
-      res.type("application/json");
-      String authToken = req.headers("Authorization");
-      JsonObject reqBody = turnIntoObject(req, JsonObject.class);
+      ctx.contentType("application/json");
+      String authToken = ctx.header("Authorization");
+      JsonObject reqBody = ctx.bodyAsClass(JsonObject.class);
 
       if (
         reqBody == null ||
@@ -195,57 +160,55 @@ public class ServerHandler {
 
       GAME_SERVICE.joinGame(joinGameRequest);
 
-      res.status(200);
-      return turnIntoJson(new JsonObject());
+      ctx.status(200);
+      ctx.json(new JsonObject());
     } catch (DataAccessException e) {
       if (e.getMessage().equals("unauthorized")) {
-        res.status(401);
+        ctx.status(401);
       } else if (e.getMessage().equals("already taken")) {
-        res.status(403);
+        ctx.status(403);
       } else {
-        res.status(400);
+        ctx.status(400);
       }
-      return turnIntoJson("message", "Error: " + e.getMessage());
+      ctx.json(Map.of("message", "Error: " + e.getMessage()));
     } catch (Exception e) {
-      res.status(500);
-      return turnIntoJson("message", "Error: " + e.getMessage());
+      ctx.status(500);
+      ctx.json(Map.of("message", "Error: " + e.getMessage()));
     }
   }
 
-  public static Object listGames(Request req, Response res) {
+  public static void listGames(Context ctx) {
     try {
-      res.type("application/json");
-      String authToken = req.headers("Authorization");
+      ctx.contentType("application/json");
+      String authToken = ctx.header("Authorization");
 
       ArrayList<GameData> games = GAME_SERVICE.listGames(authToken);
 
-      res.status(200);
-      return turnIntoJson("games", games);
+      ctx.status(200);
+      ctx.json(Map.of("games", games));
     } catch (DataAccessException e) {
-      res.status(401);
-      return turnIntoJson("message", "Error: " + e.getMessage());
+      ctx.status(401);
+      ctx.json(Map.of("message", "Error: " + e.getMessage()));
     } catch (Exception e) {
-      res.status(500);
-      return turnIntoJson("message", "Error: " + e.getMessage());
+      ctx.status(500);
+      ctx.json(Map.of("message", "Error: " + e.getMessage()));
     }
   }
 
   /**
    * Clears entire database
-   * @param ignoredReq request object
-   * @param res response object
    * @return empty JSON string or error
    */
-  public static Object clearDatabase(Request ignoredReq, Response res) {
+  public static void clearDatabase(Context ctx) {
     try {
-      res.type("application/json");
+      ctx.contentType("application/json");
       USER_SERVICE.clearDataAccess();
       GAME_SERVICE.clearDataAccess();
-      res.status(200);
-      return turnIntoJson(new JsonObject());
+      ctx.status(200);
+      ctx.json(new JsonObject());
     } catch (Exception e) {
-      res.status(500);
-      return turnIntoJson("message", "Error: " + e.getMessage());
+      ctx.status(500);
+      ctx.json(Map.of("message", "Error: " + e.getMessage()));
     }
   }
 }
