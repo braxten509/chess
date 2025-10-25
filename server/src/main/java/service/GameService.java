@@ -27,8 +27,7 @@ public class GameService {
     gameDataAccess.clear();
   }
 
-  public int createGame(CreateGameRequest createGameRequest)
-    throws DataAccessException {
+  public int createGame(CreateGameRequest createGameRequest) throws DataAccessException {
     if (
       createGameRequest == null ||
       Objects.equals(createGameRequest.gameName(), "") ||

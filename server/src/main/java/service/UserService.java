@@ -39,15 +39,15 @@ public class UserService {
     return userDataAccess.listUsers();
   }
 
-  public AuthData loginUser(LoginRequest loginRequest)
-    throws DataAccessException {
+  public AuthData loginUser(LoginRequest loginRequest) throws DataAccessException {
     UserData user = userDataAccess.getUser(loginRequest.username());
 
     if (user == null) {
       throw new DataAccessException("unauthorized");
     }
 
-    if (user.username() == null || user.password() == null) {
+    if (user.username() == null || user.password() == null
+        || user.username().isEmpty() || user.password().isEmpty()) {
       throw new DataAccessException("unauthorized");
     }
 

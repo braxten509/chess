@@ -81,10 +81,16 @@ public class ServerHandler {
 
       LoginRequest loginRequest = ctx.bodyAsClass(LoginRequest.class);
 
+      if (loginRequest == null || loginRequest.password() == null || loginRequest.username() == null
+          || loginRequest.password().isEmpty() || loginRequest.username().isEmpty()) {
+        throw new DataAccessException("bad request");
+      }
+
       AuthData authData = USER_SERVICE.loginUser(loginRequest);
       ctx.status(200);
       ctx.json(authData);
     } catch (DataAccessException e) {
+      e.getStackTrace();
       showErrors(ctx, e);
       ctx.json(Map.of("message", "Error: " + e.getMessage()));
     } catch (Exception e) {
@@ -119,6 +125,11 @@ public class ServerHandler {
       JsonObject jsonObject = JsonParser.parseString(
         ctx.body()
       ).getAsJsonObject();
+
+      if (jsonObject.get("gameName") == null) {
+        throw new DataAccessException("bad request");
+      }
+
       String gameName = jsonObject.get("gameName").getAsString();
 
       CreateGameRequest createGameRequest = new CreateGameRequest(
