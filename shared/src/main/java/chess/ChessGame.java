@@ -37,6 +37,10 @@ public class ChessGame {
     return turn;
   }
 
+  public ChessBoard getChessBoard() {
+    return board;
+  }
+
   /**
    * Set's which teams turn it is
    *
