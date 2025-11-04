@@ -1,45 +1,37 @@
 package server;
 
-import dataaccess.DatabaseManager;
-import spark.*;
+import io.javalin.Javalin;
+import io.javalin.json.JavalinGson;
 
 public class Server {
+  private final Javalin javalin;
 
-  public Server() {}
+  public Server() {
 
-  public int run(int desiredPort) {
-    Spark.port(desiredPort);
+    javalin = Javalin.create(
+            javalinConfig -> {
+              javalinConfig.staticFiles.add("web");
+              javalinConfig.jsonMapper(new JavalinGson());
+            }
+            )
+            .post("/user", ServerHandler::registerUser)
+            .post("/session", ServerHandler::loginUser)
+            .post("/game", ServerHandler::createGame)
+            .put("/game", ServerHandler::joinGame)
+            .get("/game", ServerHandler::listGames)
+            .delete("/session", ServerHandler::logoutUser)
+            .delete("/db", ServerHandler::clearDatabase);
+  }
 
-    Spark.staticFiles.location("web");
+  public int run(int port) {
+    javalin.start(port);
 
-    try {
-      DatabaseManager.createDatabase();
-      DatabaseManager.createTables();
-    } catch (Exception e) {
-      System.out.println("ERROR: " + e);
-    }
+    System.out.println("Server started on port: " + javalin.port());
 
-    // Register your endpoints and handle exceptions here.
-    Spark.post("/user", ServerHandler::registerUser);
-    Spark.post("/session", ServerHandler::loginUser);
-    Spark.post("/game", ServerHandler::createGame);
-    Spark.put("/game", ServerHandler::joinGame);
-    Spark.get("/game", ServerHandler::listGames);
-    Spark.delete("/session", ServerHandler::logoutUser);
-    Spark.delete("/db", ServerHandler::clearDatabase);
-
-    //This line initializes the server and can be removed once you have a functioning endpoint
-    Spark.init();
-
-    Spark.awaitInitialization();
-
-    System.out.println("Success!");
-
-    return Spark.port();
+    return javalin.port();
   }
 
   public void stop() {
-    Spark.stop();
-    Spark.awaitStop();
+    javalin.stop();
   }
 }
