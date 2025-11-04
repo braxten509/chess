@@ -5,10 +5,20 @@ import java.util.Properties;
 
 public class DatabaseManager {
 
-  private static final String DATABASE_NAME;
-  private static final String USER;
-  private static final String PASSWORD;
-  private static final String CONNECTION_URL;
+  private static String DATABASE_NAME;
+  private static String USER;
+  private static String PASSWORD;
+  private static String CONNECTION_URL;
+
+  public static void loadProperties(Properties props) {
+      DATABASE_NAME = props.getProperty("db.name");
+      USER = props.getProperty("db.user");
+      PASSWORD = props.getProperty("db.password");
+
+      var host = props.getProperty("db.host");
+      var port = Integer.parseInt(props.getProperty("db.port"));
+      CONNECTION_URL = String.format("jdbc:mysql://%s:%d", host, port);
+  }
 
   /*
    * Load the database information for the db.properties file.
@@ -25,13 +35,7 @@ public class DatabaseManager {
         }
         Properties props = new Properties();
         props.load(propStream);
-        DATABASE_NAME = props.getProperty("db.name");
-        USER = props.getProperty("db.user");
-        PASSWORD = props.getProperty("db.password");
-
-        var host = props.getProperty("db.host");
-        var port = Integer.parseInt(props.getProperty("db.port"));
-        CONNECTION_URL = String.format("jdbc:mysql://%s:%d", host, port);
+        loadProperties(props);
       }
     } catch (Exception ex) {
       throw new RuntimeException(
