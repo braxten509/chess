@@ -59,7 +59,9 @@ public class ServerHandler {
       ctx.status(200);
       ctx.json(authData);
     } catch (DataAccessException e) {
-      if (e.getMessage().equals("already taken")) {
+      if (e.getMessage().startsWith("ERROR")) {
+        ctx.status(500);
+      } else if (e.getMessage().equals("already taken")) {
         ctx.status(403);
       } else {
         ctx.status(400);
@@ -90,8 +92,12 @@ public class ServerHandler {
       ctx.status(200);
       ctx.json(authData);
     } catch (DataAccessException e) {
-      e.getStackTrace();
-      showErrors(ctx, e);
+      if (e.getMessage().startsWith("ERROR")) {
+        ctx.status(500);
+      } else {
+        e.getStackTrace();
+        showErrors(ctx, e);
+      }
       ctx.json(Map.of("message", "Error: " + e.getMessage()));
     } catch (Exception e) {
       ctx.status(500);
@@ -109,7 +115,11 @@ public class ServerHandler {
       ctx.status(200);
       ctx.json(new JsonObject());
     } catch (DataAccessException e) {
-      ctx.status(401);
+      if (e.getMessage().startsWith("ERROR")) {
+        ctx.status(500);
+      } else {
+        ctx.status(401);
+      }
       ctx.json(Map.of("message", "Error: " + e.getMessage()));
     } catch (Exception e) {
       ctx.status(500);
@@ -140,7 +150,11 @@ public class ServerHandler {
       int id = GAME_SERVICE.createGame(createGameRequest);
       ctx.json(Map.of("gameID", id));
     } catch (DataAccessException e) {
-      showErrors(ctx, e);
+      if (e.getMessage().startsWith("ERROR")) {
+        ctx.status(500);
+      } else {
+        showErrors(ctx, e);
+      }
       ctx.json(Map.of("message", "Error: " + e.getMessage()));
     } catch (Exception e) {
       ctx.status(500);
@@ -173,7 +187,9 @@ public class ServerHandler {
       ctx.status(200);
       ctx.json(new JsonObject());
     } catch (DataAccessException e) {
-      if (e.getMessage().equals("unauthorized")) {
+      if (e.getMessage().startsWith("ERROR")) {
+        ctx.status(500);
+      } else if (e.getMessage().equals("unauthorized")) {
         ctx.status(401);
       } else if (e.getMessage().equals("already taken")) {
         ctx.status(403);
@@ -197,7 +213,11 @@ public class ServerHandler {
       ctx.status(200);
       ctx.json(Map.of("games", games));
     } catch (DataAccessException e) {
-      ctx.status(401);
+      if (e.getMessage().startsWith("ERROR")) {
+        ctx.status(500);
+      } else {
+        ctx.status(401);
+      }
       ctx.json(Map.of("message", "Error: " + e.getMessage()));
     } catch (Exception e) {
       ctx.status(500);
