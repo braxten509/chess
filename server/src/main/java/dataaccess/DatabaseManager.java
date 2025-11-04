@@ -10,7 +10,7 @@ public class DatabaseManager {
   private static String PASSWORD;
   private static String CONNECTION_URL;
 
-  public static void loadPropertiesFromResources(Properties props) {
+  public static void loadProperties(Properties props) {
       DATABASE_NAME = props.getProperty("db.name");
       USER = props.getProperty("db.user");
       PASSWORD = props.getProperty("db.password");
@@ -20,28 +20,32 @@ public class DatabaseManager {
       CONNECTION_URL = String.format("jdbc:mysql://%s:%d", host, port);
   }
 
-  /*
-   * Load the database information for the db.properties file.
-   */
-  static {
+  public static void loadPropertiesFromResources() {
     try {
       try (
-        var propStream = Thread.currentThread()
-          .getContextClassLoader()
-          .getResourceAsStream("db.properties")
+          var propStream = Thread.currentThread()
+              .getContextClassLoader()
+              .getResourceAsStream("db.properties")
       ) {
         if (propStream == null) {
           throw new Exception("Unable to load db.properties");
         }
         Properties props = new Properties();
         props.load(propStream);
-        loadPropertiesFromResources(props);
+        loadProperties(props);
       }
     } catch (Exception ex) {
       throw new RuntimeException(
-        "unable to process db.properties. " + ex.getMessage()
+          "unable to process db.properties. " + ex.getMessage()
       );
     }
+  }
+
+  /*
+   * Load the database information for the db.properties file.
+   */
+  static {
+    loadPropertiesFromResources();
   }
 
   /**
