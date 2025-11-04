@@ -1,5 +1,7 @@
 package server;
 
+import dataaccess.DataAccessException;
+import dataaccess.DatabaseManager;
 import io.javalin.Javalin;
 import io.javalin.json.JavalinGson;
 
@@ -7,6 +9,13 @@ public class Server {
   private final Javalin javalin;
 
   public Server() {
+
+    try {
+      DatabaseManager.createDatabase();
+      DatabaseManager.createTables();
+    } catch (Exception e) {
+      System.out.println("Error initializing database: " + e);
+    }
 
     javalin = Javalin.create(
             javalinConfig -> {
