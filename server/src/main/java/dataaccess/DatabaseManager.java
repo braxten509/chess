@@ -10,7 +10,7 @@ public class DatabaseManager {
   private static String PASSWORD;
   private static String CONNECTION_URL;
 
-  public static void loadProperties(Properties props) {
+  public static void loadPropertiesFromResources(Properties props) {
       DATABASE_NAME = props.getProperty("db.name");
       USER = props.getProperty("db.user");
       PASSWORD = props.getProperty("db.password");
@@ -35,7 +35,7 @@ public class DatabaseManager {
         }
         Properties props = new Properties();
         props.load(propStream);
-        loadProperties(props);
+        loadPropertiesFromResources(props);
       }
     } catch (Exception ex) {
       throw new RuntimeException(
