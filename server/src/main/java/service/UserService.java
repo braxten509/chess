@@ -6,7 +6,6 @@ import dataaccess.UserDataAccess;
 import java.util.Collection;
 import model.*;
 import org.mindrot.jbcrypt.BCrypt;
-import spark.utils.StringUtils;
 
 public class UserService {
 
@@ -70,9 +69,12 @@ public class UserService {
   public AuthData registerUser(RegisterRequest registerRequest)
     throws DataAccessException {
     if (
-      StringUtils.isEmpty(registerRequest.username()) ||
-      StringUtils.isEmpty(registerRequest.password()) ||
-      StringUtils.isEmpty(registerRequest.email())
+        registerRequest.username() == null ||
+            registerRequest.password() == null ||
+            registerRequest.email() == null ||
+            registerRequest.username().isEmpty() ||
+            registerRequest.password().isEmpty() ||
+            registerRequest.email().isEmpty()
     ) {
       throw new DataAccessException("bad request");
     }
