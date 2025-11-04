@@ -32,6 +32,7 @@ public class GameService {
     if (
       createGameRequest == null ||
       Objects.equals(createGameRequest.gameName(), "") ||
+          createGameRequest.authToken() == null ||
       createGameRequest.authToken().isEmpty()
     ) {
       throw new DataAccessException("bad request");
