@@ -5,19 +5,19 @@ import java.util.Properties;
 
 public class DatabaseManager {
 
-  private static String DATABASE_NAME;
-  private static String USER;
-  private static String PASSWORD;
-  private static String CONNECTION_URL;
+  private static String databaseName;
+  private static String user;
+  private static String password;
+  private static String connectionURL;
 
   public static void loadProperties(Properties props) {
-      DATABASE_NAME = props.getProperty("db.name");
-      USER = props.getProperty("db.user");
-      PASSWORD = props.getProperty("db.password");
+      databaseName = props.getProperty("db.name");
+      user = props.getProperty("db.user");
+      password = props.getProperty("db.password");
 
       var host = props.getProperty("db.host");
       var port = Integer.parseInt(props.getProperty("db.port"));
-      CONNECTION_URL = String.format("jdbc:mysql://%s:%d", host, port);
+      connectionURL = String.format("jdbc:mysql://%s:%d", host, port);
   }
 
   public static void loadPropertiesFromResources() {
@@ -53,8 +53,8 @@ public class DatabaseManager {
    */
   public static void createDatabase() throws DataAccessException {
     try {
-      var statement = "CREATE DATABASE IF NOT EXISTS " + DATABASE_NAME;
-      var conn = DriverManager.getConnection(CONNECTION_URL, USER, PASSWORD);
+      var statement = "CREATE DATABASE IF NOT EXISTS " + databaseName;
+      var conn = DriverManager.getConnection(connectionURL, user, password);
       try (var preparedStatement = conn.prepareStatement(statement)) {
         preparedStatement.executeUpdate();
       }
@@ -114,8 +114,8 @@ public class DatabaseManager {
    */
   public static Connection getConnection() throws DataAccessException {
     try {
-      var conn = DriverManager.getConnection(CONNECTION_URL, USER, PASSWORD);
-      conn.setCatalog(DATABASE_NAME);
+      var conn = DriverManager.getConnection(connectionURL, user, password);
+      conn.setCatalog(databaseName);
       return conn;
     } catch (SQLException e) {
       throw new DataAccessException("ERROR: " + e.getMessage());
