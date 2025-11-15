@@ -5,6 +5,9 @@ import static ui.EscapeSequences.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Scanner;
+
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import model.AuthData;
 import model.GameData;
 import ui.SpacingType;
@@ -24,12 +27,19 @@ public class ServerCommands {
   private static void inGame(String playerColor) {
     String[][] chessPieceGrid = getChessPieceGrid(playerColor);
 
+
+
     /* BlackSquare = 1, WhiteSquare = 0 */
-    int squareColor = (playerColor.equals("WHITE")) ? 1 : 0;
+    int squareColor = 0;
+    int rowLabel = playerColor.equalsIgnoreCase("WHITE") ? -8 : 1;
     for (int indexX = 8; indexX > 0; indexX--) {
+      printf(Math.abs(rowLabel) + " ", SpacingType.NONE, null);
+      rowLabel += 1;
+
       for (int indexY = 0; indexY < 8; indexY++) {
         int currentColor = squareColor % 2;
         String currentPiece = chessPieceGrid[indexX - 1][indexY];
+
         if (currentColor == 1) {
           if (!currentPiece.equalsIgnoreCase(" ")) {
             printf("", SpacingType.NONE, SET_BG_COLOR_DARK_GREY);
@@ -64,6 +74,13 @@ public class ServerCommands {
       squareColor += 1;
       printf("", SpacingType.REGULAR, null);
     }
+
+    if (playerColor.equalsIgnoreCase("WHITE")) {
+      printf("   a  b  c  d  e  f  g  h", SpacingType.NONE, null);
+    } else {
+      printf("   h  g  f  e  d  c  b  a", SpacingType.NONE, null);
+    }
+
 
     printf("", SpacingType.REGULAR, null);
 
@@ -432,8 +449,14 @@ public class ServerCommands {
       );
       inGame(playerColor);
     } catch (Exception e) {
+      var initMessage = e.getMessage();
+      var jsonMessage = initMessage.split("ERROR: ")[1];
+      Gson gson = new Gson();
+
+      var finalMessage = gson.fromJson(jsonMessage, JsonObject.class).get("message").getAsString();
+
       printf(
-          "Error joining game: " + e.getMessage(),
+          finalMessage,
           SpacingType.SURROUND,
           SET_TEXT_COLOR_RED
       );
@@ -504,6 +527,4 @@ public class ServerCommands {
     }
     printf("", SpacingType.REGULAR, null);
   }
-
-
 }

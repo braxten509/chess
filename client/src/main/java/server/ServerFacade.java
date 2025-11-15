@@ -122,6 +122,8 @@ public class ServerFacade {
       http.connect();
       throwIfNotSuccessful(http);
       return readBody(http, responseClass);
+    } catch (RuntimeException e) {
+      throw e;
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
