@@ -1,6 +1,9 @@
 package dataaccess;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Properties;
 
 public class DatabaseManager {
@@ -8,18 +11,24 @@ public class DatabaseManager {
   private static String databaseName;
   private static String user;
   private static String password;
-  private static String connectionURL;
+  private static String connectionUrl;
 
+  /**
+   * Loads the properties from a test or real source for the database.
+   */
   public static void loadProperties(Properties props) {
-      databaseName = props.getProperty("db.name");
-      user = props.getProperty("db.user");
-      password = props.getProperty("db.password");
+    databaseName = props.getProperty("db.name");
+    user = props.getProperty("db.user");
+    password = props.getProperty("db.password");
 
-      var host = props.getProperty("db.host");
-      var port = Integer.parseInt(props.getProperty("db.port"));
-      connectionURL = String.format("jdbc:mysql://%s:%d", host, port);
+    var host = props.getProperty("db.host");
+    var port = Integer.parseInt(props.getProperty("db.port"));
+    connectionUrl = String.format("jdbc:mysql://%s:%d", host, port);
   }
 
+  /**
+   * Loads the properties from a file.
+   */
   public static void loadPropertiesFromResources() {
     try {
       try (
@@ -54,7 +63,7 @@ public class DatabaseManager {
   public static void createDatabase() throws DataAccessException {
     try {
       var statement = "CREATE DATABASE IF NOT EXISTS " + databaseName;
-      var conn = DriverManager.getConnection(connectionURL, user, password);
+      var conn = DriverManager.getConnection(connectionUrl, user, password);
       try (var preparedStatement = conn.prepareStatement(statement)) {
         preparedStatement.executeUpdate();
       }
@@ -63,38 +72,41 @@ public class DatabaseManager {
     }
   }
 
+  /**
+   * Creates the tables if they do not already exist.
+   */
   public static void createTables() throws DataAccessException {
     try (
-      var conn = getConnection();
-      Statement statement = conn.createStatement()
+        var conn = getConnection();
+        Statement statement = conn.createStatement()
     ) {
       String command =
-        """
-        CREATE TABLE IF NOT EXISTS users (
-          username VARCHAR(255) NOT NULL PRIMARY KEY,
-          hashed_password VARCHAR(255) NOT NULL,
-          email VARCHAR(255) NOT NULL
+          """
+          CREATE TABLE IF NOT EXISTS users (
+            username VARCHAR(255) NOT NULL PRIMARY KEY,
+            hashed_password VARCHAR(255) NOT NULL,
+            email VARCHAR(255) NOT NULL
+          );
+          """;
+      statement.executeUpdate(command);
+
+      command = """
+        CREATE TABLE IF NOT EXISTS games (
+          game_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+          white_username VARCHAR(255),
+          black_username VARCHAR(255),
+          game_name VARCHAR(255) NOT NULL,
+          chess_game TEXT NOT NULL
         );
         """;
       statement.executeUpdate(command);
 
       command = """
-      CREATE TABLE IF NOT EXISTS games (
-        game_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-        white_username VARCHAR(255),
-        black_username VARCHAR(255),
-        game_name VARCHAR(255) NOT NULL,
-        chess_game TEXT NOT NULL
-      );
-      """;
-      statement.executeUpdate(command);
-
-      command = """
-      CREATE TABLE IF NOT EXISTS auths (
-        auth_token VARCHAR(255) NOT NULL PRIMARY KEY,
-        username VARCHAR(255) NOT NULL
-      );
-      """;
+        CREATE TABLE IF NOT EXISTS auths (
+          auth_token VARCHAR(255) NOT NULL PRIMARY KEY,
+          username VARCHAR(255) NOT NULL
+        );
+        """;
       statement.executeUpdate(command);
     } catch (SQLException e) {
       System.out.println("ERROR: " + e);
@@ -114,7 +126,7 @@ public class DatabaseManager {
    */
   public static Connection getConnection() throws DataAccessException {
     try {
-      var conn = DriverManager.getConnection(connectionURL, user, password);
+      var conn = DriverManager.getConnection(connectionUrl, user, password);
       conn.setCatalog(databaseName);
       return conn;
     } catch (SQLException e) {
