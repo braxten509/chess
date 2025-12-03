@@ -1,4 +1,4 @@
-package server;
+package client.facade;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonIOException;
@@ -45,9 +45,22 @@ public class ServerFacade {
       );
   }
 
+  public GameData getGame(int gameID) {
+    String path = "/game/" + gameID;
+
+    return this.makeRequest(
+        "GET",
+        path,
+        null,
+        null,
+        GameData.class
+    );
+  }
+
   public CreateGameResult createGame(String authToken, String gameName) {
     String path = "/game";
     HashMap<String, String> header = mapAuthToken(authToken);
+
     return this.makeRequest(
         "POST",
         path,
@@ -60,12 +73,13 @@ public class ServerFacade {
   /**
    * Connects a player to a game if possible
    * @param authToken authToken
-   * @param playerColor this is either "WHITE" or "BLACK"
+   * @param playerColor this is either "WHITE", "BLACK", or "OBSERVER"
    * @param gameID game ID
    */
   public void joinGame(String authToken, String playerColor, int gameID) {
     String path = "/game";
     HashMap<String, String> header = mapAuthToken(authToken);
+
     this.makeRequest(
         "PUT",
         path,
@@ -122,8 +136,6 @@ public class ServerFacade {
       http.connect();
       throwIfNotSuccessful(http);
       return readBody(http, responseClass);
-    } catch (RuntimeException e) {
-      throw e;
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
