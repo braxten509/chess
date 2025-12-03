@@ -1,22 +1,31 @@
 package server.websocket;
 
-// NOTE: This is from your Spark implementation - needs to be adapted for Javalin
-// Javalin uses io.javalin.websocket.WsConnectContext instead of org.eclipse.jetty.websocket.api.Session
+import io.javalin.websocket.WsContext;
 
-import org.eclipse.jetty.websocket.api.Session;
-
-import java.io.IOException;
-
+/**
+ * This class is used to transmit messages to the designated user.
+ */
 public class Connection {
   public String username;
-  public Session session;
+  public WsContext context;
 
-  public Connection(String username, Session session) {
+  /**
+   * Constructor for Connection.java.
+   *
+   * @param username the username of the client with whom to communicate
+   * @param context essentially the "session" to use
+   */
+  public Connection(String username, WsContext context) {
     this.username = username;
-    this.session = session;
+    this.context = context;
   }
 
-  public void send(String msg) throws IOException {
-    session.getRemote().sendString(msg);
+  /**
+   * Sends a message to the user.
+   *
+   * @param msg message to send
+   */
+  public void send(String msg) {
+    context.send(msg);
   }
 }
