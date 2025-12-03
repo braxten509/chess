@@ -10,56 +10,53 @@ import dataaccess.DataAccessException;
 import dataaccess.database.DatabaseAuthDataAccess;
 import dataaccess.database.DatabaseGameDataAccess;
 import dataaccess.database.DatabaseUserDataAccess;
-import java.io.IOException;
+
+import io.javalin.websocket.WsContext;
+import io.javalin.websocket.WsMessageContext;
 import model.AuthData;
 import model.GameData;
-import org.eclipse.jetty.websocket.api.Session;
-import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
-import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import service.GameService;
 import service.UserService;
 import websocket.commands.UserGameCommand;
 
-@WebSocket
 public class WebSocketHandler {
 
-  private final ConnectionManager connections = new ConnectionManager();
-  private final UserService userService =
+  private static final ConnectionManager connections = new ConnectionManager();
+  private static final UserService userService =
       new UserService(new DatabaseUserDataAccess(), new DatabaseAuthDataAccess());
-  private final GameService gameService =
+  private static final GameService gameService =
       new GameService(new DatabaseGameDataAccess(), new DatabaseAuthDataAccess());
 
-  @OnWebSocketMessage
-  public void onMessage(Session session, String message) throws IOException, DataAccessException {
-    UserGameCommand command = new Gson().fromJson(message, UserGameCommand.class);
+  public static void onMessage(WsMessageContext context) throws DataAccessException {
+    UserGameCommand command = new Gson().fromJson(context.message(), UserGameCommand.class);
     UserGameCommand.CommandType commandType = command.getCommandType();
     AuthData authData = userService.getAuthData(command.getAuthToken());
-    int gameID = command.getGameID();
+    int gameId = command.getGameID();
     String username = authData.username();
 
     System.out.println(
         "(Server.WebSocketHandler::onMessage) onMessage triggered by '" + username + "'");
 
     switch (commandType) {
-      case CONNECT -> join(username, gameID, session);
+      case CONNECT -> join(username, gameId, context);
       case MAKE_MOVE -> notify(username);
       case null, default -> System.out.println("Invalid Command.");
     }
   }
 
-  private void notify(String triggeringUser) throws IOException {
+  private static void notify(String triggeringUser) {
     System.out.println(
         "(Server.WebSocketHandler::notify) notify triggered by '" + triggeringUser + "'");
 
     connections.broadcast(triggeringUser, triggeringUser + " made a move");
   }
 
-  private void join(String username, int gameID, Session session)
-      throws IOException, DataAccessException {
-    connections.add(username, session);
+  private static void join(String username, int gameId, WsContext context)
+      throws DataAccessException {
+    connections.add(username, context);
     System.out.println("(Server.WebSocketHandler::join) join triggered by '" + username + "'");
 
-    GameData gameData = gameService.getGame(gameID);
+    GameData gameData = gameService.getGame(gameId);
 
     connections.loadGame(username, gameData);
   }

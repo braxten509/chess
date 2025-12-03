@@ -3,6 +3,7 @@ package server;
 import dataaccess.DatabaseManager;
 import io.javalin.Javalin;
 import io.javalin.json.JavalinGson;
+import server.websocket.WebSocketHandler;
 
 public class Server {
   private final Javalin javalin;
@@ -28,7 +29,10 @@ public class Server {
             .put("/game", ServerHandler::joinGame)
             .get("/game", ServerHandler::listGames)
             .delete("/session", ServerHandler::logoutUser)
-            .delete("/db", ServerHandler::clearDatabase);
+            .delete("/db", ServerHandler::clearDatabase)
+            .ws("ws", ws -> {
+              ws.onMessage(WebSocketHandler::onMessage);
+            });
   }
 
   public int run(int port) {
