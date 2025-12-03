@@ -7,9 +7,7 @@ import model.GameData;
 import model.WebSocketResult;
 import websocket.messages.ServerMessage;
 
-/**
- * Handles all WebSocket connections.
- */
+/** Handles all WebSocket connections. */
 public class ConnectionManager {
   public final ConcurrentHashMap<String, Connection> connections = new ConcurrentHashMap<>();
 
@@ -33,31 +31,31 @@ public class ConnectionManager {
   public void broadcast(String triggeringUser, String message) {
     var connection2 = connections.get(triggeringUser);
     connection2.send(
-        new Gson().toJson(
-            new WebSocketResult(
-                new ServerMessage(
-                    ServerMessage.ServerMessageType.NOTIFICATION), message, null, null)
-        )
-    );
+        new Gson()
+            .toJson(
+                new WebSocketResult(
+                    new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION),
+                    message,
+                    null,
+                    null)));
 
     for (Connection connection : connections.values()) {
       if (!connection.username.equals(triggeringUser)) {
         try {
-          ServerMessage serverMessage = new ServerMessage(
-              ServerMessage.ServerMessageType.NOTIFICATION
-          );
+          ServerMessage serverMessage =
+              new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION);
           connection.send(
-              new Gson().toJson(new WebSocketResult(serverMessage, message, null, null))
-          );
+              new Gson().toJson(new WebSocketResult(serverMessage, message, null, null)));
           System.out.println(
               "(Server.ConnectionManager::broadcast) successfully sent message '"
-                  + message + "' to '" + connection.username + "'"
-          );
+                  + message
+                  + "' to '"
+                  + connection.username
+                  + "'");
         } catch (Exception e) {
           System.out.println(
               "(Server.ConnectionManager::broadcast) error while sending message back to client: "
-                  + e.getMessage()
-          );
+                  + e.getMessage());
         }
       }
     }
@@ -74,7 +72,6 @@ public class ConnectionManager {
     var serverMessage = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME);
 
     connection.send(
-        new Gson().toJson(new WebSocketResult(serverMessage, null, username, gameData))
-    );
+        new Gson().toJson(new WebSocketResult(serverMessage, null, username, gameData)));
   }
 }

@@ -1,21 +1,20 @@
 package client.handler;
 
+import static client.ChessClient.printf;
+import static client.ChessClient.userStatus;
+import static ui.EscapeSequences.SET_TEXT_COLOR_RED;
+import static ui.EscapeSequences.SET_TEXT_COLOR_YELLOW;
+
 import client.GameClient;
-import ui.SpacingType;
 import client.facade.WebSocketFacade;
 import com.google.gson.Gson;
+import java.util.ArrayList;
 import model.GameData;
 import model.WebSocketResult;
+import ui.SpacingType;
 import websocket.messages.ServerMessage;
 
-import java.util.ArrayList;
-
-import static client.ChessClient.*;
-import static ui.EscapeSequences.*;
-
-/**
- * Handles notifications received from WebSocketFacade. Prints these messages to the terminal.
- */
+/** Handles notifications received from WebSocketFacade. Prints these messages to the terminal. */
 public class ChessMessageHandler {
 
   private static final ArrayList<Integer> gamesOpenByID = new ArrayList<>();
@@ -24,7 +23,8 @@ public class ChessMessageHandler {
 
   public void handleMessage(String message) {
 
-    // printf("(Client.ChessMessageHandler::handleMessage) message received", SpacingType.REGULAR, SET_TEXT_COLOR_LIGHT_GREY);
+    // printf("(Client.ChessMessageHandler::handleMessage) message received", SpacingType.REGULAR,
+    // SET_TEXT_COLOR_LIGHT_GREY);
 
     WebSocketResult webSocketResult = new Gson().fromJson(message, WebSocketResult.class);
 
@@ -52,8 +52,9 @@ public class ChessMessageHandler {
    * @param toBroadcastMessage notification
    */
   private void notify(String toBroadcastMessage, String userColor) {
-      printf(toBroadcastMessage, SpacingType.SURROUND, SET_TEXT_COLOR_YELLOW);
-      printf("[(" + userColor.toUpperCase() + ") " + userStatus + "] >>> ", SpacingType.REGULAR, null);
+    printf(toBroadcastMessage, SpacingType.SURROUND, SET_TEXT_COLOR_YELLOW);
+    printf(
+        "[(" + userColor.toUpperCase() + ") " + userStatus + "] >>> ", SpacingType.REGULAR, null);
   }
 
   private void loadGame(String username, String userColor, GameData gameData) {
@@ -63,8 +64,8 @@ public class ChessMessageHandler {
       return;
     }
 
-    for (Integer gameID : gamesOpenByID) {
-      if (gameID == gameData.gameID()) {
+    for (Integer gameId : gamesOpenByID) {
+      if (gameId == gameData.gameID()) {
         return;
       }
     }
@@ -72,6 +73,5 @@ public class ChessMessageHandler {
     GameClient gameClient = new GameClient(username, userColor, gameData, webSocketFacade);
     gamesOpenByID.add(gameData.gameID());
     gameClient.run();
-
   }
 }

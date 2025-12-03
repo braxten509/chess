@@ -1,22 +1,20 @@
 package client;
 
-import client.facade.ServerFacade;
-import ui.SpacingType;
-import client.handler.ChessMessageHandler;
-import client.facade.WebSocketFacade;
-import client.handler.UserInputHandler;
-
-import java.util.Scanner;
-
 import static ui.EscapeSequences.RESET_ALL;
 import static ui.EscapeSequences.SET_TEXT_COLOR_RED;
 
-public class ChessClient {
+import client.facade.ServerFacade;
+import client.facade.WebSocketFacade;
+import client.handler.ChessMessageHandler;
+import client.handler.UserInputHandler;
+import java.util.Scanner;
+import ui.SpacingType;
 
-  private final int port;
+public class ChessClient {
 
   public static String userStatus = "LOGGED_OUT";
   public static boolean inGame = false;
+  private final int port;
 
   public ChessClient(int port) {
     this.port = port;
@@ -25,7 +23,7 @@ public class ChessClient {
   /**
    * Returns the same output as System.out.println()
    *
-   * @param text       text to print (everything will be formatted as specified)
+   * @param text text to print (everything will be formatted as specified)
    */
   public static void printf(String text) {
     System.out.println(text);
@@ -34,15 +32,11 @@ public class ChessClient {
   /**
    * Returns the same output as System.out.print() but with formatting
    *
-   * @param text       text to print (everything will be formatted as specified)
-   * @param spacing    specifies spacing around text
+   * @param text text to print (everything will be formatted as specified)
+   * @param spacing specifies spacing around text
    * @param formatting formatting. Include multiple with '+'
    */
-  public static void printf(
-      String text,
-      SpacingType spacing,
-      String formatting
-  ) {
+  public static void printf(String text, SpacingType spacing, String formatting) {
     String spacingBeginning = "";
     String spacingEnding = "\n";
 
@@ -58,8 +52,7 @@ public class ChessClient {
         spacingBeginning += "\n\n";
         spacingEnding += "\n\n";
       }
-      case null, default -> {
-      }
+      case null, default -> {}
     }
 
     if (formatting != null) {
@@ -71,9 +64,7 @@ public class ChessClient {
     System.out.print(RESET_ALL);
   }
 
-  /**
-   * Runs the entire client program.
-   */
+  /** Runs the entire client program. */
   public void run() {
     String url = "http://localhost:" + port;
     WebSocketFacade webSocketFacade;
@@ -85,11 +76,7 @@ public class ChessClient {
 
       Scanner scanner = new Scanner(System.in);
 
-      printf(
-          "♕ Welcome to Chess! Type 'help' to get started ♕",
-          SpacingType.UNDER,
-          null
-      );
+      printf("♕ Welcome to Chess! Type 'help' to get started ♕", SpacingType.UNDER, null);
 
       while (true) {
         if (!inGame) {
@@ -106,6 +93,5 @@ public class ChessClient {
       printf("ERROR: " + exception, SpacingType.ABOVE, SET_TEXT_COLOR_RED);
       printf(exception.getMessage(), SpacingType.UNDER, SET_TEXT_COLOR_RED);
     }
-
   }
 }

@@ -1,8 +1,6 @@
 import client.ChessClient;
 
-/**
- * Main class to control the client. Run this to open the client's perspective.
- */
+/** Main class to control the client. Run this to open the client's perspective. */
 public class Main {
 
   /**

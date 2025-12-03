@@ -15,10 +15,7 @@ public class GameService {
   private final GameDataAccess gameDataAccess;
   private final AuthDataAccess authDataAccess;
 
-  public GameService(
-    GameDataAccess gameDataAccess,
-    AuthDataAccess authDataAccess
-  ) {
+  public GameService(GameDataAccess gameDataAccess, AuthDataAccess authDataAccess) {
     this.gameDataAccess = gameDataAccess;
     this.authDataAccess = authDataAccess;
   }
@@ -27,20 +24,15 @@ public class GameService {
     gameDataAccess.clear();
   }
 
-  public int createGame(CreateGameRequest createGameRequest)
-    throws DataAccessException {
-    if (
-      createGameRequest == null ||
-      Objects.equals(createGameRequest.gameName(), "") ||
-          createGameRequest.authToken() == null ||
-      createGameRequest.authToken().isEmpty()
-    ) {
+  public int createGame(CreateGameRequest createGameRequest) throws DataAccessException {
+    if (createGameRequest == null
+        || Objects.equals(createGameRequest.gameName(), "")
+        || createGameRequest.authToken() == null
+        || createGameRequest.authToken().isEmpty()) {
       throw new DataAccessException("bad request");
     }
 
-    AuthData authData = authDataAccess.getAuthData(
-      createGameRequest.authToken()
-    );
+    AuthData authData = authDataAccess.getAuthData(createGameRequest.authToken());
 
     if (authData == null) {
       throw new DataAccessException("unauthorized");
@@ -52,14 +44,11 @@ public class GameService {
     return gameDataAccess.getGame(gameID);
   }
 
-  public void joinGame(JoinGameRequest joinGameRequest)
-    throws DataAccessException {
-    if (
-      joinGameRequest == null ||
-      joinGameRequest.authToken().isEmpty() ||
-      (!Objects.equals(joinGameRequest.playerColor(), "WHITE") &&
-        (!Objects.equals(joinGameRequest.playerColor(), "BLACK")))
-    ) {
+  public void joinGame(JoinGameRequest joinGameRequest) throws DataAccessException {
+    if (joinGameRequest == null
+        || joinGameRequest.authToken().isEmpty()
+        || (!Objects.equals(joinGameRequest.playerColor(), "WHITE")
+            && (!Objects.equals(joinGameRequest.playerColor(), "BLACK")))) {
       throw new DataAccessException("bad request");
     }
 
@@ -77,28 +66,20 @@ public class GameService {
 
     String teamColor = joinGameRequest.playerColor();
 
-    if (
-      gameData.blackUsername() != null && Objects.equals(teamColor, "BLACK")
-    ) {
+    if (gameData.blackUsername() != null && Objects.equals(teamColor, "BLACK")) {
       throw new DataAccessException("already taken");
     }
 
-    if (
-      gameData.whiteUsername() != null && Objects.equals(teamColor, "WHITE")
-    ) {
+    if (gameData.whiteUsername() != null && Objects.equals(teamColor, "WHITE")) {
       throw new DataAccessException("already taken");
     }
 
     String playerUsername = authData.username();
     gameDataAccess.joinGame(
-      joinGameRequest.playerColor(),
-      joinGameRequest.gameID(),
-      playerUsername
-    );
+        joinGameRequest.playerColor(), joinGameRequest.gameID(), playerUsername);
   }
 
-  public ArrayList<GameData> listGames(String authToken)
-    throws DataAccessException {
+  public ArrayList<GameData> listGames(String authToken) throws DataAccessException {
     if (authToken == null || authToken.isEmpty()) {
       throw new DataAccessException("unauthorized");
     }

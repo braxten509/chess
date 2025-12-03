@@ -10,12 +10,12 @@ import model.AuthData;
 
 public class MemoryAuthDataAccess implements AuthDataAccess {
 
+  // authToken, username
+  Map<String, String> auths = new HashMap<>();
+
   private static String generateToken() {
     return UUID.randomUUID().toString();
   }
-
-  // authToken, username
-  Map<String, String> auths = new HashMap<>();
 
   @Override
   public String createAuth(String username) throws DataAccessException {
@@ -35,11 +35,7 @@ public class MemoryAuthDataAccess implements AuthDataAccess {
 
   @Override
   public AuthData getAuthData(String authToken) throws DataAccessException {
-    if (
-      Objects.equals(authToken, "") ||
-      authToken == null ||
-      auths.get(authToken) == null
-    ) {
+    if (Objects.equals(authToken, "") || authToken == null || auths.get(authToken) == null) {
       return null;
     }
     return new AuthData(authToken, auths.get(authToken));

@@ -20,12 +20,9 @@ public class DatabaseAuthDataAccess implements AuthDataAccess {
     if (!username.matches("[^(;)]+")) {
       throw new DataAccessException("Invalid username syntax");
     }
-    try (
-      var conn = DatabaseManager.getConnection();
-      var preparedStatement = conn.prepareStatement(
-        "INSERT INTO auths (auth_token, username) VALUES (?, ?)"
-      )
-    ) {
+    try (var conn = DatabaseManager.getConnection();
+        var preparedStatement =
+            conn.prepareStatement("INSERT INTO auths (auth_token, username) VALUES (?, ?)")) {
       preparedStatement.setString(1, authToken);
       preparedStatement.setString(2, username);
       preparedStatement.executeUpdate();
@@ -37,12 +34,8 @@ public class DatabaseAuthDataAccess implements AuthDataAccess {
 
   @Override
   public boolean removeAuth(String authToken) throws DataAccessException {
-    try (
-      var conn = DatabaseManager.getConnection();
-      var preparedStatement = conn.prepareStatement(
-        "DELETE FROM auths WHERE auth_token = ?"
-      )
-    ) {
+    try (var conn = DatabaseManager.getConnection();
+        var preparedStatement = conn.prepareStatement("DELETE FROM auths WHERE auth_token = ?")) {
       preparedStatement.setString(1, authToken);
       int rowsDeleted = preparedStatement.executeUpdate();
       return rowsDeleted > 0;
@@ -53,10 +46,8 @@ public class DatabaseAuthDataAccess implements AuthDataAccess {
 
   @Override
   public void clear() throws DataAccessException {
-    try (
-      var conn = DatabaseManager.getConnection();
-      var preparedStatement = conn.prepareStatement("DELETE FROM auths")
-    ) {
+    try (var conn = DatabaseManager.getConnection();
+        var preparedStatement = conn.prepareStatement("DELETE FROM auths")) {
       preparedStatement.executeUpdate();
     } catch (SQLException e) {
       throw new DataAccessException("ERROR clearing database: " + e);
@@ -65,12 +56,8 @@ public class DatabaseAuthDataAccess implements AuthDataAccess {
 
   @Override
   public AuthData getAuthData(String authToken) throws DataAccessException {
-    try (
-      var conn = DatabaseManager.getConnection();
-      var preparedStatement = conn.prepareStatement(
-        "SELECT * FROM auths WHERE auth_token = ?"
-      )
-    ) {
+    try (var conn = DatabaseManager.getConnection();
+        var preparedStatement = conn.prepareStatement("SELECT * FROM auths WHERE auth_token = ?")) {
       preparedStatement.setString(1, authToken);
 
       try (ResultSet result = preparedStatement.executeQuery()) {

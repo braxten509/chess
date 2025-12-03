@@ -12,10 +12,7 @@ public class UserService {
   private final UserDataAccess userDataAccess;
   private final AuthDataAccess authDataAccess;
 
-  public UserService(
-    UserDataAccess userDataAccess,
-    AuthDataAccess authDataAccess
-  ) {
+  public UserService(UserDataAccess userDataAccess, AuthDataAccess authDataAccess) {
     this.userDataAccess = userDataAccess;
     this.authDataAccess = authDataAccess;
   }
@@ -37,8 +34,7 @@ public class UserService {
     return userDataAccess.listUsers();
   }
 
-  public AuthData loginUser(LoginRequest loginRequest)
-    throws DataAccessException {
+  public AuthData loginUser(LoginRequest loginRequest) throws DataAccessException {
     UserData user = userDataAccess.getUser(loginRequest.username());
 
     if (user == null) {
@@ -66,16 +62,13 @@ public class UserService {
     }
   }
 
-  public AuthData registerUser(RegisterRequest registerRequest)
-    throws DataAccessException {
-    if (
-        registerRequest.username() == null ||
-            registerRequest.password() == null ||
-            registerRequest.email() == null ||
-            registerRequest.username().isEmpty() ||
-            registerRequest.password().isEmpty() ||
-            registerRequest.email().isEmpty()
-    ) {
+  public AuthData registerUser(RegisterRequest registerRequest) throws DataAccessException {
+    if (registerRequest.username() == null
+        || registerRequest.password() == null
+        || registerRequest.email() == null
+        || registerRequest.username().isEmpty()
+        || registerRequest.password().isEmpty()
+        || registerRequest.email().isEmpty()) {
       throw new DataAccessException("bad request");
     }
 
@@ -85,11 +78,9 @@ public class UserService {
       throw new DataAccessException("already taken");
     }
 
-    user = userDataAccess.createUser(
-      registerRequest.username(),
-      registerRequest.password(),
-      registerRequest.email()
-    );
+    user =
+        userDataAccess.createUser(
+            registerRequest.username(), registerRequest.password(), registerRequest.email());
 
     String authToken = authDataAccess.createAuth(user.username());
 

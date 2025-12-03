@@ -1,19 +1,19 @@
 package client;
 
-import chess.ChessBoard;
-import chess.ChessGame;
-import chess.ChessPiece;
-import chess.ChessPosition;
-import ui.SpacingType;
-import client.facade.WebSocketFacade;
-import model.GameData;
-import java.util.Scanner;
-
 import static client.ChessClient.*;
 import static client.ChessClient.printf;
 import static client.handler.CommandHandler.checkForQuit;
 import static ui.EscapeSequences.*;
 import static ui.EscapeSequences.BLACK_KING;
+
+import chess.ChessBoard;
+import chess.ChessGame;
+import chess.ChessPiece;
+import chess.ChessPosition;
+import client.facade.WebSocketFacade;
+import java.util.Scanner;
+import model.GameData;
+import ui.SpacingType;
 
 public class GameClient {
 
@@ -24,38 +24,15 @@ public class GameClient {
 
   private boolean running = true;
 
-  public GameClient(String username, String playerColor, GameData initialGameData, WebSocketFacade webSocketFacade) {
+  public GameClient(
+      String username,
+      String playerColor,
+      GameData initialGameData,
+      WebSocketFacade webSocketFacade) {
     this.username = username;
     this.playerColor = playerColor;
     this.webSocketFacade = webSocketFacade;
     this.initialGameData = initialGameData;
-  }
-
-  public void run() {
-    Scanner scanner = new Scanner(System.in);
-
-    drawChessboard(playerColor, initialGameData);
-
-    printf(
-        "Success joining game as " + playerColor.toUpperCase() + "!",
-        SpacingType.UNDER,
-        SET_TEXT_COLOR_GREEN
-    );
-
-    while (running) {
-      printf("[(" + playerColor.toUpperCase() + ") " + userStatus + "] >>> ", SpacingType.NONE, null);
-      String response = scanner.nextLine();
-
-      if (checkForQuit(response)) {
-        printf("", SpacingType.REGULAR, null);
-        this.stop();
-      }
-    }
-    inGame = false;
-  }
-
-  public void stop() {
-    running = false;
   }
 
   /**
@@ -251,5 +228,32 @@ public class GameClient {
       };
     } */
     return chessPieceGrid;
+  }
+
+  public void run() {
+    Scanner scanner = new Scanner(System.in);
+
+    drawChessboard(playerColor, initialGameData);
+
+    printf(
+        "Success joining game as " + playerColor.toUpperCase() + "!",
+        SpacingType.UNDER,
+        SET_TEXT_COLOR_GREEN);
+
+    while (running) {
+      printf(
+          "[(" + playerColor.toUpperCase() + ") " + userStatus + "] >>> ", SpacingType.NONE, null);
+      String response = scanner.nextLine();
+
+      if (checkForQuit(response)) {
+        printf("", SpacingType.REGULAR, null);
+        this.stop();
+      }
+    }
+    inGame = false;
+  }
+
+  public void stop() {
+    running = false;
   }
 }

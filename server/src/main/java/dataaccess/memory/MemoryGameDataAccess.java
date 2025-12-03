@@ -20,10 +20,7 @@ public class MemoryGameDataAccess implements GameDataAccess {
   @Override
   public int createNewGame(String gameName) {
     currentId += 1;
-    games.put(
-      currentId,
-      new GameData(currentId, null, null, gameName, new ChessGame())
-    );
+    games.put(currentId, new GameData(currentId, null, null, gameName, new ChessGame()));
     return currentId;
   }
 
@@ -40,16 +37,10 @@ public class MemoryGameDataAccess implements GameDataAccess {
 
     if (playerColor.equals("WHITE")) {
       String blackUsername = joiningGame.blackUsername();
-      games.put(
-        gameID,
-        new GameData(gameID, playerUsername, blackUsername, gameName, game)
-      );
+      games.put(gameID, new GameData(gameID, playerUsername, blackUsername, gameName, game));
     } else {
       String whiteUsername = joiningGame.whiteUsername();
-      games.put(
-        gameID,
-        new GameData(gameID, whiteUsername, playerUsername, gameName, game)
-      );
+      games.put(gameID, new GameData(gameID, whiteUsername, playerUsername, gameName, game));
     }
   }
 

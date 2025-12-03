@@ -47,14 +47,6 @@ public class ChessGame {
   }
 
   /**
-   * Enum identifying the 2 possible teams in a chess game
-   */
-  public enum TeamColor {
-    WHITE,
-    BLACK,
-  }
-
-  /**
    * Gets a valid moves for a piece at the given location
    * This equals piecePossibleMoves minus movesThatPutTheKingInCheck
    * Also piecePossibleMoves minus movesThatDontGetKingOutOfCheckIfInCheck
@@ -372,6 +364,15 @@ public class ChessGame {
   }
 
   /**
+   * Gets the current chessboard
+   *
+   * @return the chessboard
+   */
+  public ChessBoard getBoard() {
+    return board;
+  }
+
+  /**
    * Sets this game's chessboard with a given board
    *
    * @param board the new board to use
@@ -389,15 +390,6 @@ public class ChessGame {
         this.board.addPiece(checkingPosition, board.getPiece(checkingPosition));
       }
     }
-  }
-
-  /**
-   * Gets the current chessboard
-   *
-   * @return the chessboard
-   */
-  public ChessBoard getBoard() {
-    return board;
   }
 
   @Override
@@ -420,5 +412,13 @@ public class ChessGame {
   @Override
   public int hashCode() {
     return Objects.hash(turn, board);
+  }
+
+  /**
+   * Enum identifying the 2 possible teams in a chess game
+   */
+  public enum TeamColor {
+    WHITE,
+    BLACK,
   }
 }

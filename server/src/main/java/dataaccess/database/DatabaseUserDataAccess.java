@@ -14,12 +14,8 @@ public class DatabaseUserDataAccess implements UserDataAccess {
 
   @Override
   public UserData getUser(String username) throws DataAccessException {
-    try (
-      var conn = DatabaseManager.getConnection();
-      var preparedStatement = conn.prepareStatement(
-        "SELECT * FROM users WHERE username = ?"
-      )
-    ) {
+    try (var conn = DatabaseManager.getConnection();
+        var preparedStatement = conn.prepareStatement("SELECT * FROM users WHERE username = ?")) {
       preparedStatement.setString(1, username);
 
       try (ResultSet result = preparedStatement.executeQuery()) {
@@ -31,35 +27,29 @@ public class DatabaseUserDataAccess implements UserDataAccess {
         }
       }
     } catch (SQLException e) {
-      throw new DataAccessException(
-        "ERROR getting user " + username + ": " + e
-      );
+      throw new DataAccessException("ERROR getting user " + username + ": " + e);
     }
     return null;
   }
 
   @Override
   public UserData createUser(String username, String password, String email)
-    throws DataAccessException {
+      throws DataAccessException {
     if (!password.matches("[^);(]+")) {
       throw new DataAccessException("Password contains invalid characters");
     }
     String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
 
-    if (
-      !username.matches("[a-zA-Z0-9_-]+") ||
-      !password.matches("[^);]+") ||
-      !email.matches("[^();:]+")
-    ) {
+    if (!username.matches("[a-zA-Z0-9_-]+")
+        || !password.matches("[^);]+")
+        || !email.matches("[^();:]+")) {
       throw new DataAccessException("User info does not match expected syntax");
     }
 
-    try (
-      var conn = DatabaseManager.getConnection();
-      var preparedStatement = conn.prepareStatement(
-        "INSERT INTO users (username, hashed_password, email) VALUES (?, ?, ?)"
-      )
-    ) {
+    try (var conn = DatabaseManager.getConnection();
+        var preparedStatement =
+            conn.prepareStatement(
+                "INSERT INTO users (username, hashed_password, email) VALUES (?, ?, ?)")) {
       preparedStatement.setString(1, username);
       preparedStatement.setString(2, hashedPassword);
       preparedStatement.setString(3, email);
@@ -72,10 +62,8 @@ public class DatabaseUserDataAccess implements UserDataAccess {
 
   @Override
   public void clear() throws DataAccessException {
-    try (
-      var conn = DatabaseManager.getConnection();
-      var preparedStatement = conn.prepareStatement("DELETE FROM users")
-    ) {
+    try (var conn = DatabaseManager.getConnection();
+        var preparedStatement = conn.prepareStatement("DELETE FROM users")) {
       preparedStatement.executeUpdate();
     } catch (SQLException e) {
       throw new DataAccessException("ERROR clearing database: " + e);
@@ -85,10 +73,8 @@ public class DatabaseUserDataAccess implements UserDataAccess {
   @Override
   public Collection<UserData> listUsers() throws DataAccessException {
     ArrayList<UserData> userList = new ArrayList<>();
-    try (
-      var conn = DatabaseManager.getConnection();
-      var preparedStatement = conn.prepareStatement("SELECT * FROM users")
-    ) {
+    try (var conn = DatabaseManager.getConnection();
+        var preparedStatement = conn.prepareStatement("SELECT * FROM users")) {
       try (ResultSet resultSet = preparedStatement.executeQuery()) {
         while (resultSet.next()) {
           var username = resultSet.getString("username");

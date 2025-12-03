@@ -8,34 +8,24 @@ import dataaccess.DataAccessException;
 import dataaccess.database.DatabaseAuthDataAccess;
 import dataaccess.database.DatabaseGameDataAccess;
 import dataaccess.database.DatabaseUserDataAccess;
+import io.javalin.http.Context;
 import java.util.ArrayList;
 import java.util.Map;
-
-import io.javalin.http.Context;
 import model.*;
 import service.GameService;
 import service.UserService;
 
 public class ServerHandler {
 
-  private static final DatabaseUserDataAccess USER_DATA_ACCESS =
-    new DatabaseUserDataAccess();
-  private static final DatabaseAuthDataAccess AUTH_DATA_ACCESS =
-    new DatabaseAuthDataAccess();
-  private static final DatabaseGameDataAccess GAME_DATA_ACCESS =
-    new DatabaseGameDataAccess();
-  private static final Gson GSON = new GsonBuilder()
-    .disableHtmlEscaping()
-    .create();
+  private static final DatabaseUserDataAccess USER_DATA_ACCESS = new DatabaseUserDataAccess();
+  private static final DatabaseAuthDataAccess AUTH_DATA_ACCESS = new DatabaseAuthDataAccess();
+  private static final DatabaseGameDataAccess GAME_DATA_ACCESS = new DatabaseGameDataAccess();
+  private static final Gson GSON = new GsonBuilder().disableHtmlEscaping().create();
 
-  private static final GameService GAME_SERVICE = new GameService(
-    GAME_DATA_ACCESS,
-    AUTH_DATA_ACCESS
-  );
-  private static final UserService USER_SERVICE = new UserService(
-    USER_DATA_ACCESS,
-    AUTH_DATA_ACCESS
-  );
+  private static final GameService GAME_SERVICE =
+      new GameService(GAME_DATA_ACCESS, AUTH_DATA_ACCESS);
+  private static final UserService USER_SERVICE =
+      new UserService(USER_DATA_ACCESS, AUTH_DATA_ACCESS);
 
   private static void showErrors(Context ctx, Exception e) {
     if (e.getMessage().equals("unauthorized")) {
@@ -47,6 +37,7 @@ public class ServerHandler {
 
   /**
    * Creates a new account for an unregistered user
+   *
    * @return returns an Object, likely a JSON formatted String
    */
   public static void registerUser(Context ctx) {
@@ -75,6 +66,7 @@ public class ServerHandler {
 
   /**
    * Logins an existing user
+   *
    * @return returns an Object, likely a JSON formatted String
    */
   public static void loginUser(Context ctx) {
@@ -83,8 +75,11 @@ public class ServerHandler {
 
       LoginRequest loginRequest = ctx.bodyAsClass(LoginRequest.class);
 
-      if (loginRequest == null || loginRequest.password() == null || loginRequest.username() == null
-          || loginRequest.password().isEmpty() || loginRequest.username().isEmpty()) {
+      if (loginRequest == null
+          || loginRequest.password() == null
+          || loginRequest.username() == null
+          || loginRequest.password().isEmpty()
+          || loginRequest.username().isEmpty()) {
         throw new DataAccessException("bad request");
       }
 
@@ -132,9 +127,7 @@ public class ServerHandler {
       ctx.contentType("application/json; charset=utf-8");
       String authToken = ctx.header("Authorization");
 
-      JsonObject jsonObject = JsonParser.parseString(
-        ctx.body()
-      ).getAsJsonObject();
+      JsonObject jsonObject = JsonParser.parseString(ctx.body()).getAsJsonObject();
 
       if (jsonObject.get("gameName") == null) {
         throw new DataAccessException("bad request");
@@ -142,10 +135,7 @@ public class ServerHandler {
 
       String gameName = jsonObject.get("gameName").getAsString();
 
-      CreateGameRequest createGameRequest = new CreateGameRequest(
-        authToken,
-        gameName
-      );
+      CreateGameRequest createGameRequest = new CreateGameRequest(authToken, gameName);
 
       int id = GAME_SERVICE.createGame(createGameRequest);
       ctx.json(Map.of("gameID", id));
@@ -168,19 +158,15 @@ public class ServerHandler {
       String authToken = ctx.header("Authorization");
       JsonObject reqBody = ctx.bodyAsClass(JsonObject.class);
 
-      if (
-        reqBody == null ||
-        reqBody.get("playerColor") == null ||
-        reqBody.get("gameID") == null
-      ) {
+      if (reqBody == null || reqBody.get("playerColor") == null || reqBody.get("gameID") == null) {
         throw new DataAccessException("bad request");
       }
 
-      JoinGameRequest joinGameRequest = new JoinGameRequest(
-        authToken,
-        reqBody.get("playerColor").getAsString(),
-        reqBody.get("gameID").getAsInt()
-      );
+      JoinGameRequest joinGameRequest =
+          new JoinGameRequest(
+              authToken,
+              reqBody.get("playerColor").getAsString(),
+              reqBody.get("gameID").getAsInt());
 
       GAME_SERVICE.joinGame(joinGameRequest);
 
@@ -227,6 +213,7 @@ public class ServerHandler {
 
   /**
    * Clears entire database
+   *
    * @return empty JSON string or error
    */
   public static void clearDatabase(Context ctx) {

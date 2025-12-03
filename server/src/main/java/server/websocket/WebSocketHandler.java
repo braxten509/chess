@@ -10,6 +10,7 @@ import dataaccess.DataAccessException;
 import dataaccess.database.DatabaseAuthDataAccess;
 import dataaccess.database.DatabaseGameDataAccess;
 import dataaccess.database.DatabaseUserDataAccess;
+import java.io.IOException;
 import model.AuthData;
 import model.GameData;
 import org.eclipse.jetty.websocket.api.Session;
@@ -19,14 +20,14 @@ import service.GameService;
 import service.UserService;
 import websocket.commands.UserGameCommand;
 
-import java.io.IOException;
-
 @WebSocket
 public class WebSocketHandler {
 
   private final ConnectionManager connections = new ConnectionManager();
-  private final UserService userService = new UserService(new DatabaseUserDataAccess(), new DatabaseAuthDataAccess());
-  private final GameService gameService = new GameService(new DatabaseGameDataAccess(), new DatabaseAuthDataAccess());
+  private final UserService userService =
+      new UserService(new DatabaseUserDataAccess(), new DatabaseAuthDataAccess());
+  private final GameService gameService =
+      new GameService(new DatabaseGameDataAccess(), new DatabaseAuthDataAccess());
 
   @OnWebSocketMessage
   public void onMessage(Session session, String message) throws IOException, DataAccessException {
@@ -36,7 +37,8 @@ public class WebSocketHandler {
     int gameID = command.getGameID();
     String username = authData.username();
 
-    System.out.println("(Server.WebSocketHandler::onMessage) onMessage triggered by '" + username + "'");
+    System.out.println(
+        "(Server.WebSocketHandler::onMessage) onMessage triggered by '" + username + "'");
 
     switch (commandType) {
       case CONNECT -> join(username, gameID, session);
@@ -46,12 +48,14 @@ public class WebSocketHandler {
   }
 
   private void notify(String triggeringUser) throws IOException {
-    System.out.println("(Server.WebSocketHandler::notify) notify triggered by '" + triggeringUser + "'");
+    System.out.println(
+        "(Server.WebSocketHandler::notify) notify triggered by '" + triggeringUser + "'");
 
     connections.broadcast(triggeringUser, triggeringUser + " made a move");
   }
 
-  private void join(String username, int gameID, Session session) throws IOException, DataAccessException {
+  private void join(String username, int gameID, Session session)
+      throws IOException, DataAccessException {
     connections.add(username, session);
     System.out.println("(Server.WebSocketHandler::join) join triggered by '" + username + "'");
 
@@ -59,5 +63,4 @@ public class WebSocketHandler {
 
     connections.loadGame(username, gameData);
   }
-
 }

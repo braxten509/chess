@@ -17,10 +17,8 @@ public class DatabaseGameDataAccess implements GameDataAccess {
 
   @Override
   public void clear() throws DataAccessException {
-    try (
-      var conn = DatabaseManager.getConnection();
-      var preparedStatement = conn.prepareStatement("DELETE FROM games")
-    ) {
+    try (var conn = DatabaseManager.getConnection();
+        var preparedStatement = conn.prepareStatement("DELETE FROM games")) {
       preparedStatement.executeUpdate();
     } catch (SQLException e) {
       throw new DataAccessException("ERROR clearing database: " + e);
@@ -32,12 +30,10 @@ public class DatabaseGameDataAccess implements GameDataAccess {
     if (!gameName.matches("[^);(]+")) {
       throw new DataAccessException("Game name does not match expected syntax");
     }
-    try (
-      var conn = DatabaseManager.getConnection();
-      var preparedStatement = conn.prepareStatement(
-        "INSERT INTO games (white_username, black_username, game_name, chess_game) VALUES (?, ?, ?, ?)"
-      )
-    ) {
+    try (var conn = DatabaseManager.getConnection();
+        var preparedStatement =
+            conn.prepareStatement(
+                "INSERT INTO games (white_username, black_username, game_name, chess_game) VALUES (?, ?, ?, ?)")) {
       ChessGame newGame = new ChessGame();
       String serializedGame = serializer.toJson(newGame);
 
@@ -47,11 +43,8 @@ public class DatabaseGameDataAccess implements GameDataAccess {
       preparedStatement.setString(4, serializedGame);
       preparedStatement.executeUpdate();
 
-      try (
-        var preparedStatement2 = conn.prepareStatement(
-          "SELECT game_id FROM games WHERE game_name = ?"
-        )
-      ) {
+      try (var preparedStatement2 =
+          conn.prepareStatement("SELECT game_id FROM games WHERE game_name = ?")) {
         preparedStatement2.setString(1, gameName);
         try (ResultSet resultSet = preparedStatement2.executeQuery()) {
           if (resultSet.next()) {
@@ -67,12 +60,8 @@ public class DatabaseGameDataAccess implements GameDataAccess {
 
   @Override
   public GameData getGame(int gameID) throws DataAccessException {
-    try (
-      var conn = DatabaseManager.getConnection();
-      var preparedStatement = conn.prepareStatement(
-        "SELECT * FROM games WHERE game_id = ?"
-      )
-    ) {
+    try (var conn = DatabaseManager.getConnection();
+        var preparedStatement = conn.prepareStatement("SELECT * FROM games WHERE game_id = ?")) {
       preparedStatement.setInt(1, gameID);
       try (ResultSet result = preparedStatement.executeQuery()) {
         if (result.next()) {
@@ -81,18 +70,9 @@ public class DatabaseGameDataAccess implements GameDataAccess {
           String gameName = result.getString("game_name");
           String serializedGame = result.getString("chess_game");
 
-          ChessGame deserializedGame = serializer.fromJson(
-            serializedGame,
-            ChessGame.class
-          );
+          ChessGame deserializedGame = serializer.fromJson(serializedGame, ChessGame.class);
 
-          return new GameData(
-            gameID,
-            whiteUsername,
-            blackUsername,
-            gameName,
-            deserializedGame
-          );
+          return new GameData(gameID, whiteUsername, blackUsername, gameName, deserializedGame);
         }
         return null;
       }
@@ -103,7 +83,7 @@ public class DatabaseGameDataAccess implements GameDataAccess {
 
   @Override
   public void joinGame(String playerColor, int gameID, String playerUsername)
-    throws DataAccessException {
+      throws DataAccessException {
     boolean validID = false;
     for (GameData game : listGames()) {
       if (game.gameID() == gameID) {
@@ -123,10 +103,8 @@ public class DatabaseGameDataAccess implements GameDataAccess {
     if (gameID == 0) {
       throw new DataAccessException("Non-existent game");
     }
-    try (
-      var conn = DatabaseManager.getConnection();
-      var preparedStatement = conn.prepareStatement(sqlString)
-    ) {
+    try (var conn = DatabaseManager.getConnection();
+        var preparedStatement = conn.prepareStatement(sqlString)) {
       preparedStatement.setString(1, playerUsername);
       preparedStatement.setInt(2, gameID);
       preparedStatement.executeUpdate();
@@ -138,10 +116,8 @@ public class DatabaseGameDataAccess implements GameDataAccess {
   @Override
   public ArrayList<GameData> listGames() throws DataAccessException {
     ArrayList<GameData> gamesList = new ArrayList<>();
-    try (
-      var conn = DatabaseManager.getConnection();
-      var preparedStatement = conn.prepareStatement("SELECT * FROM games")
-    ) {
+    try (var conn = DatabaseManager.getConnection();
+        var preparedStatement = conn.prepareStatement("SELECT * FROM games")) {
       try (ResultSet resultSet = preparedStatement.executeQuery()) {
         while (resultSet.next()) {
           var id = resultSet.getInt("game_id");
@@ -150,20 +126,9 @@ public class DatabaseGameDataAccess implements GameDataAccess {
           var gameName = resultSet.getString("game_name");
           String serializedGame = resultSet.getString("chess_game");
 
-          ChessGame deserializedGame = serializer.fromJson(
-            serializedGame,
-            ChessGame.class
-          );
+          ChessGame deserializedGame = serializer.fromJson(serializedGame, ChessGame.class);
 
-          gamesList.add(
-            new GameData(
-              id,
-              whiteUsername,
-              blackUsername,
-              gameName,
-              deserializedGame
-            )
-          );
+          gamesList.add(new GameData(id, whiteUsername, blackUsername, gameName, deserializedGame));
         }
       }
     } catch (SQLException e) {

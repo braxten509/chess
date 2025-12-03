@@ -29,15 +29,37 @@ public class ChessPiece {
   }
 
   /**
-   * The various different chess piece options
+   * Determines if a move is in bounds or not
+   * @param myPosition initial position
+   * @param rowChange UP/DOWN/NO_CHANGE
+   * @param colChange LEFT/RIGHT/NO_CHANGE
+   * @return returns true if inbounds and false if not
    */
-  public enum PieceType {
-    KING,
-    QUEEN,
-    BISHOP,
-    KNIGHT,
-    ROOK,
-    PAWN,
+  protected static boolean isInBounds(
+    ChessPosition myPosition,
+    int rowChange,
+    int colChange
+  ) {
+    int newRow = myPosition.getRow() + rowChange;
+    int newCol = myPosition.getColumn() + colChange;
+    return newRow >= 1 && newRow <= 8 && newCol >= 1 && newCol <= 8;
+  }
+
+  protected static void addMoves(
+    ArrayList<ChessMove> validMoves,
+    ChessPosition myPosition,
+    ChessPosition checkingPosition
+  ) {
+    validMoves.add(
+      new ChessMove(myPosition, checkingPosition, PieceType.QUEEN)
+    );
+    validMoves.add(
+      new ChessMove(myPosition, checkingPosition, PieceType.KNIGHT)
+    );
+    validMoves.add(
+      new ChessMove(myPosition, checkingPosition, PieceType.BISHOP)
+    );
+    validMoves.add(new ChessMove(myPosition, checkingPosition, PieceType.ROOK));
   }
 
   /**
@@ -101,40 +123,6 @@ public class ChessPiece {
     }
 
     return validMoves;
-  }
-
-  /**
-   * Determines if a move is in bounds or not
-   * @param myPosition initial position
-   * @param rowChange UP/DOWN/NO_CHANGE
-   * @param colChange LEFT/RIGHT/NO_CHANGE
-   * @return returns true if inbounds and false if not
-   */
-  protected static boolean isInBounds(
-    ChessPosition myPosition,
-    int rowChange,
-    int colChange
-  ) {
-    int newRow = myPosition.getRow() + rowChange;
-    int newCol = myPosition.getColumn() + colChange;
-    return newRow >= 1 && newRow <= 8 && newCol >= 1 && newCol <= 8;
-  }
-
-  protected static void addMoves(
-    ArrayList<ChessMove> validMoves,
-    ChessPosition myPosition,
-    ChessPosition checkingPosition
-  ) {
-    validMoves.add(
-      new ChessMove(myPosition, checkingPosition, PieceType.QUEEN)
-    );
-    validMoves.add(
-      new ChessMove(myPosition, checkingPosition, PieceType.KNIGHT)
-    );
-    validMoves.add(
-      new ChessMove(myPosition, checkingPosition, PieceType.BISHOP)
-    );
-    validMoves.add(new ChessMove(myPosition, checkingPosition, PieceType.ROOK));
   }
 
   /**
@@ -332,5 +320,17 @@ public class ChessPiece {
   @Override
   public int hashCode() {
     return Objects.hash(pieceColor, type);
+  }
+
+  /**
+   * The various different chess piece options
+   */
+  public enum PieceType {
+    KING,
+    QUEEN,
+    BISHOP,
+    KNIGHT,
+    ROOK,
+    PAWN,
   }
 }

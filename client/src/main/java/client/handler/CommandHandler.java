@@ -1,29 +1,27 @@
 package client.handler;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Scanner;
+import static client.ChessClient.*;
+import static ui.EscapeSequences.*;
 
 import client.facade.ServerFacade;
 import client.facade.WebSocketFacade;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Scanner;
 import model.AuthData;
 import model.GameData;
 import ui.SpacingType;
 import websocket.commands.UserGameCommand;
 
-import static client.ChessClient.*;
-import static ui.EscapeSequences.*;
-
 /**
- * Class that contains all the commands that can be executed by the user,
- * including some helper methods.
+ * Class that contains all the commands that can be executed by the user, including some helper
+ * methods.
  */
 public class CommandHandler {
 
   private static final Scanner SCANNER = new Scanner(System.in);
-  private static String authToken = "";
-
   private static final HashMap<Integer, Integer> LISTED_GAMES = new HashMap<>();
+  private static String authToken = "";
 
   private static void loadValues(ServerFacade serverFacade) {
     ArrayList<GameData> games = serverFacade.listGames(authToken).games();
@@ -36,18 +34,12 @@ public class CommandHandler {
     }
   }
 
-  /**
-   * Command used to clear the client's terminal.
-   */
+  /** Command used to clear the client's terminal. */
   public static void clearCommand() {
 
     printf("", SpacingType.REGULAR, ERASE_SCREEN);
     System.out.flush();
-    printf(
-        "♕ Welcome to Chess! Type 'help' to get started ♕",
-        SpacingType.UNDER,
-        null
-    );
+    printf("♕ Welcome to Chess! Type 'help' to get started ♕", SpacingType.UNDER, null);
   }
 
   /**
@@ -58,8 +50,10 @@ public class CommandHandler {
    */
   public static boolean checkForQuit(String userInput) {
     if (userInput.matches("\\bquit\\b\\s*\\S+") || userInput.matches("\\bexit\\b\\s*\\S+")) {
-      printf("Improper number of parameters. Expected 0. Use: <quit/exit>",
-          SpacingType.SURROUND, SET_TEXT_COLOR_YELLOW);
+      printf(
+          "Improper number of parameters. Expected 0. Use: <quit/exit>",
+          SpacingType.SURROUND,
+          SET_TEXT_COLOR_YELLOW);
       return false;
     } else {
       if (userInput.matches("\\bquit\\b") || userInput.matches("\\bexit\\b")) {
@@ -71,57 +65,38 @@ public class CommandHandler {
     }
   }
 
-  /**
-   * Lists available commands for the user.
-   */
+  /** Lists available commands for the user. */
   public static void helpCommand() {
 
-    printf(
-        "AVAILABLE COMMANDS",
-        SpacingType.SURROUND,
-        SET_TEXT_COLOR_YELLOW + SET_TEXT_BOLD
-    );
-    
+    printf("AVAILABLE COMMANDS", SpacingType.SURROUND, SET_TEXT_COLOR_YELLOW + SET_TEXT_BOLD);
+
     printf("help", SpacingType.NONE, SET_TEXT_COLOR_YELLOW);
     printf(" : lists all available commands", SpacingType.REGULAR, null);
-    
+
     if (userStatus.equals("LOGGED_OUT")) {
-      printf(
-          "login <username> <password>",
-          SpacingType.NONE,
-          SET_TEXT_COLOR_YELLOW
-      );
-      
+      printf("login <username> <password>", SpacingType.NONE, SET_TEXT_COLOR_YELLOW);
+
       printf(" : login an existing user", SpacingType.REGULAR, null);
-      printf(
-          "register <username> <password> <email>",
-          SpacingType.NONE,
-          SET_TEXT_COLOR_YELLOW
-      );
-      
+      printf("register <username> <password> <email>", SpacingType.NONE, SET_TEXT_COLOR_YELLOW);
+
       printf(" : register a new user", SpacingType.REGULAR, null);
-      
+
     } else {
-      
+
       printf("logout", SpacingType.NONE, SET_TEXT_COLOR_YELLOW);
       printf(" : logout of current session", SpacingType.REGULAR, null);
       printf("create <name>", SpacingType.NONE, SET_TEXT_COLOR_YELLOW);
       printf(" : create a new game", SpacingType.REGULAR, null);
       printf("list", SpacingType.NONE, SET_TEXT_COLOR_YELLOW);
       printf(" : list games", SpacingType.REGULAR, null);
-      
-      printf(
-          "join <ID> [WHITE|BLACK]",
-          SpacingType.NONE,
-          SET_TEXT_COLOR_YELLOW
-      );
-      
+
+      printf("join <ID> [WHITE|BLACK]", SpacingType.NONE, SET_TEXT_COLOR_YELLOW);
+
       printf(" : join an existing game", SpacingType.REGULAR, null);
       printf("observe <ID>", SpacingType.NONE, SET_TEXT_COLOR_YELLOW);
       printf(" : watch an ongoing game", SpacingType.REGULAR, null);
-      
     }
-    
+
     printf("clear", SpacingType.NONE, SET_TEXT_COLOR_YELLOW);
     printf(" : clears the current terminal", SpacingType.REGULAR, null);
     printf("quit", SpacingType.NONE, SET_TEXT_COLOR_YELLOW);
@@ -137,7 +112,7 @@ public class CommandHandler {
    * @param userInput user userInput to use
    */
   public static void loginCommand(ServerFacade serverFacade, String userInput) {
-    
+
     String username = userInput.split("\\s")[1];
     String password = userInput.split("\\s")[2];
 
@@ -146,18 +121,10 @@ public class CommandHandler {
       authToken = authData.authToken();
       loadValues(serverFacade);
 
-      printf(
-          "Success! You have been logged in",
-          SpacingType.SURROUND,
-          SET_TEXT_COLOR_GREEN
-      );
+      printf("Success! You have been logged in", SpacingType.SURROUND, SET_TEXT_COLOR_GREEN);
       userStatus = username.toUpperCase();
     } catch (Exception e) {
-      printf(
-          "Error: Invalid credentials",
-          SpacingType.SURROUND,
-          SET_TEXT_COLOR_RED
-      );
+      printf("Error: Invalid credentials", SpacingType.SURROUND, SET_TEXT_COLOR_RED);
     }
   }
 
@@ -173,11 +140,7 @@ public class CommandHandler {
       userStatus = "LOGGED_OUT";
       printf("Logout successful!", SpacingType.SURROUND, SET_TEXT_COLOR_GREEN);
     } catch (Exception e) {
-      printf(
-          "Error logging out: " + e.getMessage(),
-          SpacingType.SURROUND,
-          SET_TEXT_COLOR_RED
-      );
+      printf("Error logging out: " + e.getMessage(), SpacingType.SURROUND, SET_TEXT_COLOR_RED);
     }
   }
 
@@ -196,11 +159,7 @@ public class CommandHandler {
     String confirmedPassword = SCANNER.next();
 
     if (!password.equals(confirmedPassword)) {
-      printf(
-          "Error: Passwords do not match.",
-          SpacingType.SURROUND,
-          SET_TEXT_COLOR_RED
-      );
+      printf("Error: Passwords do not match.", SpacingType.SURROUND, SET_TEXT_COLOR_RED);
       return;
     }
 
@@ -213,22 +172,13 @@ public class CommandHandler {
       printf(
           "Success! You have been registered and logged in",
           SpacingType.SURROUND,
-          SET_TEXT_COLOR_GREEN
-      );
+          SET_TEXT_COLOR_GREEN);
       userStatus = username.toUpperCase();
     } catch (Exception e) {
-      if (
-          e
-              .getMessage()
-              .equals(
-                  "java.lang.RuntimeException: (403) ERROR: {\"message\":\"Error: already taken\"}"
-              )
-      ) {
-        printf(
-            "Error: Username already taken",
-            SpacingType.REGULAR,
-            SET_TEXT_COLOR_RED
-        );
+      if (e.getMessage()
+          .equals(
+              "java.lang.RuntimeException: (403) ERROR: {\"message\":\"Error: already taken\"}")) {
+        printf("Error: Username already taken", SpacingType.REGULAR, SET_TEXT_COLOR_RED);
       }
     }
   }
@@ -247,14 +197,9 @@ public class CommandHandler {
       printf(
           "Success creating game with name '" + gameName + "'!",
           SpacingType.SURROUND,
-          SET_TEXT_COLOR_GREEN
-      );
+          SET_TEXT_COLOR_GREEN);
     } catch (Exception e) {
-      printf(
-          "Error creating game: " + e.getMessage(),
-          SpacingType.SURROUND,
-          SET_TEXT_COLOR_RED
-      );
+      printf("Error creating game: " + e.getMessage(), SpacingType.SURROUND, SET_TEXT_COLOR_RED);
     }
   }
 
@@ -264,7 +209,8 @@ public class CommandHandler {
    * @param serverFacade serverFacade to use
    * @param userInput user userInput to use
    */
-  public static void joinCommand(ServerFacade serverFacade, WebSocketFacade webSocketFacade, String userInput) {
+  public static void joinCommand(
+      ServerFacade serverFacade, WebSocketFacade webSocketFacade, String userInput) {
     int userGivenGameID = Integer.parseInt(userInput.split("\\s+")[1]);
     String playerColor;
     if (userInput.split("\\s+").length > 2) {
@@ -274,11 +220,7 @@ public class CommandHandler {
     }
 
     if (!LISTED_GAMES.containsKey(userGivenGameID)) {
-      printf(
-          "Game does not exist.",
-          SpacingType.SURROUND,
-          SET_TEXT_COLOR_YELLOW
-      );
+      printf("Game does not exist.", SpacingType.SURROUND, SET_TEXT_COLOR_YELLOW);
       return;
     }
 
@@ -301,11 +243,7 @@ public class CommandHandler {
       webSocketFacade.sendCommand(joinCommand);
 
     } catch (Exception e) {
-      printf(
-          "Error joining game: " + e.getMessage(),
-          SpacingType.SURROUND,
-          SET_TEXT_COLOR_RED
-      );
+      printf("Error joining game: " + e.getMessage(), SpacingType.SURROUND, SET_TEXT_COLOR_RED);
     }
   }
 
@@ -315,11 +253,7 @@ public class CommandHandler {
    * @param serverFacade serverFacade to use
    */
   public static void listCommand(ServerFacade serverFacade) {
-    printf(
-        "CURRENT GAMES",
-        SpacingType.ABOVE,
-        SET_TEXT_COLOR_YELLOW + SET_TEXT_BOLD
-    );
+    printf("CURRENT GAMES", SpacingType.ABOVE, SET_TEXT_COLOR_YELLOW + SET_TEXT_BOLD);
     ArrayList<GameData> games = serverFacade.listGames(authToken).games();
 
     LISTED_GAMES.clear();
@@ -337,27 +271,18 @@ public class CommandHandler {
         playerBlack = game.blackUsername().toUpperCase();
         playerCount += 1;
       }
-      printf(
-          gameNumber + ". " + game.gameName() + " ",
-          SpacingType.NONE,
-          SET_TEXT_COLOR_BLUE
-      );
+      printf(gameNumber + ". " + game.gameName() + " ", SpacingType.NONE, SET_TEXT_COLOR_BLUE);
       if (playerCount < 2) {
         printf(playerCount + "/2", SpacingType.REGULAR, SET_TEXT_COLOR_GREEN);
       } else {
         printf(playerCount + "/2", SpacingType.REGULAR, SET_TEXT_COLOR_YELLOW);
       }
       printf("   " + playerWhite, SpacingType.REGULAR, null);
-      printf(
-          "   " + playerBlack,
-          SpacingType.REGULAR,
-          SET_TEXT_COLOR_LIGHT_GREY
-      );
+      printf("   " + playerBlack, SpacingType.REGULAR, SET_TEXT_COLOR_LIGHT_GREY);
 
       LISTED_GAMES.put(gameNumber, game.gameID());
       gameNumber += 1;
     }
     printf("", SpacingType.REGULAR, null);
   }
-
 }

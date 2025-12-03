@@ -2,9 +2,7 @@ package server.websocket;
 
 import io.javalin.websocket.WsContext;
 
-/**
- * This class is used to transmit messages to the designated user.
- */
+/** This class is used to transmit messages to the designated user. */
 public class Connection {
   public String username;
   public WsContext context;
